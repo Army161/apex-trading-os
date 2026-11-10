@@ -8,13 +8,13 @@ Each registered strategy is placed on a grid of style and default timeframe, so 
 |---|---|---|---|
 | trend | supertrend, golden_cross (long) | **gap** | rsi_regime, psar_reverse, psar_adx, sma_10_20, sma50_trend (long) |
 | breakout | **gap** | **gap** | bb_squeeze, turtle_55_20 (long), breakout_50_20 (long) |
-| mean_reversion | **gap** | **gap** | ema50_bands, rsi2_dip (long) |
+| mean_reversion | garch_vol_premium | **gap** | ema50_bands, rsi2_dip (long) |
 | reversal | liq_reversal, liq_reversal_ema, urban_sr_memory, dave_swing_count | liq_fx_levels, sharp_reversal_aoi (long) | failure_test_2b, wyckoff_spring, gws_reversal |
 | sweep | ict_turtle_soup, ict_silver_bullet, ict_turtle_soup_ema | smc_sweep_lite, liq_trend_sweep | **gap** |
 | pullback | ict_unicorn, demand_second_leg, dave_prev_range | anchor_discount (long) | urban_deal_flow |
 | score | **gap** | **gap** | confluence |
 
-**Empty cells (8):** trend / swing, breakout / intraday, breakout / swing, mean_reversion / intraday, mean_reversion / swing, sweep / daily, score / intraday, score / swing.
+**Empty cells (7):** trend / swing, breakout / intraday, breakout / swing, mean_reversion / swing, sweep / daily, score / intraday, score / swing.
 **Long only (1):** pullback / swing.
 
 **Ideas in the archive with no strategy yet:**

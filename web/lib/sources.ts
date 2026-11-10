@@ -561,6 +561,48 @@ export const SOURCES = [
   "notes": "Uploaded file. Ideas only; nothing installed."
  },
  {
+  "id": "chat/81",
+  "title": "MQL5 HFT EA with trailing-stop modes",
+  "feeds": "engine trail.ts (scalp, previous candles, fast MA, Tenkan) in backtest(); paper-exchange trail.py",
+  "file": "archive/chat/81-mql5-hft-ea-trailing-stops.md",
+  "notes": "Author never tested it; no trail beat the fixed target on the pullback candidate. Unproven."
+ },
+ {
+  "id": "chat/82",
+  "title": "ML and quant strategies course (k-means momentum, Twitter engagement, GARCH intraday)",
+  "feeds": "engine garch.ts garch_vol_premium",
+  "file": "archive/chat/82-freecodecamp-ml-quant-course.md",
+  "notes": "Uploaded file. Course used simulated data. k-means and Twitter projects need data we don't have."
+ },
+ {
+  "id": "chat/83",
+  "title": "Futures bot factory and leaderboard video",
+  "feeds": "lib/leaderboard.ts (board, strict gate, deflated Sharpe), lib/news.ts RSS digest",
+  "file": "archive/chat/83-futures-bot-factory-leaderboard.md",
+  "notes": "556+ bots a day with 90-99% failing: the best results are selection bias. Unproven."
+ },
+ {
+  "id": "chat/84",
+  "title": "Bitcoin CME futures bot livestream",
+  "feeds": "leaderboard consistency (profitable weeks/months) and alpha vs S&P 500",
+  "file": "archive/chat/84-btc-cme-futures-bot-livestream.md",
+  "notes": "Mostly promotion. No Rithmic package installed, no signups."
+ },
+ {
+  "id": "chat/85",
+  "title": "Micro Bitcoin futures sample bot walkthrough",
+  "feeds": "paper-exchange runner.py (closed bars, 60m/5m, env settings, loss limits, run manifest)",
+  "file": "archive/chat/85-micro-btc-futures-sample-bot-walkthrough.md",
+  "notes": "His bot not downloaded. 821% across 765 bots is a multiple-testing artifact."
+ },
+ {
+  "id": "chat/86",
+  "title": "Scaling 100 futures bots and free samples",
+  "feeds": "backtest dayTarget/dayLoss, engine session.ts skipMidday",
+  "file": "archive/chat/86-scaling-100-futures-bots-free-samples.md",
+  "notes": "Neither rule beat always-on in our tests. 4 wins and 0 losses means nothing yet."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",

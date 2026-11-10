@@ -11,3 +11,5 @@ What we took from the HFT talks, and what we didn't:
 - Every order passes the risk gate before it rests: size, notional, position, order rate, price band, and repeated rejects pause the strategy.
 - The kill switch uses the same `pause` / `resume` / `kill` commands as the other bots. After a kill, the gate refuses everything until the process restarts.
 - Fills come only from replayed market prints, and every state change is logged with `mode: paper`.
+- Trailing stops (`trail.py`, chat/81) only ever tighten, stay past the entry, respect the stop level, and are capped at `max_mods_per_min` modifications.
+- The closed-bar runner (`runner.py`, chat/85) acts only on closed bars, reads its settings from env vars, defaults to `APEX_TRADABLE=no`, and has no live mode.

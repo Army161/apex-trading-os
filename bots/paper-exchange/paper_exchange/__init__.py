@@ -7,3 +7,5 @@ from .events import Event, EventStream
 from .risk import RiskLimits, RiskGate
 from .orders import PaperOrder, OrderLog
 from .metrics import Latency
+from .trail import TrailConfig, TrailingStop
+from .runner import Runner, Settings

@@ -86,6 +86,12 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 78 | [chat/78-fractal-m1-scalper-interview.md](chat/78-fractal-m1-scalper-interview.md) | 2026-11-10 19:14 | 63,078 |
 | 79 | [chat/79-hft-system-architecture.md](chat/79-hft-system-architecture.md) | 2026-11-10 19:15 | 10,069 |
 | 80 | [chat/80-low-latency-cpp-trading-talk.md](chat/80-low-latency-cpp-trading-talk.md) | 2026-11-10 19:17 | 73,935 |
+| 81 | [chat/81-mql5-hft-ea-trailing-stops.md](chat/81-mql5-hft-ea-trailing-stops.md) | 2026-11-10 19:54 | 26,781 |
+| 82 | [chat/82-freecodecamp-ml-quant-course.md](chat/82-freecodecamp-ml-quant-course.md) | 2026-11-10 19:55 | 123,038 |
+| 83 | [chat/83-futures-bot-factory-leaderboard.md](chat/83-futures-bot-factory-leaderboard.md) | 2026-11-10 19:59 | 19,312 |
+| 84 | [chat/84-btc-cme-futures-bot-livestream.md](chat/84-btc-cme-futures-bot-livestream.md) | 2026-11-10 20:00 | 26,005 |
+| 85 | [chat/85-micro-btc-futures-sample-bot-walkthrough.md](chat/85-micro-btc-futures-sample-bot-walkthrough.md) | 2026-11-10 20:00 | 25,317 |
+| 86 | [chat/86-scaling-100-futures-bots-free-samples.md](chat/86-scaling-100-futures-bots-free-samples.md) | 2026-11-10 20:01 | 27,936 |
 
 ## Uploaded files
 

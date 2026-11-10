@@ -45,10 +45,14 @@ The status tags mean:
 | S/R memory + DNA | The second push into a zone is choppier; enter on the failed retest | chat/61 | `urban_sr_memory` | no edge |
 | Previous-range pullback | After a break of structure, a 50% retrace into the leg that broke it, a sweep and a close above the last down candle; target the high | chat/78 | `dave_prev_range` | **candidate**: 6/6 on SPY 30m/1h and on fresh IWM 30m/1h; fails on 4h and daily; mostly shorts |
 | Swing-count reversal | Counter-trend only after 4+ swings into a higher-timeframe level | chat/78 | `dave_swing_count` | too few trades to judge |
+| GARCH volatility premium | Fade an intraday RSI/Bollinger extreme on days after GARCH forecasts more volatility than recent history | chat/82 | `garch_vol_premium` | too few trades (1-4 in two years) |
 | Insider buying | Officer or director open-market buys of $10k or more; hold 5 sessions | chat/46 | `bots/alpaca/daytrader/insider.py` | untested on real data |
 
 ## 5. What the tests taught
 - Buy and hold beat almost every rule on GLD, USO and QQQ in this window. Every rule has to beat that first.
 - Two years of daily data rarely gives 50 trades. Longer history or intraday data comes before any verdict.
 - Filters cut the trade count faster than they lift quality. Test each filter on and off.
+- Trailing stops (chat/78 and chat/81) all did worse than the fixed target on the pullback candidate.
+- Daily profit-target stops and skipping the midday lull (chat/86) did not help either.
+- The best of many tries looks good by luck alone: the best of 500 no-edge bots has a Sharpe near 2.6. Count every try (`docs/bot-factory-and-leaderboard.md`).
 - Gaps in the library are listed in `docs/strategy-gaps.md`.

@@ -116,3 +116,58 @@ Why this is a **candidate, not a proven edge**:
 - **Exits:** the fixed target beat all three trailing exits (bullish candle lows, swing lows, 21 EMA close-below) on most sets. A swing-low trail at a 70% depth also passed on SPY 30m (72 trades).
 - **Skipping the first hour of the New York open** made little difference. It cut about 17% of trades and passed 6/6 on SPY 30m and IWM 30m, but it fell to 4/6 on IWM 1h.
 - **Top-down alignment (4× and 16× timeframes agree)** cut trades by about 85% and made results worse. We have no 1m or 15m data, so his exact daily/4h/15m/1m stack couldn't be tested.
+
+## chat/81: trailing-stop modes vs Dave's trails (run 2026-11-10)
+
+The MQL5 EA author says he never tested his EA, warns it bleeds in quiet markets, needs low spreads, and sends so many stop
+modifications that a broker may ban the account. We built the four modes ourselves (`web/lib/engine/trail.ts`) with his
+guards: never loosen, keep the stop past the entry, stay on the right side of the bid/ask, and respect a broker stop level.
+The trail is measured from the bid (ask for shorts) with a 0.02% spread, and every stop modification is counted. All on the
+chat/78 previous-range pullback (0.5 depth), fees 0.02% a side, full six checks. Cells: checks passed · trades · return.
+
+| Exit | SPY 30m | SPY 1h | QQQ 30m | QQQ 1h | IWM 30m | IWM 1h | Mods/trade |
+|---|---|---|---|---|---|---|---|
+| fixed target (baseline) | 6/6 · 109 · +9.9% | 6/6 · 51 · +9.1% | 5/6 · 96 · +8.9% | 1/6 · 49 · -4.9% | 6/6 · 73 · +11.6% | 6/6 · 56 · +12.7% | 0.0 |
+| dave: candle-low trail | 1/6 · 151 · -1.3% | 1/6 · 77 · -4.3% | 1/6 · 162 · -6.2% | 1/6 · 76 · -10.2% | 2/6 · 131 · -1.7% | 1/6 · 74 · +0.3% | 0.0 |
+| dave: swing-low trail | 1/6 · 136 · -7.1% | 2/6 · 70 · -4.6% | 1/6 · 148 · -9.8% | 1/6 · 73 · -16.6% | 1/6 · 122 · -8.4% | 1/6 · 67 · -3.5% | 0.0 |
+| dave: 21 EMA trail | 1/6 · 142 · -3.4% | 1/6 · 74 · -6.3% | 1/6 · 146 · -5.2% | 1/6 · 73 · -14.4% | 2/6 · 126 · -6.1% | 1/6 · 64 · -5.5% | 0.0 |
+| ea: scalp 0.5/0.3 ATR | 1/6 · 152 · -4.0% | 1/6 · 76 · -4.2% | 2/6 · 156 · -2.2% | 2/6 · 75 · -5.4% | 2/6 · 129 · -5.1% | 5/6 · 73 · +3.4% | 1.2 |
+| ea: scalp 1.0/0.5 ATR | 1/6 · 146 · +0.6% | 2/6 · 73 · -4.5% | 3/6 · 152 · -1.3% | 1/6 · 68 · -5.7% | 2/6 · 124 · -0.8% | 6/6 · 69 · +7.5% | 1.3 |
+| ea: scalp 0.5/0.3 + target | 1/6 · 152 · -5.4% | 1/6 · 76 · -3.4% | 2/6 · 156 · -2.4% | 1/6 · 76 · -3.5% | 2/6 · 129 · -3.9% | 5/6 · 73 · +4.0% | 0.8 |
+| ea: previous 2 candles | 1/6 · 146 · -3.5% | 1/6 · 71 · -2.7% | 6/6 · 136 · +7.8% | 2/6 · 69 · -3.8% | 3/6 · 125 · +3.4% | 6/6 · 71 · +10.8% | 2.1 |
+| ea: previous 3 candles + target | 1/6 · 144 · -1.9% | 2/6 · 71 · -3.6% | 6/6 · 136 · +7.4% | 1/6 · 67 · -6.4% | 3/6 · 124 · +3.5% | 6/6 · 73 · +7.7% | 1.1 |
+| ea: fast EMA 9 | 1/6 · 148 · -5.7% | 1/6 · 70 · -6.3% | 2/6 · 151 · -3.3% | 1/6 · 67 · -9.1% | 3/6 · 126 · -3.0% | 5/6 · 69 · +5.9% | 3.5 |
+| ea: Tenkan-sen 9 | 1/6 · 146 · -3.2% | 1/6 · 69 · -9.0% | 1/6 · 131 · -3.9% | 1/6 · 66 · -5.9% | 3/6 · 126 · -7.8% | 3/6 · 69 · +0.6% | 2.6 |
+| ea: Tenkan-sen 9 + target | 1/6 · 148 · -6.7% | 1/6 · 69 · -6.7% | 2/6 · 134 · +0.2% | 1/6 · 67 · -1.1% | 3/6 · 127 · -2.6% | 3/6 · 73 · +1.4% | 1.2 |
+
+- **No trail beat the fixed target.** The fixed target passed 6/6 on four sets; the best trail (previous 2 candles) passed on
+  two (QQQ 30m, IWM 1h) and lost money on SPY. Trailing cuts winners short, so the strategy re-enters more often and pays more fees.
+- **Modification counts here are a floor.** We decide on 30m/1h closes, so it is 1 to 3.5 changes a trade. His EA trails on
+  every tick, which is where the broker-ban warning comes from. The paper-bot version (`bots/paper-exchange/paper_exchange/trail.py`)
+  caps modifications per minute for that reason.
+- Status: **unproven, no edge.** Reproduce with `cd web && npx tsx scripts/validate-trails.ts`.
+
+## chat/82: GARCH volatility-premium intraday rule (run 2026-11-10)
+
+The course built this on simulated data, so its equity curve proves nothing. Our version (`garch_vol_premium`) fits a
+GARCH(1,1) (we recover alpha 0.091, beta 0.853 from simulated data with true 0.10/0.85), needs 180 days for the fit and
+another 180 for the premium's own spread. With two years of real data that leaves about 140 tradable days, and the rule
+fired 1 to 4 times on SPY, QQQ and IWM 30m (returns -0.8% to +1.1%). **Too few trades to judge.** It needs a longer daily
+history; our data plan returns two years. The course's k-means momentum portfolio needs the full S&P 500 universe and the
+Twitter engagement strategy needs a sentiment dataset; neither is built. Reproduce with `npx tsx scripts/validate-garch.ts`.
+
+## chat/86: daily profit-target stop and midday filter vs always-on (run 2026-11-10)
+
+Tested on SPY, QQQ and IWM at 30m and 1h (6 sets each), averages across sets:
+
+| Strategy | Always on | Skip 11:30-13:30 NY | Stop at +0.5% day | Stop at +1% day | Stop at -1% day |
+|---|---|---|---|---|---|
+| dave_prev_range | +7.9%, 4/6 sets pass | +6.5%, 4/6 | +7.5%, 4/6 | +7.3%, 4/6 | +8.0%, 5/6 |
+| smc_sweep_lite | -9.7%, 0/6 | -7.4%, 0/6 | -9.2%, 0/6 | -9.2%, 0/6 | -10.3%, 0/6 |
+| rsi2_dip | -2.0%, 0/6 | -1.9%, 0/6 | -2.0%, 0/6 | -2.0%, 0/6 | -2.0%, 0/6 |
+
+- **Neither rule turned a loser into a winner, and neither helped the candidate in any meaningful way.** The -1% daily loss
+  stop moved one set (QQQ 30m) from 5/6 to 6/6 by 0.7 points; that is one test out of many, so it counts as noise.
+- Skipping the midday lull cut losses a little on the sweep rule but cost the candidate 1.4 points.
+- The author's "4 wins, 0 losses" bots are far below our 50-trade minimum and mean nothing yet.
+- Reproduce with `npx tsx scripts/validate-session.ts`.

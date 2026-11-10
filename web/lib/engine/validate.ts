@@ -3,7 +3,7 @@
 import { Bar, Sig, Trade, backtest } from './core';
 
 export const MIN_TRADES = 50;
-type Opts = { capital?: number; risk?: number; fee?: number; slip?: number };
+type Opts = { capital?: number; risk?: number; fee?: number; slip?: number; dayTarget?: number; dayLoss?: number };
 
 /** Deterministic PRNG so every run of a check gives the same answer (Park-Miller). */
 export const rng = (seed = 7) => { let s = Math.max(1, Math.floor(seed) % 2147483647); return () => (s = (s * 16807) % 2147483647) / 2147483647; };

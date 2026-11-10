@@ -1,5 +1,6 @@
 import { dealFlow, srMemory } from './urban';
 import { swingCount, prevRange } from './dave';
+import { garchIntraday } from './garch';
 import { Bar, Sig, atr, sma, ema, rsi, adx, rollMax, rollMin, shift, stdev, candles, swings, supertrend } from './core';
 import { goldenCross, turtleSoup, silverBullet, unicorn, ictPoints } from './ict';
 import { sarReverse, maCross, bandRevert, withEmaRegime, withAdx, regimePoints } from './trend';
@@ -102,6 +103,8 @@ export const STRATEGIES: StratDef[] = [
     build: swingCount() },
   { id: 'dave_prev_range', name: 'Previous-Range Pullback', source: 'chat/78', direction: 'both', tf: '1h', desc: 'After a break of structure, wait for a 50% retrace into the range that caused it, a sweep and a close above the last down candle; target the high it retraced from. Candidate: passed all 6 checks on SPY and IWM 30m/1h (mostly shorts), fails on 4h/daily; needs forward paper trading. His P&L claims are unproven.',
     build: prevRange() },
+  { id: 'garch_vol_premium', name: 'GARCH Volatility Premium Fade', source: 'chat/82', direction: 'both', tf: '30m', desc: 'Daily: GARCH(1,1) forecast vs 180-day variance; when the premium is beyond 1.5 of its own standard deviations, fade an intraday RSI(20) + Bollinger extreme the next day and exit before the close. The course used simulated data. On real SPY/QQQ/IWM it made 1 to 4 trades in two years: too few to judge.',
+    build: garchIntraday() },
   { id: 'buy_hold', name: 'Buy & Hold (benchmark)', source: 'benchmark', direction: 'long', tf: 'any', desc: 'Buys the first bar and holds.',
     build: b => { const s = empty(b.length); s.le[0] = true; s.stop[0] = b[0].c * 1e-4; s.fullSize = true; return s; } },
 ];

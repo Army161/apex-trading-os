@@ -19,6 +19,10 @@ import { decide, rosterRules, newAgent, afterRun, redact, purposeStale, asks, sh
 import { gate, ruleFilter } from '../decide';
 import { pickModel, markDown } from '../router';
 import { gapScan } from './gaps';
+import { makeTrailer, TrailMode } from './trail';
+import { boardRow, strictGate, deflatedSharpe, expectedMaxSharpe } from '../leaderboard';
+import { parseFeed, digest } from '../news';
+import { garchFit } from './garch';
 import { simulateMM, leadLag, convert } from './mm';
 import { timeSplit, holdSameBalances } from './validate';
 const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/parity.json'), 'utf8'));
@@ -221,6 +225,45 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
   const h = holdSameBalances({ BTC: 1, USD: 1000 }, { BTC: 100 }, { BTC: 110 }); const m6 = Math.abs(h.ret - 10 / 1100) < 1e-12;
   const ok = m1 && m2 && m3 && m4 && m5 && m6;
   console.log(`${ok ? 'PASS' : 'FAIL'} market making: spread capture ${m1}, adverse selection ${m2}, lead-lag ${m3} (lag ${ll.best.lag}, offset ${(ll.offsetPct * 100).toFixed(2)}%), fx convert ${m4}, time split ${m5}, hold benchmark ${m6}`); if (!ok) fail++;
+}
+{
+  // chat/81 trailing stops: price climbs 1 a bar for 40 bars, then drops hard. Every mode should ratchet the stop up, never
+  // down, and exit on the drop in profit; the guards refuse a looser stop, a stop behind the entry, and one inside the stop level.
+  const up: Bar[] = Array.from({ length: 80 }, (_, i) => { const c = i < 60 ? 100 + i : 159 - 4 * (i - 59); return { t: i * 864e5, o: c - 0.5, h: c + 1, l: c - 1, c, v: 1 }; });
+  const res = (['scalp', 'candles', 'ma', 'tenkan'] as TrailMode[]).map(mode => {
+    const n = up.length, sig: Sig = { le: Array(n).fill(false), se: Array(n).fill(false), lx: Array(n).fill(false), sx: Array(n).fill(false), stop: Array(n).fill(NaN), target: Array(n).fill(NaN), trail: { mode, spread: 0.0002 } };
+    sig.le[20] = true; sig.stop[20] = 110;
+    const t = backtest(up, sig, { fee: 0, slip: 0 }).trades[0];
+    return { mode, ok: !!t && t.reason === 'trail' && t.pnl > 0 && (t.mods ?? 0) > 3 && t.stop0 === 110, mods: t?.mods };
+  });
+  const tr = makeTrailer(up, { mode: 'scalp', trigger: 0, distance: 1 });
+  const g1 = isNaN(tr(50, 1, 120, 200)), g2 = isNaN(tr(50, 1, 160, 100)), g3 = !isNaN(tr(50, 1, 120, 100));
+  const g4 = isNaN(makeTrailer(up, { mode: 'scalp', trigger: 0, distance: 1, stopLevel: 5 })(50, 1, 120, 100));
+  const ok = res.every(r => r.ok) && g1 && g2 && g3 && g4;
+  console.log(`${ok ? 'PASS' : 'FAIL'} trailing stops: ${res.map(r => `${r.mode} ${r.ok} (${r.mods} mods)`).join(', ')}; never loosen ${g1}, beyond entry ${g2}, moves when allowed ${g3}, stop level ${g4}`); if (!ok) fail++;
+}
+{
+  // chat/83-86: leaderboard, strict gate with a multiple-testing charge, daily stops, news digest, GARCH fit.
+  let seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const gauss = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+  const mk = (id: string, drift: number, n = 250) => ({ id, capital: 10000, trades: Array.from({ length: n }, (_, i) => ({ t: Date.UTC(2025, 0, 1) + Math.floor(i * 7 / 5) * 864e5 + 72e6, pnl: 100 * (drift + gauss()) })) });
+  // 500 bots with no edge: the best one looks good alone but fails once the 500 tries are counted
+  const bots = Array.from({ length: 500 }, (_, i) => mk('b' + i, 0)), best = bots.map(b => boardRow(b)).sort((a, b) => b.sharpe - a.sharpe)[0];
+  const lone = deflatedSharpe(bots.map(b => b).find(b => b.id === best.id)!.trades.map(t => t.pnl / 10000), 1).psr, counted = strictGate(bots.find(b => b.id === best.id)!, { nTrials: 500, maxDrawdown: 1, minProfitableMonths: 0 });
+  const real = strictGate(mk('edge', 0.5), { nTrials: 500, maxDrawdown: 1, minProfitableMonths: 0 });
+  const l1 = best.sharpe > 1.5 && lone > 0.95 && !counted.pass && real.pass && expectedMaxSharpe(500, 250) > expectedMaxSharpe(10, 250);
+  const row = boardRow({ id: 'x', capital: 1000, trades: [{ t: 0, pnl: 10 }, { t: 864e5, pnl: -5 }, { t: 2 * 864e5, pnl: 20 }] }), l2 = row.wins === 2 && row.losses === 1 && Math.abs(row.profitFactor - 6) < 1e-9 && row.grade === 'D';
+  // daily stop: two winning trades on one day, the second is skipped once the +0.5% target is hit (the first win is +0.67%)
+  const n = 20, day: Bar[] = Array.from({ length: n }, (_, i) => ({ t: Date.UTC(2025, 0, 2, 14) + i * 18e5, o: 100 + i, h: 101 + i, l: 99.5 + i, c: 100.5 + i, v: 1 }));
+  const sg: Sig = { le: Array(n).fill(false), se: Array(n).fill(false), lx: Array(n).fill(false), sx: Array(n).fill(false), stop: Array(n).fill(NaN), target: Array(n).fill(NaN) };
+  sg.le[1] = true; sg.stop[1] = 99; sg.target[1] = 104; sg.le[6] = true; sg.stop[6] = 104; sg.target[6] = 109;
+  const d1 = backtest(day, sg, { fee: 0, slip: 0 }).trades.length, d2 = backtest(day, sg, { fee: 0, slip: 0, dayTarget: 0.005 }).trades.length, l3 = d1 === 2 && d2 === 1;
+  const xml = '<rss><channel><item><title>Hedge funds pile into crude oil longs</title><link>https://x/1</link><pubDate>Mon, 10 Nov 2025 10:00:00 GMT</pubDate></item><item><title>Local bakery opens</title><link>https://x/2</link></item><item><title><![CDATA[Fed &amp; Treasury yields]]></title><link>https://x/3</link></item></channel></rss>';
+  const dg = digest(parseFeed(xml, 'x')), l4 = dg.items.length === 2 && dg.items[0].who.includes('hedge_funds') && dg.items[0].markets.includes('energy') && dg.byWho.central_banks === 1;
+  let h = 1e-4, x = 0; const sim: number[] = []; for (let i = 0; i < 2000; i++) { h = 2e-6 + 0.1 * x * x + 0.85 * h; x = Math.sqrt(h) * gauss(); sim.push(x); }
+  const gf = garchFit(sim), l5 = Math.abs(gf.alpha - 0.1) < 0.05 && Math.abs(gf.beta - 0.85) < 0.07;
+  const ok = l1 && l2 && l3 && l4 && l5;
+  console.log(`${ok ? 'PASS' : 'FAIL'} leaderboard and gates: luck caught by the 500-try charge ${l1} (best Sharpe ${best.sharpe.toFixed(2)}), board row ${l2}, daily target stop ${l3}, news digest ${l4}, GARCH fit ${l5} (a ${gf.alpha.toFixed(3)} b ${gf.beta.toFixed(3)})`); if (!ok) fail++;
 }
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');

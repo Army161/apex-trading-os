@@ -2,8 +2,9 @@
 // decide on bar close, fill at next open, stops intrabar (stop first if both touched), fees both sides,
 // size = equity * risk / stop distance capped at 1x equity notional.
 export type Bar = { t: number; o: number; h: number; l: number; c: number; v: number };
-export type Sig = { le: boolean[]; se: boolean[]; lx: boolean[]; sx: boolean[]; stop: number[]; target: number[]; maxBars?: number; fullSize?: boolean };
-export type Trade = { side: 1 | -1; entryT: number; entry: number; stop: number; target: number; qty: number; exitT: number; exit: number; reason: string; pnl: number; r: number; bars: number };
+export type Sig = { le: boolean[]; se: boolean[]; lx: boolean[]; sx: boolean[]; stop: number[]; target: number[]; maxBars?: number; fullSize?: boolean; trail?: TrailSpec };
+export type Trade = { side: 1 | -1; entryT: number; entry: number; stop: number; target: number; qty: number; exitT: number; exit: number; reason: string; pnl: number; r: number; bars: number; stop0?: number; mods?: number };
+import { makeTrailer, TrailSpec } from './trail';
 
 const N = NaN;
 export const sma = (x: number[], n: number) => { const o = new Array(x.length).fill(N); let s = 0; for (let i = 0; i < x.length; i++) { s += x[i]; if (i >= n) s -= x[i - n]; if (i >= n - 1) o[i] = s / n; } return o; };
@@ -58,9 +59,12 @@ export function swings(b: Bar[], left = 3, right = 3) {
   return { lastSH, lastSL, prevSH, prevSL, trend };
 }
 
-export function backtest(b: Bar[], s: Sig, o: { capital?: number; risk?: number; fee?: number; slip?: number } = {}) {
+/** dayTarget / dayLoss (chat/86): fractions of the day's starting equity. Once realised P&L for the UTC day reaches either,
+ *  no new entries that day. Open trades still run to their own exits. */
+export function backtest(b: Bar[], s: Sig, o: { capital?: number; risk?: number; fee?: number; slip?: number; dayTarget?: number; dayLoss?: number } = {}) {
   const capital = o.capital ?? 10000, risk = o.risk ?? 0.01, fee = o.fee ?? 0.001, slip = o.slip ?? 0.0005;
-  const a = atr(b, 14);
+  const a = atr(b, 14), trailer = s.trail ? makeTrailer(b, s.trail) : null;
+  let dayKey = -1, dayStart = capital, halted = false;
   let cash = capital, pos: Trade | null = null, pending: [1 | -1, number, number] | null = null, pendExit = false;
   const trades: Trade[] = [], eq: number[] = [];
   const close = (i: number, px0: number, why: string) => {
@@ -68,24 +72,28 @@ export function backtest(b: Bar[], s: Sig, o: { capital?: number; risk?: number;
     const gross = (px - p.entry) * p.qty * p.side, cost = fee * px * p.qty;
     cash += gross - cost;
     Object.assign(p, { exit: px, exitT: b[i].t, reason: why, pnl: gross - cost - fee * p.entry * p.qty });
-    const ra = Math.abs(p.entry - p.stop) * p.qty; p.r = ra > 0 ? p.pnl / ra : 0;
+    const ra = Math.abs(p.entry - (p.stop0 ?? p.stop)) * p.qty; p.r = ra > 0 ? p.pnl / ra : 0;
     trades.push(p); pos = null;
   };
   for (let i = 0; i < b.length; i++) {
+    const dk = Math.floor(b[i].t / 864e5); if (dk !== dayKey) { dayKey = dk; dayStart = cash; halted = false; }
     if (pos && pendExit) { close(i, b[i].o, 'signal'); pendExit = false; }
+    if (!halted && (o.dayTarget || o.dayLoss)) { const pl = cash - dayStart; if ((o.dayTarget && pl >= o.dayTarget * dayStart) || (o.dayLoss && pl <= -o.dayLoss * dayStart)) halted = true; }
+    if (halted) pending = null;
     if (!pos && pending) {
       const [side, st0, tg] = pending; const px = b[i].o * (1 + slip * side);
       let st = st0; if (isNaN(st) || (side === 1 && st >= px) || (side === -1 && st <= px)) st = px - 2 * (a[i - 1] || px * 0.025) * side;
       const d = Math.abs(px - st);
       let qty = d > 0 ? Math.min(cash * risk / d, cash / px) : 0; if (s.fullSize) qty = cash / px;
-      if (qty > 0) { cash -= fee * px * qty; pos = { side, entryT: b[i].t, entry: px, stop: st, target: tg, qty, exitT: 0, exit: N, reason: '', pnl: 0, r: 0, bars: 0 }; }
+      if (qty > 0) { cash -= fee * px * qty; pos = { side, entryT: b[i].t, entry: px, stop: st, target: s.trail && !s.trail.keepTarget ? N : tg, qty, exitT: 0, exit: N, reason: '', pnl: 0, r: 0, bars: 0, stop0: st, mods: 0 }; }
     }
     pending = null;
     if (pos) {
       const p: Trade = pos; p.bars++;
-      if (p.side === 1) { if (b[i].l <= p.stop) close(i, Math.min(b[i].o, p.stop), 'stop'); else if (!isNaN(p.target) && b[i].h >= p.target) close(i, Math.max(b[i].o, p.target), 'target'); }
-      else { if (b[i].h >= p.stop) close(i, Math.max(b[i].o, p.stop), 'stop'); else if (!isNaN(p.target) && b[i].l <= p.target) close(i, Math.min(b[i].o, p.target), 'target'); }
+      if (p.side === 1) { if (b[i].l <= p.stop) close(i, Math.min(b[i].o, p.stop), p.mods ? 'trail' : 'stop'); else if (!isNaN(p.target) && b[i].h >= p.target) close(i, Math.max(b[i].o, p.target), 'target'); }
+      else { if (b[i].h >= p.stop) close(i, Math.max(b[i].o, p.stop), p.mods ? 'trail' : 'stop'); else if (!isNaN(p.target) && b[i].l <= p.target) close(i, Math.min(b[i].o, p.target), 'target'); }
     }
+    if (pos && trailer) { const p: Trade = pos; const ns = trailer(i, p.side, p.entry, p.stop); if (!isNaN(ns)) { p.stop = ns; p.mods = (p.mods ?? 0) + 1; } }  // chat/81 trail, live next bar
     if (pos) { const p: Trade = pos; if ((p.side === 1 && s.lx[i]) || (p.side === -1 && s.sx[i]) || (s.maxBars && p.bars >= s.maxBars)) pendExit = true; }
     else if (i < b.length - 1) { if (s.le[i]) pending = [1, s.stop[i], s.target[i]]; else if (s.se[i]) pending = [-1, s.stop[i], s.target[i]]; }
     const p2 = pos as Trade | null;
