@@ -519,6 +519,13 @@ export const SOURCES = [
   "notes": "Nothing installed. License unchecked. Sponsor is an ad."
  },
  {
+  "id": "chat/75",
+  "title": "Claude use cases list",
+  "feeds": "docs/trading-playbook.md, .claude/agents/playbook-distiller.md, web/lib/engine/gaps.ts, docs/strategy-gaps.md",
+  "file": "archive/chat/75-claude-use-cases-list.md",
+  "notes": "Only the playbook and gap-scan ideas used. Hacking, jailbreak, dating-bot, decompiling and haggling items not acted on."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",

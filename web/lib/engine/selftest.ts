@@ -18,6 +18,7 @@ import { usdValues, currencyStrength, strengthSide, allCrosses } from './urban';
 import { decide, rosterRules, newAgent, afterRun, redact, purposeStale, asks, shouldRun, imported } from '../policy';
 import { gate, ruleFilter } from '../decide';
 import { pickModel, markDown } from '../router';
+import { gapScan } from './gaps';
 const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/parity.json'), 'utf8'));
 const bars: Bar[] = fx.bars.map((r: number[]) => ({ t: r[0], o: r[1], h: r[2], l: r[3], c: r[4], v: r[5] }));
 let fail = 0;
@@ -195,6 +196,10 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
   const p3 = pickModel(L, markDown(st, 'a', 1000, 0), { env, now: 10 })?.model.id === 'b' && pickModel(L, { ...st, spentUsd: { K1: 5, K2: 1, K3: 1 } }, { env, now: 0 }) === null;
   const rr = pickModel(L, { ...st, next: 1 }, { env, now: 0, strategy: 'round-robin' }), p4 = rr?.model.id === 'b' && rr.next === 2 && pickModel(L, st, { env: {}, now: 0 }) === null;
   const ok = p1 && p2 && p3 && p4; console.log(`${ok ? 'PASS' : 'FAIL'} model router: priority ${p1}, free only ${p2}, fallback and caps ${p3}, round-robin ${p4}`); if (!ok) fail++;
+{
+  const g = gapScan(); const ok = g.unstyled.length === 0 && g.emptyCells.length > 0;
+  console.log(`${ok ? 'PASS' : 'FAIL'} gap scan: every strategy has a style ${g.unstyled.length === 0}${g.unstyled.length ? ' (missing: ' + g.unstyled.join(', ') + ')' : ''}, ${g.emptyCells.length} empty cells`); if (!ok) fail++;
+}
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');
 process.exit(fail ? 1 : 0);
