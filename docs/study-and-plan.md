@@ -153,6 +153,17 @@ All paper-first. None of them gets order, withdraw, pay or transfer tools.
 | SaaS | Only if Jeremy picks the product track: multi-user accounts, Stripe billing, per-user limits | A business, separate from trading |
 | Docs | White paper, architecture spec, a short spec and test plan per feature, runbooks (data outage, halt, going live), decision records | The design and build threads work from these |
 
+### Approved install shortlist (Jeremy said yes on 2026-11-10)
+
+From `docs/repo-catalog.md`. The build thread installs these. Each is scanned first, and none of them gets order, withdraw or pay tools.
+1. PR-Agent, as a GitHub Action on `apex-trading-os`. Money-code changes still need a person's approval.
+2. The elephant-goldfish planning plugin, for the design and build threads.
+3. Playwright MCP, for dashboard smoke tests.
+4. TradingAgents and anthropics/financial-services, as paper-only research desks next to `bots/research-council`.
+5. SkillSpector and the Solana dev skill, on Jeremy's machine, because the cloud environment blocked them.
+
+Freqtrade (GPL) and Fincept/Honcho (AGPL) stay separate or ideas-only.
+
 ## 7. Product track (Jeremy's call)
 
 The one business model in the archive that clearly makes money is the vendors' own: selling tools and education. The honest version is the claim checker as a product. It answers "does this strategy or bot actually work?" with the six checks and the deflated Sharpe, for traders who buy bots and courses. Delivered as web, API, browser extension and an MCP or plugin for Claude users. It is separate from trading, and nothing is built for it unless he picks it.
