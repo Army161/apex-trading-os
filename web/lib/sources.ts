@@ -225,6 +225,20 @@ export const SOURCES = [
   "notes": "Ideas only, nothing installed. Ads tool and Buzz skipped. Archify covered in chat/31."
  },
  {
+  "id": "chat/33",
+  "title": "Fable 5.2 prompts (audit, grill me, red team, verified/unverified/suspicious, sub-agents)",
+  "feeds": "Journal: your trading rules interview (20 questions to a rules file the AI tools follow); Risk Mitigator red-team button; trust tags on every number in research output; review chain on Fable 5.2",
+  "file": "archive/chat/33-fable-5-2-prompts.md",
+  "notes": "Spec: docs/specs/2026-11-10-trader-rules-red-team-tags.md. Big parallel sweeps and long unattended jobs wait for a runner that can work past Vercel's 2-minute limit."
+ },
+ {
+  "id": "chat/34",
+  "title": "5 things pros do with Claude (outcome, spec, tests, checkpoints, Git)",
+  "feeds": "How Apex is built from here: a spec and test plan per feature in docs/specs, a Git commit per working checkpoint; docs/how-to-direct-apex-agents.md",
+  "file": "archive/chat/34-five-things-pros-do-with-claude.md",
+  "notes": "A working method, not a feature."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",

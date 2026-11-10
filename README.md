@@ -1,13 +1,13 @@
 # Apex Trading OS
 
-One repo for every bot, strategy and tool built from Jeremy's 46 transcripts and uploads.
+One repo for every bot, strategy and tool built from Jeremy's 49 transcripts and uploads.
 **Everything starts in paper/test mode.** No strategy here is guaranteed to make money; backtests are shown as they are.
 
 | Folder | What it is |
 |---|---|
-| `archive/` | Every source saved word for word (`chat/01-31`, `uploads/01-15`), an `INDEX.md`, and rule notes per source |
+| `archive/` | Every source saved word for word (`chat/01-34`, `uploads/01-15`), an `INDEX.md`, and rule notes per source |
 | `engine/` | Python backtest engine: 22 strategies (incl. Supertrend), confluence score, walk-forward, Monte Carlo, risk guard, paper trader, CLI. `pytest` runs 50 tests including planted-edge, noise and look-ahead checks |
-| `web/` | Next.js dashboard: command center, kill switch, **Strategies** (AI builder: plain English to tested rules, edit, deploy/pause/stop to paper, per-strategy chart and P&L), Strategy Lab, signals, psychology journal, AI council, **Assistants** (morning brief, Friday Deal Seeker, investor lenses, FRED macro panel, Risk Mitigator chat), Apex AI chat with voice in/out, Telegram bot (/positions /orders /pnl and free-text chat with Apex AI from your phone), a second opinion from a different model before any strategy is flagged live, AI spend tracking with a daily budget, shared candle cache, system map, source library |
+| `web/` | Next.js dashboard: command center, kill switch, **Strategies** (AI builder: plain English to tested rules, edit, deploy/pause/stop to paper, per-strategy chart and P&L), Strategy Lab, signals, psychology journal, AI council, **Assistants** (morning brief, Friday Deal Seeker, investor lenses, FRED macro panel, Risk Mitigator chat), Apex AI chat with voice in/out, your trading rules interview (the AI tools follow it), Risk Mitigator red team, crowd check (Reddit/X/YouTube/HN/Polymarket), Telegram bot (/positions /orders /pnl and free-text chat with Apex AI from your phone), an owner, engineer and QA review chain on Fable 5.2 before any strategy is flagged live, `npm run check:ui` browser check of every tab, AI spend tracking with a daily budget, shared candle cache, system map, source library |
 | `bots/freqtrade/` | Freqtrade config (dry run) with ApexTurtle and ApexConfluence strategies |
 | `bots/polymarket-copy/` | Polymarket copy bot with paper fills against the real order book and a wallet scorer |
 | `bots/solana-copy/` | Solana memecoin copy bot (pump/bonk) from the Trade Wiz video: wallet scorer, anti-PVP, filters, 80%-at-2x ladder, trailing stop; paper fills on real Jupiter quotes |
@@ -17,6 +17,9 @@ One repo for every bot, strategy and tool built from Jeremy's 46 transcripts and
 | `mcp-server/` | Apex MCP server: Claude Desktop or Claude Code can call the engine (list strategies, backtest, walk-forward leaderboard, scan, dashboard status). Read-only, no order tools |
 | `tools/skill_scan.py` | Safety scan for any skill, plugin or MCP server before you install it: hidden instructions, secret/wallet access, data sent out, curl-into-shell, destructive or obfuscated code. Score 0-100 |
 | `bots/tradingview-bridge/` | Pine v6 scripts and TradingView MCP setup for Claude desktop |
+
+## Working on Apex
+Read [docs/how-to-direct-apex-agents.md](docs/how-to-direct-apex-agents.md). Each feature gets a short spec and test plan in `docs/specs/`, and each working checkpoint is a Git commit.
 
 ## Quick start
 ```bash
