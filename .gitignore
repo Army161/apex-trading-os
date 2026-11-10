@@ -11,3 +11,5 @@ __pycache__/
 web/ui-check/
 bots/research-council/reports/
 *.log
+.apex/
+*.tsbuildinfo

@@ -1,2 +1,3 @@
 /** @type {import('next').NextConfig} */
-export default { reactStrictMode: true, poweredByHeader: false };
+export default { reactStrictMode: true, poweredByHeader: false,
+  transpilePackages: ['@apex/engine', '@apex/kernel', '@apex/autopilot', '@apex/data', '@apex/store'] };
