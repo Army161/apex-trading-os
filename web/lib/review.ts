@@ -6,7 +6,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import { getStrategy, evaluate, putStrategy, specKey } from './strategies';
 import { record, guard } from './usage';
 
-export const REVIEW_MODEL = process.env.APEX_REVIEW_MODEL || 'claude-sonnet-5-5';
+// Fable 5.2 by default (archive/chat/33): the review runs rarely and matters most. Different from the builder model (Opus).
+export const REVIEW_MODEL = process.env.APEX_REVIEW_MODEL || 'claude-fable-5-2';
 const SCHEMA = { type: 'object', additionalProperties: false, required: ['verdict', 'summary', 'issues'], properties: {
   verdict: { type: 'string', enum: ['ok', 'concerns', 'block'] }, summary: { type: 'string' },
   issues: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['severity', 'issue', 'fix'],

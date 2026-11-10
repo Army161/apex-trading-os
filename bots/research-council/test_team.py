@@ -63,3 +63,8 @@ def test_compare_sorts(monkeypatch):
     monkeypatch.setattr(T, "ask", fake_ask({}))
     rows = T.compare("synthetic", ["A", "B"], "1d")
     assert len(rows) == 2 and rows[0]["score"] >= rows[1]["score"]
+
+
+def test_rules_require_number_tags():
+    for tag in ("[verified: source]", "[unverified]", "[suspicious: why]"):
+        assert tag in T.RULES

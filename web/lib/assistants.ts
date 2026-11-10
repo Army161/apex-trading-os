@@ -48,7 +48,8 @@ export async function morningBrief() {
   const today = new Date().toISOString().slice(0, 10);
   const { text, sources } = await research(
     'You write a pre-market brief for a retail trader in Arizona (US market opens 6:30am local). Plain, short, no hype, no predictions of price. ' +
-    'Every fact must come from your searches or the numbers given; say "not found" rather than guess. End with the main downside risk today.',
+    'Every fact must come from your searches or the numbers given; say "not found" rather than guess. End with the main downside risk today.' +
+    ' Tag figures: [verified: source], [unverified] or [suspicious: why]; numbers given to you from candles count as verified.',
     `Date ${today}. Crypto numbers computed from exchange candles (fractions, 0.01 = 1%): ${JSON.stringify(crypto)}.\n` +
     'Write the brief with these sections, each 2-5 bullet lines: 1) Gapping up / down pre-market (US stocks, % and the reason). ' +
     '2) Earnings today, before the open and after the close. 3) Economic reports today and this week, with times in ET, and anything released this morning. ' +
@@ -129,7 +130,8 @@ export async function investorLenses(symbol: string) {
   if (/USDT$/.test(sym)) { try { numbers = snap(sym, (await candles(sym, '1d', 260)).bars); } catch { /* numbers stay null */ } }
   const { text, sources } = await research(
     'You compare investor styles on one asset for a retail trader. Each lens is a style, not the real person, and never claims to be their view. ' +
-    'Facts only from your searches or the numbers given; say "not found" rather than guess. No price predictions. For crypto, say plainly where a lens built for companies does not fit.',
+    'Facts only from your searches or the numbers given; say "not found" rather than guess. No price predictions. For crypto, say plainly where a lens built for companies does not fit.' +
+    ' Tag figures: [verified: source], [unverified] or [suspicious: why]; numbers given to you from candles count as verified.',
     `Asset: ${sym}.${numbers ? ` Numbers from exchange candles (fractions): ${JSON.stringify(numbers)}.` : ''}\n` +
     `Give each lens a verdict (likes it / neutral / avoids it), a score 0-100, two short reasons and its biggest worry:\n${LENSES.map(([n, d]) => `- ${n}: ${d}`).join('\n')}\n` +
     'Then: WHERE THEY AGREE (one line), WHERE THEY DISAGREE (one line), and WHAT WOULD CHANGE THE PICTURE (one line). Plain text, CAPS labels, under 300 words.', 6, 5000, 'lenses');
@@ -164,7 +166,8 @@ export async function crowdCheck(topic: string) {
   const { text, sources } = await research(
     'You run a social sentiment sweep for a cautious retail trader. Search Reddit, X, YouTube, Hacker News and Polymarket for the last 30 days. ' +
     'Report what people actually say, with the platform for each point. Crowd opinion is not fact: never present it as one. No price predictions. ' +
-    'If the mood is one-sided (euphoria or panic), say so plainly as a contrarian warning.',
+    'If the mood is one-sided (euphoria or panic), say so plainly as a contrarian warning.' +
+    ' Tag figures: [verified: source], [unverified] or [suspicious: why]; numbers given to you from candles count as verified.',
     `Topic: ${t}. Give: MOOD (one word plus a 0-100 crowd bullishness number and how sure you are), RISING (what is gaining attention), ` +
     'BULL CASE PEOPLE MAKE, BEAR CASE PEOPLE MAKE, POLYMARKET (any related markets with current odds, or "none found"), ' +
     'OVERHYPED OR IGNORED (one line), CONTRARIAN WARNING (yes/no and why). Plain text, CAPS labels, under 280 words.', 8, 5000, 'crowd');

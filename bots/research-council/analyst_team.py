@@ -39,7 +39,10 @@ EQUITY = float(os.environ.get("APEX_EQUITY", "10000"))
 WEIGHTS = {"technical": 0.30, "fundamental": 0.20, "sentiment": 0.15, "risk": 0.15, "thesis": 0.20}
 RULES = ("Use only numbers from the data pack or the discovery notes (which cite sources). If something is unknown, say "
          "unknown; never guess prices, dates or figures. No strategy is guaranteed and past results do not predict returns. "
-         "Scores: 0-100 where 50 is neutral, above 50 favours buying, below 50 favours avoiding or selling.")
+         "Scores: 0-100 where 50 is neutral, above 50 favours buying, below 50 favours avoiding or selling. "
+         # number trust tags (archive/chat/33): every figure says how far to trust it
+         "Tag every figure you state: [verified: source] when a cited source or the data pack shows it, [unverified] when only "
+         "one weak or undated source has it, [suspicious: why] when sources disagree or it looks wrong. Data-pack numbers count as verified.")
 
 AGENTS = {
     "technical": "You are the technical analyst. Judge trend, structure (higher highs/lows), momentum (RSI regime, MACD), volatility (ATR), "
