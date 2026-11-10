@@ -42,6 +42,8 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 34 | [chat/34-five-things-pros-do-with-claude.md](chat/34-five-things-pros-do-with-claude.md) | 2026-11-10 17:46 | 12,571 |
 | 35 | [chat/35-honcho-evolving-second-brain.md](chat/35-honcho-evolving-second-brain.md) | 2026-11-10 17:54 | 14,547 |
 | 36 | [chat/36-delete-90-percent-of-skills.md](chat/36-delete-90-percent-of-skills.md) | 2026-11-10 17:55 | 48,585 |
+| 37 | [chat/37-ai-software-factory-security.md](chat/37-ai-software-factory-security.md) | 2026-11-10 17:55 | 33,622 |
+| 38 | [chat/38-software-factory-v2.md](chat/38-software-factory-v2.md) | 2026-11-10 17:59 | 36,822 |
 
 ## Uploaded files
 
