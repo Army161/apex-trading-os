@@ -1,0 +1,23 @@
+{
+  "name": "apex-solana-copy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Solana memecoin copy-trading bot (archive/chat/23 Trade Wiz settings) with PAPER mode default, wallet scoring, anti-PVP, filters, take-profit ladder and trailing stop",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "score": "tsx src/score.ts",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0",
+    "bs58": "^6.0.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

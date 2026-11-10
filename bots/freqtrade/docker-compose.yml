@@ -1,0 +1,22 @@
+# Apex Freqtrade. Starts in DRY-RUN (paper) mode. Exchange keys come only from env, never from config.json.
+services:
+  freqtrade:
+    image: freqtradeorg/freqtrade:stable
+    restart: unless-stopped
+    container_name: apex-freqtrade
+    volumes:
+      - ./user_data:/freqtrade/user_data
+      - ../../engine:/apex-engine:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      - FREQTRADE__EXCHANGE__KEY=${BINANCE_API_KEY:-}
+      - FREQTRADE__EXCHANGE__SECRET=${BINANCE_API_SECRET:-}
+      - FREQTRADE__API_SERVER__JWT_SECRET_KEY=${FT_JWT_SECRET:-change-me}
+      - FREQTRADE__API_SERVER__PASSWORD=${FT_API_PASSWORD:-change-me}
+      - FREQTRADE__WEBHOOK__ENABLED=${APEX_WEBHOOK_ENABLED:-false}
+      - FREQTRADE__WEBHOOK__URL=${APEX_DASHBOARD_URL:-http://localhost:3000}/api/ingest/freqtrade?token=${APEX_INGEST_TOKEN:-}
+      - FREQTRADE__TELEGRAM__ENABLED=${TELEGRAM_ENABLED:-false}
+      - FREQTRADE__TELEGRAM__TOKEN=${TELEGRAM_TOKEN:-}
+      - FREQTRADE__TELEGRAM__CHAT_ID=${TELEGRAM_CHAT_ID:-}
+    entrypoint: ["/bin/sh", "-c", "pip install --quiet -e /apex-engine && freqtrade trade --config /freqtrade/user_data/config.json --strategy ${FT_STRATEGY:-ApexTurtle}"]

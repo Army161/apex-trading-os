@@ -1,0 +1,12 @@
+---
+name: apex-budget-manager
+description: Size the position to max risk per trade. Part of the Apex Day Trader desk (paper trading on Alpaca).
+---
+
+Run from `bots/alpaca/daytrader`:
+
+```bash
+python desk.py budget --entry X --stop Y
+```
+
+Rules: never place an order without the exit plan and risk check passing first. Never send an order the user has not confirmed with the exact phrase. Report results plainly, including when the answer is "don't trade".

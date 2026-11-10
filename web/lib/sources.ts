@@ -1,0 +1,332 @@
+// Generated: every archived source and the component it feeds.
+export const SOURCES = [
+ {
+  "id": "chat/01",
+  "title": "MakerDAO keeper guide (outdated flip auctions)",
+  "feeds": "bots/maker-clip-keeper (modernised to Dog/Clipper)",
+  "file": "archive/chat/01-makerdao-auction-keeper-guide.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/02",
+  "title": "Polymarket copy trading bot guide",
+  "feeds": "bots/polymarket-copy",
+  "file": "archive/chat/02-polymarket-copy-trading-bot-guide.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/03",
+  "title": "Turtle Breakout 55/20 AI trading bot",
+  "feeds": "engine turtle_55_20, Freqtrade ApexTurtle, Pine apex_turtle_55_20",
+  "file": "archive/chat/03-turtle-breakout-ai-trading-bot-tradingview.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/04",
+  "title": "Connect Claude to TradingView (MCP)",
+  "feeds": "bots/tradingview-bridge setup + config snippet",
+  "file": "archive/chat/04-connect-claude-to-tradingview-mcp.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/05",
+  "title": "AI trading with TradingView: SMA50 strategy",
+  "feeds": "engine sma50_trend, Pine apex_sma50_trend",
+  "file": "archive/chat/05-ai-trading-tradingview-sma50-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/06",
+  "title": "Market structure course",
+  "feeds": "engine failure_test_2b, structure_pullback, structure() BOS/CHoCH",
+  "file": "archive/chat/06-market-structure-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/07",
+  "title": "Trading psychology course",
+  "feeds": "dashboard Journal (emotion tags, plan adherence), RiskGuard cooldown + drawdown pause",
+  "file": "archive/chat/07-trading-psychology-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/08",
+  "title": "Chart patterns course",
+  "feeds": "engine double_bottom, bull_flag",
+  "file": "archive/chat/08-chart-patterns-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/09",
+  "title": "Smart money concepts course",
+  "feeds": "engine smc_liquidity_sweep, fvg(), liquidity_sweep()",
+  "file": "archive/chat/09-smart-money-concepts-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/10",
+  "title": "Elliott wave course",
+  "feeds": "confluence context filter (impulse > correction) only",
+  "file": "archive/chat/10-elliott-wave-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/11",
+  "title": "Top-down analysis course",
+  "feeds": "engine top_down_mtf",
+  "file": "archive/chat/11-top-down-analysis-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/12",
+  "title": "Top-down analysis (duplicate)",
+  "feeds": "same as chat/11",
+  "file": "archive/chat/12-top-down-analysis-course-duplicate.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/13",
+  "title": "Swing trading course",
+  "feeds": "engine swing_flag_macd",
+  "file": "archive/chat/13-swing-trading-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/14",
+  "title": "Candlestick bible course",
+  "feeds": "engine candles() classifier, pin_bar_level",
+  "file": "archive/chat/14-candlestick-bible-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/15",
+  "title": "RSI course",
+  "feeds": "engine rsi_regime, divergence()",
+  "file": "archive/chat/15-rsi-indicator-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/16",
+  "title": "MACD course",
+  "feeds": "engine macd_divergence (3-10-16 SMA)",
+  "file": "archive/chat/16-macd-indicator-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/17",
+  "title": "Technical analysis course",
+  "feeds": "engine confluence scorer (5-step checklist), Pine apex_confluence",
+  "file": "archive/chat/17-technical-analysis-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/18",
+  "title": "Bollinger Bands course",
+  "feeds": "engine bb_squeeze, bb_free_bar",
+  "file": "archive/chat/18-bollinger-bands-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/19",
+  "title": "Wyckoff method course",
+  "feeds": "engine wyckoff_spring, wyckoff_phase()",
+  "file": "archive/chat/19-wyckoff-method-course.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/20",
+  "title": "Top 8 AI trading GitHub repos",
+  "feeds": "Freqtrade bot, research-council (TradingAgents/AI Hedge Fund style)",
+  "file": "archive/chat/20-top-8-ai-trading-github-repos.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/21",
+  "title": "Herder terminal multiplexer",
+  "feeds": "not a bot; waiting on your call whether to install",
+  "file": "archive/chat/21-herder-terminal-multiplexer.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/22",
+  "title": "Day Trader Claude skill (11 skills)",
+  "feeds": "bots/alpaca/daytrader desk + 11 Claude Code skills",
+  "file": "archive/chat/22-day-trader-claude-skill.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/23",
+  "title": "Trade Wiz Solana copy trading settings",
+  "feeds": "bots/solana-copy (wallet scorer, anti-PVP, filters, TP ladder, trailing stop)",
+  "file": "archive/chat/23-tradewiz-solana-copy-trading-settings.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/24",
+  "title": "Delta Exchange AI algo terminal",
+  "feeds": "dashboard Strategy Builder (plain English to editable strategy), supertrend, per-strategy deploy/pause/stop/exit, Telegram /positions /orders /pnl",
+  "file": "archive/chat/24-delta-exchange-ai-algo-terminal.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/25",
+  "title": "AI trading analyst team (16 Claude Code skills, 5 agents)",
+  "feeds": "research-council v2: discovery, 5 parallel agents, weighted 0-100 scorecard, bull/bear, catalysts, 3 targets, risk matrix, quick and compare modes, Markdown report",
+  "file": "archive/chat/25-ai-trading-analyst-team-claude-code.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/26",
+  "title": "FinceptTerminal repo audit (free 'Bloomberg replacement')",
+  "feeds": "ideas only (AGPL, no code copied): free macro data connectors (FRED, World Bank), MCP tool layer, multi-provider LLM routing incl. local models, investor-persona council agents as research aids",
+  "file": "archive/chat/26-fincept-terminal-repo-audit.md",
+  "notes": "Video's verdict: nice aggregator of free public feeds, not a data moat; broker layer is mostly Indian retail brokers."
+ },
+ {
+  "id": "chat/27",
+  "title": "AI trading assistant: morning brief, Deal Seeker, Risk Mitigator",
+  "feeds": "bots/assistants: pre-market brief (gappers, earnings, econ calendar, what's moving BTC) to Telegram/Discord; Friday oversold-quality scan (25 -> top 5); risk-mitigator chat (3:1 R:R, conservative on shorts, always the downside, conversation summary)",
+  "file": "archive/chat/27-ai-trading-assistant-bots.md",
+  "notes": "Second half of the message repeats chat/26."
+ },
+ {
+  "id": "chat/28",
+  "title": "Reverse Engineer Anything (REA) + Jarvis assistant",
+  "feeds": "archive only, not a strategy. Teardown-with-evidence method (DevTools network/stack report) is a way to study public dashboards for UI ideas; Apex never clones another product's look or code",
+  "file": "archive/chat/28-reverse-engineer-anything-jarvis.md",
+  "notes": ""
+ },
+ {
+  "id": "chat/29",
+  "title": "Open Jarvis: local AI assistant with phone access",
+  "feeds": "Telegram free-text chat with Apex AI from your phone, voice in/out in the AI chats, AI spend tracking with a daily budget alert, start-small permissions advice",
+  "file": "archive/chat/29-open-jarvis-local-assistant.md",
+  "notes": "Ollama/NVIDIA model options held for Jeremy's call (Apex is Claude-only today)."
+ },
+ {
+  "id": "chat/30",
+  "title": "Fincept Terminal walkthrough (Bloomberg-style desktop terminal)",
+  "feeds": "ideas only: investor-style lenses (Buffett, Graham, Lynch, Munger) compared side by side, a shared candle cache so every screen fetches once, keys kept server-side in env vars, macro and news panels",
+  "file": "archive/chat/30-fincept-terminal-walkthrough.md",
+  "notes": "Video says GPL 3.0, earlier source said AGPL. Either way no Fincept code is copied."
+ },
+ {
+  "id": "chat/31",
+  "title": "7 GitHub repos for AI (God's Eye View, SkillSpector, SlopMonster, Claudex loop, DeepSeek harness, Archify)",
+  "feeds": "tools/skill_scan.py safety scan before installing any skill or MCP server; Second opinion from a different model required before a strategy is flagged live; system map diagram on Setup",
+  "file": "archive/chat/31-seven-github-repos-ai.md",
+  "notes": "Ideas only. SkillSpector and Archify are Apache-2.0 (checked). DeepSeek model option held with the Ollama/NVIDIA question. Flute, SlopMonster and the world tracker skipped for now."
+ },
+ {
+  "id": "chat/32",
+  "title": "7 repos to supercharge Claude (last30days, Playwright MCP, Claude Ads, Archify, gstack, agency agents, Buzz)",
+  "feeds": "Crowd check (Reddit, X, YouTube, Hacker News, Polymarket sweep) on Assistants and in the analyst team; the second opinion became a 3-step review chain (owner, engineer, QA); Playwright UI check script for the dashboard",
+  "file": "archive/chat/32-seven-repos-supercharge-claude.md",
+  "notes": "Ideas only, nothing installed. Ads tool and Buzz skipped. Archify covered in chat/31."
+ },
+ {
+  "id": "uploads/01",
+  "title": "Build a trading bot with Claude masterclass",
+  "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",
+  "file": "archive/uploads/01-build-trading-bot-with-claude-masterclass.md",
+  "notes": "archive/notes/01-build-trading-bot-with-claude-masterclass.notes.md"
+ },
+ {
+  "id": "uploads/02",
+  "title": "Candlestick patterns ultimate course",
+  "feeds": "candles() classifier, pin_bar_level",
+  "file": "archive/uploads/02-candlestick-patterns-ultimate-course.md",
+  "notes": "archive/notes/02-candlestick-patterns-ultimate-course.notes.md"
+ },
+ {
+  "id": "uploads/03",
+  "title": "Complete trading course 2026 (6h)",
+  "feeds": "failure test, momentum breakout, pullback, order-flow notes -> confluence + delta_divergence",
+  "file": "archive/uploads/03-complete-trading-course-2026-6h.md",
+  "notes": "archive/notes/03-complete-trading-course-2026-6h.notes.md"
+ },
+ {
+  "id": "uploads/04",
+  "title": "Futures trading course",
+  "feeds": "BOS/key-level breakout logic in structure_pullback; risk sizing",
+  "file": "archive/uploads/04-futures-trading-course.md",
+  "notes": "archive/notes/04-futures-trading-course.notes.md"
+ },
+ {
+  "id": "uploads/05",
+  "title": "VWAP course",
+  "feeds": "engine vwap_reclaim, vwap_bands()",
+  "file": "archive/uploads/05-vwap-indicator-course.md",
+  "notes": "archive/notes/05-vwap-indicator-course.notes.md"
+ },
+ {
+  "id": "uploads/06",
+  "title": "Risk management course",
+  "feeds": "RiskGuard (fixed fractional, ATR stops, daily loss limit), Monte Carlo",
+  "file": "archive/uploads/06-risk-management-course.md",
+  "notes": "archive/notes/06-risk-management-course.notes.md"
+ },
+ {
+  "id": "uploads/07",
+  "title": "Trading strategies: build your own",
+  "feeds": "failure test + RSI divergence, breakout-retest rules",
+  "file": "archive/uploads/07-trading-strategies-build-your-own.md",
+  "notes": "archive/notes/07-trading-strategies-build-your-own.notes.md"
+ },
+ {
+  "id": "uploads/08",
+  "title": "Liquidity course (+ strategies course)",
+  "feeds": "smc_liquidity_sweep, liquidity_sweep(), fvg()",
+  "file": "archive/uploads/08-liquidity-course.md",
+  "notes": "archive/notes/08-liquidity-course.notes.md"
+ },
+ {
+  "id": "uploads/09",
+  "title": "Trading strategies (duplicate of 07)",
+  "feeds": "same as uploads/07",
+  "file": "archive/uploads/09-trading-strategies-build-your-own-duplicate.md",
+  "notes": "archive/notes/09-trading-strategies-build-your-own-duplicate.notes.md"
+ },
+ {
+  "id": "uploads/10",
+  "title": "Order flow course",
+  "feeds": "engine delta_divergence (bar-level CVD proxy)",
+  "file": "archive/uploads/10-order-flow-course.md",
+  "notes": "archive/notes/10-order-flow-course.notes.md"
+ },
+ {
+  "id": "uploads/11",
+  "title": "Trading for beginners",
+  "feeds": "trend pullback + S/R zone rules in structure_pullback",
+  "file": "archive/uploads/11-trading-for-beginners.md",
+  "notes": "archive/notes/11-trading-for-beginners.notes.md"
+ },
+ {
+  "id": "uploads/12",
+  "title": "Market structure masterclass",
+  "feeds": "failure_test_2b, structure_pullback",
+  "file": "archive/uploads/12-market-structure-masterclass.md",
+  "notes": "archive/notes/12-market-structure-masterclass.notes.md"
+ },
+ {
+  "id": "uploads/13",
+  "title": "Price action masterclass (+ MACD course)",
+  "feeds": "momentum candle detector, false-breakout fade, macd_divergence",
+  "file": "archive/uploads/13-price-action-masterclass.md",
+  "notes": "archive/notes/13-price-action-masterclass.notes.md"
+ },
+ {
+  "id": "uploads/14",
+  "title": "Indicators masterclass",
+  "feeds": "RSI divergence, MACD, Fibonacci notes -> confluence momentum",
+  "file": "archive/uploads/14-indicators-masterclass.md",
+  "notes": "archive/notes/14-indicators-masterclass.notes.md"
+ },
+ {
+  "id": "uploads/15",
+  "title": "TradingView ultimate tutorial",
+  "feeds": "tradingview-bridge README, alerts/webhook setup",
+  "file": "archive/uploads/15-tradingview-ultimate-tutorial.md",
+  "notes": "archive/notes/15-tradingview-ultimate-tutorial.notes.md"
+ }
+] as const;

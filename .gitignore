@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+*.egg-info/
+web/ui-check/
+bots/research-council/reports/
+*.log

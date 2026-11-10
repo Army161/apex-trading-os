@@ -1,0 +1,15 @@
+{
+  "_source": "archive/uploads/01-build-trading-bot-with-claude-masterclass.md (core + sleeves). Re-pick sleeves quarterly with `python nightly.py --repick`.",
+  "core": {"engine": "QQQ", "safe": "GLD", "line": 200, "weight": 1.0},
+  "sleeves": [
+    {"id": "QQQ-breakout", "ticker": "QQQ", "strategy": "breakout_50_20", "stop_pct": 0.10},
+    {"id": "XLK-dip", "ticker": "XLK", "strategy": "rsi2_dip", "stop_pct": 0.08},
+    {"id": "GLD-dip", "ticker": "GLD", "strategy": "rsi2_dip", "stop_pct": 0.08}
+  ],
+  "slot_pct": 0.20,
+  "volatile_slot_pct": 0.10,
+  "max_borrow_pct": 0.60,
+  "daily_loss_stop_pct": 0.03,
+  "pause_day_loss_pct": 0.05,
+  "backtest_worst_dd": -0.112
+}

@@ -1,0 +1,16 @@
+//@version=6
+// Apex RSI(2) dip-buy sleeve (archive/uploads/01): RSI(2) < 10 above the 200-day line, exit close > 5-day SMA or 10 bars, 8% stop.
+strategy("Apex RSI2 Dip", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=20, commission_type=strategy.commission.percent, commission_value=0.05)
+th = input.int(10, "RSI(2) threshold")
+r = ta.rsi(close, 2)
+trend = ta.sma(close, 200)
+var int barsIn = 0
+if r < th and close > trend and strategy.position_size == 0
+    strategy.entry("L", strategy.long)
+    barsIn := 0
+if strategy.position_size > 0
+    barsIn += 1
+    strategy.exit("stop", "L", stop=strategy.position_avg_price * 0.92)
+    if close > ta.sma(close, 5) or barsIn >= 10
+        strategy.close("L")
+plot(trend, "200 SMA", color.gray)

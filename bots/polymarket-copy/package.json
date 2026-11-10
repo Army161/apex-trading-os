@@ -1,0 +1,25 @@
+{
+  "name": "apex-polymarket-copy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Polymarket copy-trading bot (QuickNode guide, archive/chat/02) with PAPER mode default, wallet scoring, caps and dashboard reporting",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "score": "tsx src/score.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@polymarket/clob-client": "^4.22.8",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "ethers": "^5.7.2",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

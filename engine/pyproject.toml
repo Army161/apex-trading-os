@@ -1,0 +1,20 @@
+[project]
+name = "apex-engine"
+version = "0.1.0"
+description = "Apex strategy engine: indicators, rule-based strategies from the course archive, honest backtester, walk-forward, risk guards, paper trading"
+requires-python = ">=3.10"
+dependencies = ["pandas>=2.0", "numpy>=1.24"]
+
+[project.optional-dependencies]
+live = ["web3>=6", "anthropic>=0.40"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+apex = "apex_engine.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["apex_engine*"]

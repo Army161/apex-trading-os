@@ -1,0 +1,32 @@
+//@version=6
+// Apex Confluence Score (archive/chat/17 checklist): structure + location + trigger candle + momentum/volume.
+// Indicator, not a strategy: it paints the score 0-100 and fires an alert when a side crosses the threshold with a trigger candle.
+indicator("Apex Confluence", overlay=false)
+th = input.int(60, "Alert threshold")
+e50 = ta.ema(close, 50), e200 = ta.ema(close, 200)
+ph = ta.pivothigh(high, 3, 3), pl = ta.pivotlow(low, 3, 3)
+var float lastH = na, var float prevH = na, var float lastL = na, var float prevL = na
+if not na(ph)
+    prevH := lastH, lastH := ph
+if not na(pl)
+    prevL := lastL, lastL := pl
+up = lastH > prevH and lastL > prevL
+dn = lastH < prevH and lastL < prevL
+a = ta.atr(14)
+b = math.abs(close - open)
+prevB = math.avg(b[1], b[2], b[3])
+bullEng = close > open and close[1] < open[1] and close >= open[1] and open <= close[1]
+bearEng = close < open and close[1] > open[1] and close <= open[1] and open >= close[1]
+hammer = (math.min(open, close) - low) >= 2 * b and (high - math.max(open, close)) <= b
+star = (high - math.max(open, close)) >= 2 * b and (math.min(open, close) - low) <= b
+r = ta.rsi(close, 14)
+volSpike = volume > 1.5 * ta.sma(volume, 20)
+sweepL = low < ta.lowest(low, 20)[1] and close > ta.lowest(low, 20)[1]
+sweepH = high > ta.highest(high, 20)[1] and close < ta.highest(high, 20)[1]
+Ls = (up ? 15 : 0) + (close > e50 ? 5 : 0) + (e50 > e200 ? 5 : 0) + (math.abs(low - lastL) <= 0.5 * a ? 12 : 0) + (sweepL ? 8 : 0) + math.min(20, (bullEng ? 10 : 0) + (hammer ? 10 : 0) + (close > open and b >= 2 * prevB ? 6 : 0)) + (r > 50 and r < 75 ? 6 : 0) + (volSpike ? 6 : 0)
+Ss = (dn ? 15 : 0) + (close < e50 ? 5 : 0) + (e50 < e200 ? 5 : 0) + (math.abs(high - lastH) <= 0.5 * a ? 12 : 0) + (sweepH ? 8 : 0) + math.min(20, (bearEng ? 10 : 0) + (star ? 10 : 0) + (close < open and b >= 2 * prevB ? 6 : 0)) + (r < 50 and r > 25 ? 6 : 0) + (volSpike ? 6 : 0)
+plot(Ls, "Long score", color.teal, 2)
+plot(Ss, "Short score", color.red, 2)
+hline(th, "threshold", color.gray)
+alertcondition(ta.crossover(Ls, th) and (bullEng or hammer), "Apex long confluence", '{"bot":"tv-confluence","side":"buy","symbol":"{{ticker}}","price":{{close}}}')
+alertcondition(ta.crossover(Ss, th) and (bearEng or star), "Apex short confluence", '{"bot":"tv-confluence","side":"sell","symbol":"{{ticker}}","price":{{close}}}')

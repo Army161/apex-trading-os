@@ -1,0 +1,25 @@
+//@version=6
+// Apex Turtle Breakout 55/20 (archive/chat/03). Long only. Enter on close > prior 55-bar high,
+// fixed stop 2x ATR(20) below the signal close, exit on close < prior 20-bar low, risk 1% of equity.
+strategy("Apex Turtle 55/20", overlay=true, initial_capital=10000, commission_type=strategy.commission.percent, commission_value=0.1, slippage=2, process_orders_on_close=false)
+entryN  = input.int(55, "Entry lookback")
+exitN   = input.int(20, "Exit lookback")
+atrN    = input.int(20, "ATR length")
+atrMult = input.float(2.0, "ATR stop multiple")
+riskPct = input.float(1.0, "Risk % of equity") / 100
+hh = ta.highest(high, entryN)[1]
+ll = ta.lowest(low, exitN)[1]
+a  = ta.atr(atrN)
+var float stopPx = na
+longSig = close > hh and strategy.position_size == 0
+if longSig
+    stopPx := close - atrMult * a
+    qty = (strategy.equity * riskPct) / math.max(close - stopPx, syminfo.mintick)
+    strategy.entry("L", strategy.long, qty=qty, alert_message='{"bot":"tv-turtle","side":"buy","symbol":"{{ticker}}","price":{{close}},"stop":' + str.tostring(stopPx) + '}')
+if strategy.position_size > 0
+    strategy.exit("stop", "L", stop=stopPx, alert_message='{"bot":"tv-turtle","side":"stop","symbol":"{{ticker}}","price":{{close}}}')
+if close < ll and strategy.position_size > 0
+    strategy.close("L", comment="20-low exit", alert_message='{"bot":"tv-turtle","side":"sell","symbol":"{{ticker}}","price":{{close}}}')
+plot(hh, "55 high", color.new(color.teal, 0))
+plot(ll, "20 low", color.new(color.orange, 0))
+plot(strategy.position_size > 0 ? stopPx : na, "stop", color.red, style=plot.style_linebr)

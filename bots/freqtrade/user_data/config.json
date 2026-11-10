@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.freqtrade.io/schema.json",
+  "bot_name": "apex-freqtrade",
+  "dry_run": true,
+  "dry_run_wallet": 10000,
+  "max_open_trades": 3,
+  "stake_currency": "USDT",
+  "stake_amount": "unlimited",
+  "tradable_balance_ratio": 0.99,
+  "fiat_display_currency": "USD",
+  "timeframe": "1d",
+  "cancel_open_orders_on_exit": false,
+  "trading_mode": "spot",
+  "unfilledtimeout": {"entry": 10, "exit": 10, "exit_timeout_count": 0, "unit": "minutes"},
+  "entry_pricing": {"price_side": "same", "use_order_book": true, "order_book_top": 1},
+  "exit_pricing": {"price_side": "same", "use_order_book": true, "order_book_top": 1},
+  "exchange": {
+    "name": "binance",
+    "key": "",
+    "secret": "",
+    "ccxt_config": {},
+    "pair_whitelist": ["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "XRP/USDT"],
+    "pair_blacklist": []
+  },
+  "pairlists": [{"method": "StaticPairList"}],
+  "telegram": {"enabled": false, "token": "", "chat_id": ""},
+  "api_server": {
+    "enabled": true,
+    "listen_ip_address": "127.0.0.1",
+    "listen_port": 8080,
+    "verbosity": "error",
+    "enable_openapi": false,
+    "jwt_secret_key": "change-me-via-env",
+    "CORS_origins": [],
+    "username": "apex",
+    "password": "change-me-via-env"
+  },
+  "webhook": {
+    "enabled": false,
+    "url": "https://YOUR-APEX-DASHBOARD/api/ingest/freqtrade",
+    "format": "json",
+    "retries": 2,
+    "retry_delay": 1,
+    "entry": {"type": "entry", "pair": "{pair}", "direction": "{direction}", "open_rate": "{open_rate}", "amount": "{amount}", "stake_amount": "{stake_amount}", "trade_id": "{trade_id}", "strategy": "{strategy}"},
+    "exit": {"type": "exit", "pair": "{pair}", "close_rate": "{close_rate}", "profit_amount": "{profit_amount}", "profit_ratio": "{profit_ratio}", "exit_reason": "{exit_reason}", "trade_id": "{trade_id}", "strategy": "{strategy}"},
+    "status": {"type": "status", "status": "{status}"}
+  },
+  "initial_state": "running",
+  "force_entry_enable": false,
+  "internals": {"process_throttle_secs": 5}
+}

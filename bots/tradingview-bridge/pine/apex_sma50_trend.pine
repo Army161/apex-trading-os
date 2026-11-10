@@ -1,0 +1,10 @@
+//@version=6
+// Apex SMA 50 trend, long/flat (archive/chat/05). Compare with buy-and-hold in the Strategy Tester.
+strategy("Apex SMA50 Trend", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.1)
+n = input.int(50, "SMA length")
+m = ta.sma(close, n)
+if ta.crossover(close, m)
+    strategy.entry("L", strategy.long, alert_message='{"bot":"tv-sma50","side":"buy","symbol":"{{ticker}}","price":{{close}}}')
+if close < m
+    strategy.close("L", alert_message='{"bot":"tv-sma50","side":"sell","symbol":"{{ticker}}","price":{{close}}}')
+plot(m, "SMA", color.blue, 2)
