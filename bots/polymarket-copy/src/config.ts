@@ -5,6 +5,7 @@ const bool = (k: string, d: boolean) => (process.env[k] ? process.env[k] === 'tr
 
 export const config = {
   mode: (process.env.MODE ?? 'paper') as 'paper' | 'live',
+  allowLive: process.env.APEX_ALLOW_LIVE === 'yes', // second switch Jeremy sets himself (same rule as the other bots)
   targetWallet: (process.env.TARGET_WALLET ?? '').toLowerCase(),
   privateKey: process.env.PRIVATE_KEY ?? '',
   rpcUrl: process.env.RPC_URL ?? 'https://polygon-rpc.com',
@@ -30,6 +31,7 @@ export const config = {
 
 export function validate() {
   if (!/^0x[0-9a-f]{40}$/.test(config.targetWallet)) throw new Error('TARGET_WALLET must be a 0x address');
+  if (config.mode === 'live' && !config.allowLive) throw new Error('MODE=live also needs APEX_ALLOW_LIVE=yes. Staying safe: run MODE=paper first.');
   if (config.mode === 'live' && !config.privateKey) throw new Error('MODE=live requires PRIVATE_KEY in .env');
   if (config.mode === 'live' && (config.risk.maxSessionNotional <= 0 || config.risk.maxPerMarketNotional <= 0))
     throw new Error('MODE=live requires non-zero MAX_SESSION_NOTIONAL and MAX_PER_MARKET_NOTIONAL caps');

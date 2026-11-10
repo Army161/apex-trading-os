@@ -79,6 +79,7 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 71 | [chat/71-orchestrator-bot-software-factory.md](chat/71-orchestrator-bot-software-factory.md) | 2026-11-10 18:44 | 18,828 |
 | 72 | [chat/72-t3-code-multi-harness.md](chat/72-t3-code-multi-harness.md) | 2026-11-10 18:44 | 48,575 |
 | 73 | [chat/73-pr-agent-open-source-review.md](chat/73-pr-agent-open-source-review.md) | 2026-11-10 18:45 | 9,459 |
+| 74 | [chat/74-elephant-goldfish-planning.md](chat/74-elephant-goldfish-planning.md) | 2026-11-10 18:46 | 18,889 |
 
 ## Uploaded files
 

@@ -512,6 +512,13 @@ export const SOURCES = [
   "notes": "Nothing installed. License unchecked. Sponsor plugs are ads."
  },
  {
+  "id": "chat/74",
+  "title": "Elephant goldfish planning method",
+  "feeds": "docs/how-to-direct-apex-agents.md fresh-eyes review, folder README invariants, tools/drift_check.py",
+  "file": "archive/chat/74-elephant-goldfish-planning.md",
+  "notes": "Nothing installed. License unchecked. Sponsor is an ad."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",

@@ -83,3 +83,18 @@ Apex has local commits for every checkpoint. They go to GitHub as soon as the `a
 - **Lock the doors.** Agents run sandboxed with scoped credentials, read-only wherever possible. They open PRs but never merge them. Bots never share a machine that holds another bot's logins. Controls live in the environment, not in the agent's good intentions.
 - **Backlog triage.** Score with RICE (reach × impact × confidence ÷ effort) and use the blast-radius colour as a tie-breaker: at the same score, green work goes first. Don't let a bot fill the backlog just because it can, and don't run hourly context-farming routines. They burn tokens.
 - The orchestrator tools in the video (Grockbot, T3 Code) and the sponsor plug (a hosted database) are not used. Nothing was installed.
+
+## Plan big features with a fresh-eyes review (chat/74)
+This comes from a video on Google's "elephant goldfish" planning method. Nothing was installed and its license has not been checked. The sponsor segment is an ad.
+
+**When to use it:** only for big or risky work, such as anything on a live-trading path, the risk engine, the policy gateway or key handling. Skip it for small fixes an agent can finish in one go, because the extra planning just slows those down.
+
+1. **Design doc first** (the "elephant", the agent that knows the whole chat). Write it in `docs/specs/`. It covers the problem, what's in and out of scope, the main user journeys with a test for each, the technical plan, the alternatives considered and why they lost, and a step-by-step build list.
+2. **Goldfish review.** Fresh sub-agents read only the doc and the code, never the chat, so nothing said earlier can talk them out of a finding. Each one takes a single angle:
+   - **Simpler path:** is there an easier way, or does Apex already have something that does this?
+   - **Outsider read:** does the doc make sense to someone who knows nothing about Apex?
+   - **Scale and failure:** what breaks under load, bad data, a dead exchange or a restart?
+   - **Buildability:** could a model build it from the doc without guessing?
+   One coordinating agent merges their notes into a single report. Jeremy makes the final calls and keeps what's useful.
+3. **Folder READMEs hold the invariants**, the rules that must always stay true. Examples: `bots/README.md` ("bots start in paper; live needs `APEX_ALLOW_LIVE=yes`", "no withdraw or transfer tools") and `web/lib/README.md`. Agents read the README of every folder they work in (see `AGENTS.md`).
+4. **Drift check.** `python3 tools/drift_check.py` compares the code against those invariants and exits with an error when they no longer match. Its first run caught a real gap: the Polymarket copy bot could go live without the `APEX_ALLOW_LIVE=yes` second switch. That is fixed now.

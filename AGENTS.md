@@ -19,7 +19,11 @@ These are model-agnostic (archive/chat/68). Claude Code, OpenCode, Codex, or a l
 - `.claude/agents/build-buddy.md`: the debug helper prompt. It is plain markdown, so any agent can use it.
 - `web/lib/gateway.ts`: the only file that calls a model. Switching providers is a change to that one file.
 
+## Before you change a folder
+Read its README.md first. The `## Invariants` section lists rules that must stay true. For big or risky features, follow the design-doc and fresh-eyes review steps in `docs/how-to-direct-apex-agents.md` (chat/74).
+
 ## Checks before you say you're done
 ```
 cd web && npx tsc --noEmit -p . && npm test
+python3 tools/drift_check.py
 ```
