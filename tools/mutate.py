@@ -96,8 +96,11 @@ def mutants(src: str, funcs: list[str], py: bool):
             if not s or s.startswith(("#", "//", '"""', "*")):
                 continue
             cut = code_part(line, py)
+            strs = [m.span() for m in re.finditer(r"'(?:\\.|[^'\\])*'|\"(?:\\.|[^\"\\])*\"|`[^`]*`", line)]
             for name, pat, rep in OPS:
                 for m in re.finditer(pat, line[:cut]):
+                    if any(a <= m.start() < b for a, b in strs):
+                        continue  # inside a string literal: changing text is not a logic mutation
                     new = line[:m.start()] + rep + line[m.end():]
                     out = lines[:]
                     out[i] = new
