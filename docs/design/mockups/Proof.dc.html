@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Proof landing page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+body{margin:0}
+a{color:#2456d6}a:hover{color:#173a94}
+</style>
+</helmet>
+<div style="min-height: 1120px; background: #f6f7f9; color: #0f1720; font-family: Inter, system-ui, sans-serif; font-size: 15px; line-height: 1.5">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px; padding: 16px 32px; max-width: 1200px; margin: 0 auto; box-sizing: border-box">
+    <div style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 20px">Proof <span style="font-family: Inter, system-ui, sans-serif; font-weight: 400; font-size: 12px; color: #566170">working name</span></div>
+    <div style="flex-grow: 1"></div>
+    <a href="#how" style="color: #0f1720; text-decoration: none; padding: 10px 4px">How it works</a>
+    <a href="#pricing" style="color: #0f1720; text-decoration: none; padding: 10px 4px">Pricing</a>
+    <a href="#method" style="color: #0f1720; text-decoration: none; padding: 10px 4px">Method</a>
+    <a href="#signin" style="padding: 10px 16px; border-radius: 8px; border: 1px solid #c9d1da; color: #0f1720; text-decoration: none">Sign in</a>
+  </header>
+
+  <section style="max-width: 1200px; margin: 0 auto; padding: 40px 32px 32px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 40px; align-items: center">
+    <div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 18px">
+      <h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 48px; line-height: 1.08; font-weight: 700">Does that trading strategy actually work?</h1>
+      <p style="margin: 0; font-size: 18px; color: #3c4653">Paste the video transcript, the Pine script or the sales page. Proof pulls out the exact rules and tests them against random entries, real costs and simply holding the market.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+        <a href="#check" style="padding: 14px 22px; border-radius: 8px; background: #0b7a5c; color: #ffffff; font-weight: 600; text-decoration: none">Check a strategy free</a>
+        <span style="color: #566170; font-size: 14px">3 checks a month. No card.</span>
+      </div>
+      <p style="margin: 0; font-size: 13px; color: #566170">Proof tests rules on past data. It does not give investment advice, signals or promises. Most strategies it tests show no edge.</p>
+    </div>
+    <div style="flex: 1 1 420px; background: #ffffff; border: 1px solid #e3e7ec; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #566170">EXAMPLE RESULT · TURTLE BREAKOUT 55/20 ON BTC DAILY</div>
+      <div style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px; font-weight: 700">No edge</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <div style="padding: 12px; background: #f0f3f6; border-radius: 8px"><div style="font-size: 12px; color: #566170">Claimed</div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 22px; font-weight: 600">+729%</div><div style="font-size: 12px; color: #566170">one backtest, no trade count</div></div>
+        <div style="padding: 12px; background: #f0f3f6; border-radius: 8px"><div style="font-size: 12px; color: #566170">Measured</div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 22px; font-weight: 600">−1.5%</div><div style="font-size: 12px; color: #566170">net of costs, 7 trades, 730 days</div></div>
+      </div>
+      <div style="font-size: 13px; color: #3c4653">0 of 6 checks passed. Beat 43% of random entries; the bar is 95%. The video covers a longer period than this test, and the page says so.</div>
+    </div>
+  </section>
+
+  <section id="how" style="max-width: 1200px; margin: 0 auto; padding: 24px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px">What a check does</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
+      <div style="background: #ffffff; border: 1px solid #e3e7ec; border-radius: 12px; padding: 18px"><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; color: #0b7a5c; font-weight: 600">1</div><h3 style="margin: 4px 0 6px; font-size: 16px">Extracts the rules</h3><div style="color: #3c4653; font-size: 14px">Entry, stop, exit and filters, each linked to the sentence it came from. Anything it had to assume is listed and you can change it.</div></div>
+      <div style="background: #ffffff; border: 1px solid #e3e7ec; border-radius: 12px; padding: 18px"><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; color: #0b7a5c; font-weight: 600">2</div><h3 style="margin: 4px 0 6px; font-size: 16px">Runs six stress checks</h3><div style="color: #3c4653; font-size: 14px">Enough trades. Beats 95% of random traders. Profitable on a locked recent window. Survives acting one bar late, doubled costs, and costs under half the gains.</div></div>
+      <div style="background: #ffffff; border: 1px solid #e3e7ec; border-radius: 12px; padding: 18px"><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; color: #0b7a5c; font-weight: 600">3</div><h3 style="margin: 4px 0 6px; font-size: 16px">Compares with holding</h3><div style="color: #3c4653; font-size: 14px">A rule has to beat buying and holding the same market on risk, not just make money in a rising one.</div></div>
+      <div style="background: #ffffff; border: 1px solid #e3e7ec; border-radius: 12px; padding: 18px"><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; color: #0b7a5c; font-weight: 600">4</div><h3 style="margin: 4px 0 6px; font-size: 16px">Counts every try</h3><div style="color: #3c4653; font-size: 14px">Tweaking until something passes is how luck gets sold as skill. Every re-run is counted and the result is marked down for it.</div></div>
+    </div>
+  </section>
+
+  <section id="pricing" style="max-width: 1200px; margin: 0 auto; padding: 24px 32px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px">Pricing <span style="font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 400; color: #566170">proposed, for Jeremy to set</span></h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
+      <div style="background: #ffffff; border: 1px solid #e3e7ec; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 8px"><h3 style="margin: 0; font-size: 16px">Free</h3><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 26px; font-weight: 600">$0</div><div style="color: #3c4653; font-size: 14px">3 checks a month. Daily bars. Private results.</div></div>
+      <div style="background: #ffffff; border: 2px solid #0b7a5c; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 8px"><h3 style="margin: 0; font-size: 16px">Trader</h3><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 26px; font-weight: 600">[PRICE] <span style="font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 400; color: #566170">a month</span></div><div style="color: #3c4653; font-size: 14px">40 checks a month. Intraday bars. Browser extension. Edit and re-run. Export.</div></div>
+      <div style="background: #ffffff; border: 1px solid #e3e7ec; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 8px"><h3 style="margin: 0; font-size: 16px">Pro</h3><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 26px; font-weight: 600">[PRICE] <span style="font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 400; color: #566170">a month</span></div><div style="color: #3c4653; font-size: 14px">200 checks a month. API and Claude connector. Forward paper tracking with a verifiable record.</div></div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":1120}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

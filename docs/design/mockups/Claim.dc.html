@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Apex claim check result</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+a{color:#6ea8ff}a:hover{color:#9cc3ff}
+</style>
+</helmet>
+<div style="min-height: 1120px; background: #0a0d12; color: #e6edf3; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.45">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 24px; background: #11161d; border-bottom: 1px solid #222b36">
+    <a href="Main.dc.html" style="font-weight: 700; letter-spacing: 0.08em; font-size: 16px; color: #e6edf3; text-decoration: none">APEX</a>
+    <span style="padding: 3px 10px; border-radius: 999px; border: 1px solid #2fd59b; color: #2fd59b; font-size: 12px; font-weight: 600; letter-spacing: 0.06em">PAPER</span>
+    <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #93a0b0">266 tries counted</span>
+    <div style="flex-grow: 1"></div>
+    <button style="background: #ff7b72; border: 0; color: #1a0503; padding: 8px 18px; border-radius: 8px; font: inherit; font-weight: 700; min-height: 44px">Halt</button>
+  </header>
+  <main style="max-width: 1200px; margin: 0 auto; padding: 20px 24px 40px; display: flex; flex-direction: column; gap: 16px; box-sizing: border-box">
+    <div style="font-size: 13px"><a href="#claims">Claim check</a> <span style="color: #93a0b0">/ Turtle Breakout 55/20 video</span></div>
+
+    <section style="background: #161d26; border: 1px solid #222b36; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #93a0b0">VERDICT</div>
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700; line-height: 1.2">No edge</h1>
+      <div style="font-size: 16px">On BTC daily bars, these rules did not beat random entries, costs and buy and hold.</div>
+      <div style="color: #93a0b0; font-size: 13px">This is about the rules as extracted, on the data Apex has. 1 interpretation · 1 try · <a href="#receipt">receipt</a></div>
+    </section>
+
+    <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; overflow-x: auto">
+      <table style="width: 100%; border-collapse: collapse; min-width: 640px">
+        <thead><tr style="background: #161d26; color: #93a0b0; text-align: left; font-size: 13px">
+          <th scope="col" style="padding: 10px 16px; font-weight: 600; width: 22%">Metric</th>
+          <th scope="col" style="padding: 10px 16px; font-weight: 600; width: 39%">Claimed in the video</th>
+          <th scope="col" style="padding: 10px 16px; font-weight: 600">Measured by Apex</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-top: 1px solid #222b36"><th scope="row" style="padding: 12px 16px; text-align: left; font-weight: 500">Return</th><td style="padding: 12px 16px; font-family: 'JetBrains Mono', ui-monospace, monospace">+729%</td><td style="padding: 12px 16px; font-family: 'JetBrains Mono', ui-monospace, monospace">−1.5% <span style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; font-size: 13px">net · n = 7 · 730 days</span></td></tr>
+          <tr style="border-top: 1px solid #222b36"><th scope="row" style="padding: 12px 16px; text-align: left; font-weight: 500">Max drawdown</th><td style="padding: 12px 16px; font-family: 'JetBrains Mono', ui-monospace, monospace">3.29% <span style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; font-size: 13px">closed trades only</span></td><td style="padding: 12px 16px; font-family: 'JetBrains Mono', ui-monospace, monospace">−4.7% <span style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; font-size: 13px">marked every bar</span></td></tr>
+          <tr style="border-top: 1px solid #222b36"><th scope="row" style="padding: 12px 16px; text-align: left; font-weight: 500">Beat random entries</th><td style="padding: 12px 16px; color: #93a0b0">no figure given</td><td style="padding: 12px 16px; font-family: 'JetBrains Mono', ui-monospace, monospace">43% <span style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; font-size: 13px">needs 95%</span></td></tr>
+          <tr style="border-top: 1px solid #222b36"><th scope="row" style="padding: 12px 16px; text-align: left; font-weight: 500">Trades</th><td style="padding: 12px 16px; color: #93a0b0">no figure given</td><td style="padding: 12px 16px; font-family: 'JetBrains Mono', ui-monospace, monospace">7 <span style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; font-size: 13px">needs 50</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section style="background: #11161d; border: 1px solid #f0b54a; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+      <div style="font-weight: 600; color: #f0b54a">Read this before comparing the two columns</div>
+      <div>The video's backtest covers more years than the 730 days of BTC bars Apex has. The measured column is a shorter period, so the two returns are not the same test. Seven trades is far too few to judge any rule.</div>
+    </section>
+
+    <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 600">Checks <span style="color: #93a0b0; font-weight: 400">· 0 of 6 passed</span></h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px">
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #ff7b72; font-weight: 700">Fail</span><span>Enough trades <span style="color: #93a0b0">· 7 of 50</span></span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #ff7b72; font-weight: 700">Fail</span><span>Monkey test <span style="color: #93a0b0">· 43%</span></span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #ff7b72; font-weight: 700">Fail</span><span>Locked test window</span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #ff7b72; font-weight: 700">Fail</span><span>One bar late</span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #ff7b72; font-weight: 700">Fail</span><span>Double costs</span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #ff7b72; font-weight: 700">Fail</span><span>Costs under half the moves</span></div>
+      </div>
+    </section>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px">
+      <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">The rules as extracted</h2>
+        <div><div style="color: #93a0b0; font-size: 12px">Entry</div><div>Buy when the daily close is above the highest high of the last 55 days.</div></div>
+        <div><div style="color: #93a0b0; font-size: 12px">Stop</div><div>2 × ATR(20) below the signal close. Fixed, not trailed.</div></div>
+        <div><div style="color: #93a0b0; font-size: 12px">Exit</div><div>Sell when the daily close is below the lowest low of the last 20 days.</div></div>
+        <div><div style="color: #93a0b0; font-size: 12px">Size and side</div><div>Risk 1% per trade. Long only.</div></div>
+        <div style="padding: 10px 12px; background: #161d26; border-radius: 8px; font-size: 13px"><span style="font-weight: 600">Assumptions: none.</span> <span style="color: #93a0b0">Every rule above is stated in the source. Each one links to its quote.</span></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <button style="background: #17202a; border: 1px solid #222b36; color: #e6edf3; padding: 10px 14px; border-radius: 8px; font: inherit; min-height: 44px">Edit and re-run (uses 1 try)</button>
+          <button style="background: #17202a; border: 1px solid #222b36; color: #e6edf3; padding: 10px 14px; border-radius: 8px; font: inherit; min-height: 44px">Export</button>
+        </div>
+      </section>
+      <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">Around the claim</h2>
+        <div><div style="color: #93a0b0; font-size: 12px">Flags</div><div>The only proof shown is one backtest chosen after the fact. Drawdown is quoted on closed trades only. No trade count, no out-of-sample test, no live record.</div></div>
+        <div><div style="color: #93a0b0; font-size: 12px">Not tested</div><div>Alerts to email and the app. They are delivery, not rules.</div></div>
+        <div><div style="color: #93a0b0; font-size: 12px">Data</div><div>BTC daily, 730 days. Costs assumed at 10 bp a side, not measured.</div></div>
+        <div><div style="color: #93a0b0; font-size: 12px">Also ran on</div><div>SPY 1h: 74 trades, −2.2%, 1 of 6 checks. Counted as a separate try.</div></div>
+        <div id="receipt"><div style="color: #93a0b0; font-size: 12px">Receipt</div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #93a0b0">Written to the ledger when the build is live. Shows the entry number, input hash and result hash.</div></div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":1120}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

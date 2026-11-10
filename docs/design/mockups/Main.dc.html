@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Apex Today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+a{color:#6ea8ff}a:hover{color:#9cc3ff}
+</style>
+</helmet>
+<div style="min-height: 1010px; background: #0a0d12; color: #e6edf3; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.45">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 24px; background: #11161d; border-bottom: 1px solid #222b36">
+    <div style="font-weight: 700; letter-spacing: 0.08em; font-size: 16px">APEX</div>
+    <span style="padding: 3px 10px; border-radius: 999px; border: 1px solid #2fd59b; color: #2fd59b; font-size: 12px; font-weight: 600; letter-spacing: 0.06em">PAPER</span>
+    <a href="Autopilot.dc.html" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #93a0b0; text-decoration: none">266 tries counted</a>
+    <span style="display: flex; align-items: center; gap: 6px; color: #93a0b0; font-size: 13px"><span style="width: 8px; height: 8px; border-radius: 50%; background: #2fd59b; display: inline-block"></span>Data ok</span>
+    <div style="flex-grow: 1"></div>
+    <button style="background: #17202a; border: 1px solid #222b36; color: #93a0b0; padding: 8px 12px; border-radius: 8px; font: inherit; min-height: 44px">Search or jump  Ctrl K</button>
+    <button style="background: #17202a; border: 1px solid #222b36; color: #e6edf3; padding: 8px 12px; border-radius: 8px; font: inherit; min-height: 44px">Ask Apex</button>
+    <button style="background: #ff7b72; border: 0; color: #1a0503; padding: 8px 18px; border-radius: 8px; font: inherit; font-weight: 700; min-height: 44px">Halt</button>
+  </header>
+  <div style="display: flex; flex-wrap: wrap">
+    <nav aria-label="Sections" style="flex: 1 1 180px; max-width: 220px; min-width: 160px; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #222b36">
+      <a href="Main.dc.html" style="padding: 11px 12px; border-radius: 8px; background: #17202a; color: #e6edf3; font-weight: 600; text-decoration: none">Today</a>
+      <a href="Autopilot.dc.html" style="padding: 11px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Autopilot</a>
+      <a href="Claim.dc.html" style="padding: 11px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Claim check</a>
+      <a href="#research" style="padding: 11px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Research</a>
+      <a href="#agents" style="padding: 11px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Agents</a>
+      <a href="#you" style="padding: 11px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">You</a>
+    </nav>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 20px 24px 40px; display: flex; flex-direction: column; gap: 16px">
+      <div style="color: #93a0b0; font-size: 13px">Paper mode. Nothing here is proven or guaranteed.</div>
+
+      <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">Needs you <span style="color: #93a0b0; font-weight: 400">(2)</span></h2>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 12px; background: #161d26; border-radius: 8px">
+          <div style="flex: 1 1 320px"><div style="font-weight: 500">The candidate is waiting for its independent check</div><div style="color: #93a0b0; font-size: 13px">dave_prev_range on SPY 1h passed six checks. The comparison with buy and hold and the validator re-run come next.</div></div>
+          <a href="Slot.dc.html" style="padding: 10px 14px; border-radius: 8px; background: #17202a; border: 1px solid #222b36; color: #e6edf3; text-decoration: none">Open</a>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 12px; background: #161d26; border-radius: 8px">
+          <div style="flex: 1 1 320px"><div style="font-weight: 500">Nine tests are queued from the approved plan</div><div style="color: #93a0b0; font-size: 13px">Five can run on data Apex already has. They would add 9 tries. Weekly budget: 0 of 25 used.</div></div>
+          <a href="#queue" style="padding: 10px 14px; border-radius: 8px; background: #17202a; border: 1px solid #222b36; color: #e6edf3; text-decoration: none">Review</a>
+        </div>
+      </section>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+        <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 16px; font-weight: 600">Evidence</h2>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">
+            <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; text-align: right; font-size: 20px; font-weight: 600">266</span><div style="flex-grow: 1; height: 10px; border-radius: 999px; background: #93a0b0"></div></div>
+            <div style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; padding-left: 54px; margin-top: -4px">strategy and market pairs tried</div>
+            <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; text-align: right; font-size: 20px; font-weight: 600">5</span><div style="width: 22px; height: 10px; border-radius: 999px; background: #f0b54a"></div></div>
+            <div style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; padding-left: 54px; margin-top: -4px">one check short (near miss or needs data)</div>
+            <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; text-align: right; font-size: 20px; font-weight: 600">1</span><div style="width: 10px; height: 10px; border-radius: 999px; background: #6ea8ff"></div></div>
+            <div style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; padding-left: 54px; margin-top: -4px">passed six checks, being checked independently</div>
+            <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; text-align: right; font-size: 20px; font-weight: 600">0</span><div style="width: 10px; height: 10px; border-radius: 999px; border: 1px solid #93a0b0; box-sizing: border-box"></div></div>
+            <div style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; padding-left: 54px; margin-top: -4px">in paper · 0 eligible · 0 live</div>
+          </div>
+          <a href="Autopilot.dc.html" style="font-size: 13px">See the whole board</a>
+        </section>
+
+        <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 600">Paper book</h2>
+            <span style="padding: 2px 8px; border-radius: 999px; background: #17202a; color: #93a0b0; font-size: 12px">book · 0 trades</span>
+          </div>
+          <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; line-height: 1.2">$10,000.00</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px; color: #93a0b0; font-size: 13px"><span>against the diversified core: no trades yet</span><span>against SPY hold: no trades yet</span></div>
+          <div style="height: 150px; border: 1px dashed #222b36; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; color: #93a0b0; font-size: 13px">Nothing has passed yet. The diversified core is the benchmark.<br>The chart starts with the first paper fill.</div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; font-size: 12.5px">
+            <div><div style="color: #93a0b0">Day loss</div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace">0.0% of −2%</div><div style="height: 6px; border-radius: 999px; background: #17202a; margin-top: 4px"></div></div>
+            <div><div style="color: #93a0b0">Week loss</div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace">0.0% of −5%</div><div style="height: 6px; border-radius: 999px; background: #17202a; margin-top: 4px"></div></div>
+            <div><div style="color: #93a0b0">Drawdown</div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace">0.0% of −15%</div><div style="height: 6px; border-radius: 999px; background: #17202a; margin-top: 4px"></div></div>
+          </div>
+        </section>
+      </div>
+
+      <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">Candidates and slots</h2>
+        <a href="Slot.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px; background: #161d26; border-radius: 8px; color: #e6edf3; text-decoration: none">
+          <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 600">dave_prev_range</span>
+          <span style="color: #93a0b0">SPY 1h</span>
+          <span style="padding: 2px 10px; border-radius: 999px; border: 1px solid #6ea8ff; color: #6ea8ff; font-size: 12px; font-weight: 600">Checking</span>
+          <span style="padding: 2px 8px; border-radius: 999px; background: #17202a; color: #93a0b0; font-size: 12px">in-sample · n = 51 · net of costs</span>
+          <span style="font-family: 'JetBrains Mono', ui-monospace, monospace">+9.1%</span>
+          <span style="color: #93a0b0; font-size: 13px">SPY hold over the same bars: +25.4%, with a deeper drawdown</span>
+          <span style="flex-grow: 1"></span>
+          <span style="color: #6ea8ff">Open</span>
+        </a>
+      </section>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+        <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <h2 style="margin: 0; font-size: 16px; font-weight: 600">Runs</h2>
+          <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #93a0b0">Last full run</span><span>Not yet. The first one runs tonight at 00:30 UTC.</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #93a0b0">Ledger</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace">0 entries</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #93a0b0">AI spend today</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace">$0.00 of $5.00</span></div>
+        </section>
+        <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <h2 style="margin: 0; font-size: 16px; font-weight: 600">Closest near misses</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline"><span style="font-family: 'JetBrains Mono', ui-monospace, monospace">dave_prev_range</span><span style="color: #93a0b0">SPY 4h</span><span style="color: #f0b54a">5 of 6</span><span style="color: #93a0b0; font-size: 13px">failed: enough trades (25 of 50)</span></div>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline"><span style="font-family: 'JetBrains Mono', ui-monospace, monospace">demand_second_leg</span><span style="color: #93a0b0">USO 1d</span><span style="color: #f0b54a">5 of 6</span><span style="color: #93a0b0; font-size: 13px">failed: enough trades (3 of 50)</span></div>
+          <div style="color: #93a0b0; font-size: 13px">Both need longer history before they can be judged.</div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":1010}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

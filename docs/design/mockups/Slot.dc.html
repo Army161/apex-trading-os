@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Apex slot detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+a{color:#6ea8ff}a:hover{color:#9cc3ff}
+</style>
+</helmet>
+<div style="min-height: 1010px; background: #0a0d12; color: #e6edf3; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.45">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 24px; background: #11161d; border-bottom: 1px solid #222b36">
+    <a href="Main.dc.html" style="font-weight: 700; letter-spacing: 0.08em; font-size: 16px; color: #e6edf3; text-decoration: none">APEX</a>
+    <span style="padding: 3px 10px; border-radius: 999px; border: 1px solid #2fd59b; color: #2fd59b; font-size: 12px; font-weight: 600; letter-spacing: 0.06em">PAPER</span>
+    <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #93a0b0">266 tries counted</span>
+    <div style="flex-grow: 1"></div>
+    <button style="background: #ff7b72; border: 0; color: #1a0503; padding: 8px 18px; border-radius: 8px; font: inherit; font-weight: 700; min-height: 44px">Halt</button>
+  </header>
+  <main style="max-width: 1360px; margin: 0 auto; padding: 20px 24px 40px; display: flex; flex-direction: column; gap: 16px; box-sizing: border-box">
+    <div style="font-size: 13px"><a href="Autopilot.dc.html">Autopilot</a> <span style="color: #93a0b0">/ dave_prev_range · SPY 1h</span></div>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+      <h1 style="margin: 0; font-size: 20px; font-weight: 600; font-family: 'JetBrains Mono', ui-monospace, monospace">dave_prev_range</h1>
+      <span style="color: #93a0b0">SPY 1h · previous-range pullback · source chat/78</span>
+      <span style="padding: 2px 10px; border-radius: 999px; border: 1px solid #6ea8ff; color: #6ea8ff; font-size: 12px; font-weight: 600">Checking</span>
+      <div style="flex-grow: 1"></div>
+      <button style="background: #17202a; border: 1px solid #222b36; color: #e6edf3; padding: 10px 14px; border-radius: 8px; font: inherit; min-height: 44px">Pause</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px">
+      <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">Graduation clock</h2>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; justify-content: space-between"><span>Forward months</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace">0.0 of 6</span></div>
+          <div style="height: 8px; border-radius: 999px; background: #17202a"></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; justify-content: space-between"><span>Forward trades</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace">0 of 50</span></div>
+          <div style="height: 8px; border-radius: 999px; background: #17202a"></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; justify-content: space-between"><span>Deflated Sharpe probability</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace">not yet · needs 95%</span></div>
+          <div style="height: 8px; border-radius: 999px; background: #17202a"></div>
+        </div>
+        <div style="padding: 10px 12px; background: #161d26; border-radius: 8px; color: #93a0b0; font-size: 13px">The clock starts when the independent check agrees and the rules are locked. At the backtest pace of about 25 trades a year on SPY alone, 50 forward trades take about two years. A pooled slot across SPY, QQQ and IWM would get there sooner and counts as one try.</div>
+      </section>
+
+      <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">Live locks</h2>
+        <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; background: #161d26; border-radius: 8px">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#93a0b0" stroke-width="1.6" aria-hidden="true"><rect x="4" y="9" width="12" height="8" rx="2"></rect><path d="M7 9V6a3 3 0 0 1 6 0v3"></path></svg>
+          <div><div style="font-weight: 500">1. Evidence <span style="color: #93a0b0; font-weight: 400">· closed</span></div><div style="color: #93a0b0; font-size: 13px">Six months of forward paper that held up, and the strict gate. Opened by the record, not by a person.</div></div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; background: #161d26; border-radius: 8px">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#93a0b0" stroke-width="1.6" aria-hidden="true"><rect x="4" y="9" width="12" height="8" rx="2"></rect><path d="M7 9V6a3 3 0 0 1 6 0v3"></path></svg>
+          <div><div style="font-weight: 500">2. Independent check <span style="color: #93a0b0; font-weight: 400">· closed</span></div><div style="color: #93a0b0; font-size: 13px">Two agreeing validator runs and the owner, engineer and QA review.</div></div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; background: #161d26; border-radius: 8px">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#93a0b0" stroke-width="1.6" aria-hidden="true"><rect x="4" y="9" width="12" height="8" rx="2"></rect><path d="M7 9V6a3 3 0 0 1 6 0v3"></path></svg>
+          <div><div style="font-weight: 500">3. Your approval <span style="color: #93a0b0; font-weight: 400">· waits for 1 and 2</span></div><div style="color: #93a0b0; font-size: 13px">You review the checklist here, type the slot name and re-enter your password. It starts at 1% of paper size.</div></div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; background: #161d26; border-radius: 8px; border: 1px solid #ff9f43">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#ff9f43" stroke-width="1.6" aria-hidden="true"><rect x="4" y="9" width="12" height="8" rx="2"></rect><path d="M7 9V6a3 3 0 0 1 6 0v3"></path></svg>
+          <div><div style="font-weight: 500">4. Your machine <span style="color: #93a0b0; font-weight: 400">· closed</span></div><div style="color: #93a0b0; font-size: 13px">Going live is your switch, on your machine, with your keys. Nothing on this dashboard can open it.</div></div>
+        </div>
+      </section>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px">
+      <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Forward record</h2><span style="padding: 2px 8px; border-radius: 999px; border: 1px solid #6ea8ff; color: #6ea8ff; font-size: 12px">forward</span></div>
+        <div style="height: 132px; border: 1px dashed #222b36; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; color: #93a0b0; font-size: 13px">No forward trades yet. Only bars after the lock count here.</div>
+      </section>
+      <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap"><h2 style="margin: 0; font-size: 16px; font-weight: 600">What it was selected on</h2><span style="padding: 2px 8px; border-radius: 999px; background: #17202a; color: #93a0b0; font-size: 12px">in-sample · net of costs</span></div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; font-family: 'JetBrains Mono', ui-monospace, monospace">
+          <div><div style="font-size: 20px; font-weight: 600">+9.1%</div><div style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; font-size: 12px">return, n = 51</div></div>
+          <div><div style="font-size: 20px; font-weight: 600">−8.3%</div><div style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; font-size: 12px">drawdown</div></div>
+          <div><div style="font-size: 20px; font-weight: 600">97.5%</div><div style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; font-size: 12px">of random runs beaten</div></div>
+          <div><div style="font-size: 20px; font-weight: 600">+25.4%</div><div style="font-family: Inter, system-ui, sans-serif; color: #93a0b0; font-size: 12px">SPY hold, drawdown −20.5%</div></div>
+        </div>
+        <div style="color: #93a0b0; font-size: 13px">It made less than holding SPY, with a much shallower drawdown. The risk-adjusted comparison decides whether it goes to paper.</div>
+      </section>
+    </div>
+
+    <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 600">Checks</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px">
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #2fd59b; font-weight: 700">Pass</span><span>Enough trades <span style="color: #93a0b0">· 51 of 50</span></span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #2fd59b; font-weight: 700">Pass</span><span>Monkey test <span style="color: #93a0b0">· beat 97.5%, needs 95%</span></span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #2fd59b; font-weight: 700">Pass</span><span>Locked test window <span style="color: #93a0b0">· last 18 months</span></span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #2fd59b; font-weight: 700">Pass</span><span>One bar late</span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #2fd59b; font-weight: 700">Pass</span><span>Double costs</span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #2fd59b; font-weight: 700">Pass</span><span>Costs under half the moves</span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #6ea8ff; font-weight: 700">Next</span><span>Beats hold on risk <span style="color: #93a0b0">· not run yet</span></span></div>
+        <div style="display: flex; gap: 10px; padding: 9px 12px; background: #161d26; border-radius: 8px"><span style="color: #6ea8ff; font-weight: 700">Next</span><span>Validator re-run <span style="color: #93a0b0">· second data source</span></span></div>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <a href="#trades" style="padding: 10px 12px; border-radius: 8px; background: #17202a; color: #e6edf3; font-weight: 600; text-decoration: none">Trades</a>
+      <a href="#intents" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Intents and blocks</a>
+      <a href="#validator" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Validator runs</a>
+      <a href="#drift" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Drift</a>
+      <a href="#regime" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Regime context</a>
+      <a href="#receipts" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Receipts</a>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":1010}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
