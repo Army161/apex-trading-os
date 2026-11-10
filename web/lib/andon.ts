@@ -17,7 +17,7 @@ export function botCommand(killswitch: boolean, cord: Cord, queued: string | nul
 
 /** True when a reading has crossed its line and the cord should be pulled. */
 export function shouldPull(r: Reading): boolean {
-  if (!Number.isFinite(r.value) || !Number.isFinite(r.limit)) return false;
+  // NaN readings never pull: every comparison with NaN is false.
   if (r.kind === 'errors') return r.value >= r.limit;
   return r.value <= r.limit; // drawdown / daily_loss: e.g. -0.27 <= -0.25
 }

@@ -1,7 +1,7 @@
 // Parity + sanity checks between the TS port and the Python engine. Run: npm test
 import fs from 'node:fs';
 import path from 'node:path';
-import { backtest, Bar } from './core';
+import { backtest, atr, Bar, Sig } from './core';
 import { byId, STRATEGIES } from './strategies';
 import { EXAMPLE, compile, validate, setPath, Spec } from './spec';
 import { paperRecord } from '../strategies';
@@ -110,6 +110,32 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
     && finalVerdict([{ step: 'a', verdict: 'concerns', summary: '', issues: [] }, { step: 'b', verdict: 'block', summary: '', issues: [hi] }]) === 'block'
     && triage([hi, md, lo]).serious.length === 1 && triage([hi, md, lo]).optional.length === 1 && triage([hi, md, lo]).ignore.length === 1;
   console.log(`${ok ? 'PASS' : 'FAIL'} review: stop-overthinking verdict and triage`); if (!ok) fail++;
+}
+{ // engine edges (added after mutation testing): exact stop/target touches, invalid stops, R multiple, time exits
+  const mk = (n: number, last: Partial<Bar>[] = []) => { const b: Bar[] = []; for (let i = 0; i < n; i++) b.push({ t: i * 864e5, o: 100, h: 101, l: 99, c: 100, v: 1 });
+    last.forEach((x, k) => Object.assign(b[n - last.length + k], x)); return b; };
+  const sig = (n: number, at: number, o: Partial<Sig> & { side?: 1 | -1; st?: number; tg?: number } = {}): Sig => {
+    const f = () => Array(n).fill(false), s: Sig = { le: f(), se: f(), lx: f(), sx: f(), stop: Array(n).fill(NaN), target: Array(n).fill(NaN), maxBars: o.maxBars };
+    (o.side === -1 ? s.se : s.le)[at] = true; s.stop[at] = o.st ?? NaN; s.target[at] = o.tg ?? NaN; if (o.sx) s.sx = o.sx; return s; };
+  const one = (b: Bar[], s: Sig) => backtest(b, s, { fee: 0, slip: 0 }).trades[0];
+  const n = 24, atrv = atr(mk(n), 14)[19];
+  const L1 = one(mk(n, [{}, { l: 95, c: 96 }, {}, {}]), sig(n, 19, { st: 95, tg: 110 }));
+  const L2 = one(mk(n, [{}, { h: 110 }, {}, {}]), sig(n, 19, { st: 95, tg: 110 }));
+  const S1 = one(mk(n, [{}, { h: 105 }, {}, {}]), sig(n, 19, { side: -1, st: 105, tg: 90 }));
+  const S2 = one(mk(n, [{}, { l: 90 }, {}, {}]), sig(n, 19, { side: -1, st: 105, tg: 90 }));
+  const touch = L1?.reason === 'stop' && L1.exit === 95 && L2?.reason === 'target' && L2.exit === 110 && S1?.reason === 'stop' && S1.exit === 105 && S2?.reason === 'target' && S2.exit === 90;
+  const rOk = Math.abs((L1?.r ?? 0) + 1) < 1e-9;
+  const E1 = one(mk(n), sig(n, 19, { st: 100 })), E2 = one(mk(n), sig(n, 19, { side: -1, st: 100 })), E3 = one(mk(n), sig(n, 19, {}));
+  const fallback = !!E1 && Math.abs(E1.stop - (100 - 2 * atrv)) < 1e-9 && !!E2 && Math.abs(E2.stop - (100 + 2 * atrv)) < 1e-9 && !!E3 && Math.abs(E3.stop - (100 - 2 * atrv)) < 1e-9;
+  const tb = mk(n), T1 = one(tb, sig(n, 19, { st: 50, maxBars: 2 }));
+  const timeExit = T1?.reason === 'signal' && T1.exitT === tb[22].t;
+  const T2 = one(mk(n), sig(n, 19, { st: 50, sx: Array(n).fill(true) }));
+  const sideOk = T2?.reason === 'end';
+  const ct = (checkTrade({ side: 'long', entry: 100, stop: 100, target: 110 }) as any).ok === false && (checkTrade({ side: 'long', entry: 100, stop: 95, target: 100 }) as any).ok === false
+    && (checkTrade({ side: 'short', entry: 100, stop: 100, target: 90 }) as any).ok === false && !!(checkTrade({ side: 'short', entry: 100, stop: 102, target: 90 }) as any).note
+    && !(checkTrade({ side: 'long', entry: 100, stop: 98, target: 110 }) as any).note;
+  const ok = touch && rOk && fallback && timeExit && sideOk && ct;
+  console.log(`${ok ? 'PASS' : 'FAIL'} engine edges: touches ${touch}, R ${rOk}, stop fallback ${fallback}, time exit ${timeExit}, side exits ${sideOk}, checkTrade ${ct}`); if (!ok) fail++;
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');
 process.exit(fail ? 1 : 0);

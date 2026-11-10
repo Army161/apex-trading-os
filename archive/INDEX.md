@@ -48,6 +48,7 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 40 | [chat/40-elephant-goldfish-review.md](chat/40-elephant-goldfish-review.md) | 2026-11-10 18:01 | 21,127 |
 | 41 | [chat/41-herder-hermes-agent-team.md](chat/41-herder-hermes-agent-team.md) | 2026-11-10 18:07 | 7,529 |
 | 42 | [chat/42-grokbot-marketplace.md](chat/42-grokbot-marketplace.md) | 2026-11-10 18:08 | 5,191 |
+| 43 | [chat/43-memecoin-trader-five-secrets.md](chat/43-memecoin-trader-five-secrets.md) | 2026-11-10 18:09 | 20,092 |
 
 ## Uploaded files
 

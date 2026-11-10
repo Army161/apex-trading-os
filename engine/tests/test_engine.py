@@ -129,3 +129,54 @@ def test_walk_forward_and_confluence_explain():
     assert "oos_metrics" in wf
     e = explain(DF)
     assert 0 <= e["score"] <= 100 and set(e["components"]) == {"structure", "location", "trigger", "momentum", "context"}
+
+
+# Boundary tests added after mutation testing (tools/mutate.py, archive/chat/37): each one pins an exact edge of a
+# risk rule so flipping a comparison, min/max or and/or in apex_engine/risk.py makes a test fail.
+def test_risk_size_edges():
+    g = RiskGuard(equity=10_000)
+    assert g.size(100, 90) == 10.0                      # 1% of 10k over a $10 stop
+    assert g.size(100, 90, risk_pct=0.005) == 5.0       # an explicit lower risk is honoured
+    assert g.size(100, 90, risk_pct=0.05) == 20.0       # capped at the 2% hard limit
+    assert g.size(100, 100) == 0.0                      # no stop distance, no position
+
+
+def test_risk_check_edges():
+    t = 1_000_000
+    g = RiskGuard(RiskConfig(min_rr=1.5, max_open_positions=2, cooldown_after_loss_min=60, backtest_max_dd=-0.9), equity=10_000)
+    assert g.check(100, 90, 115, now=t)[0]              # exactly 1.5R is allowed
+    g.on_open(); assert g.check(100, 90, 115, now=t)[0]
+    g.on_open(); ok, why = g.check(100, 90, 115, now=t)
+    assert not ok and "max open" in why                 # at the limit is blocked
+    g.on_close(50, now=t)
+    assert g.state.open_positions == 1 and g.state.losses_in_row == 0
+    g.on_close(0, now=t)                                # break-even is not a loss: no cooldown
+    assert g.state.losses_in_row == 0 and g.check(100, 90, 115, now=t)[0]
+
+
+def test_risk_cooldown_and_streak_edges():
+    t = 1_000_000
+    g = RiskGuard(RiskConfig(streak_len=3, cooldown_after_loss_min=60, cooldown_after_streak_min=600, backtest_max_dd=-0.9,
+                             daily_loss_limit_pct=0.5), equity=10_000)
+    g.on_close(-10, now=t)
+    assert g.state.losses_in_row == 1 and g.state.cooldown_until == t + 3600
+    assert not g.check(100, 90, 120, now=t + 3599)[0]
+    assert g.check(100, 90, 120, now=t + 3600)[0]       # cooldown ends exactly on time
+    g.on_close(-10, now=t)
+    assert g.state.cooldown_until == t + 3600           # 2 losses: still the short cooldown
+    g.on_close(-10, now=t)
+    assert g.state.losses_in_row == 3 and g.state.cooldown_until == t + 600 * 60  # 3rd loss: streak cooldown
+
+
+def test_risk_daily_limit_and_dd_pause_edges():
+    t = 1_000_000
+    g = RiskGuard(RiskConfig(daily_loss_limit_pct=0.5, cooldown_after_loss_min=0, backtest_max_dd=-0.9), equity=10_000)
+    g.check(100, 90, 120, now=t)                        # starts the day at 10k
+    g.on_close(-5_000, now=t)                           # exactly -50% today
+    ok, why = g.check(100, 90, 120, now=t + 60)
+    assert not ok and "daily loss" in why
+    g2 = RiskGuard(RiskConfig(backtest_max_dd=-0.5, cooldown_after_loss_min=0, daily_loss_limit_pct=0.99), equity=10_000)
+    g2.on_close(-4_999, now=t)
+    assert not g2.state.paused
+    g2.on_close(-1, now=t)                              # drawdown exactly equals the backtest worst: pause
+    assert g2.state.paused
