@@ -239,6 +239,258 @@ export const SOURCES = [
   "notes": "A working method, not a feature."
  },
  {
+  "id": "chat/35",
+  "title": "Honcho evolving second brain",
+  "feeds": "web/lib/memory.ts (own code; Honcho is AGPL, not copied)",
+  "file": "archive/chat/35-honcho-evolving-second-brain.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/36",
+  "title": "Delete 90% of skills",
+  "feeds": "skills audit (pending)",
+  "file": "archive/chat/36-delete-90-percent-of-skills.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/37",
+  "title": "AI software factory security",
+  "feeds": "web/lib/gateway.ts, andon.ts",
+  "file": "archive/chat/37-ai-software-factory-security.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/38",
+  "title": "Software factory v2",
+  "feeds": "web/lib/team.ts, jobs.ts",
+  "file": "archive/chat/38-software-factory-v2.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/39",
+  "title": "Open-source business models",
+  "feeds": "docs/business-models.md",
+  "file": "archive/chat/39-open-source-business-models.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/40",
+  "title": "Elephant/goldfish review",
+  "feeds": "web/lib/review.ts",
+  "file": "archive/chat/40-elephant-goldfish-review.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/41",
+  "title": "Herder + Hermes agent team",
+  "feeds": "web/lib/team.ts (Herder install pending Jeremy)",
+  "file": "archive/chat/41-herder-hermes-agent-team.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/42",
+  "title": "GrokBot marketplace",
+  "feeds": "template library idea (pending)",
+  "file": "archive/chat/42-grokbot-marketplace.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/43",
+  "title": "Memecoin trader five secrets",
+  "feeds": "notes only; no token launching",
+  "file": "archive/chat/43-memecoin-trader-five-secrets.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/44",
+  "title": "Memecoin November event bet",
+  "feeds": "notes only",
+  "file": "archive/chat/44-memecoin-november-event-bet.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/45",
+  "title": "Memecoin five secrets (incent)",
+  "feeds": "watch-only mode idea (pending)",
+  "file": "archive/chat/45-memecoin-incent-five-secrets.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/46",
+  "title": "Three AI bots (Jev)",
+  "feeds": "web/lib/decide.ts AI decision layer; bots/alpaca/daytrader/insider.py; docs/always-on-server.md",
+  "file": "archive/chat/46-three-ai-bots-claude-jev.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/47",
+  "title": "GEX last half hour on MES",
+  "feeds": "web/lib/engine/options.ts gexProfile, lastHalfHour",
+  "file": "archive/chat/47-gex-last-half-hour-mes.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/48",
+  "title": "Golden cross vs AI on gold",
+  "feeds": "web/lib/engine/ict.ts goldenCross; validate.ts",
+  "file": "archive/chat/48-golden-cross-vs-ai-gold.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/49",
+  "title": "Kronos gold monkey test",
+  "feeds": "web/lib/engine/validate.ts stressSuite; Kronos noted only",
+  "file": "archive/chat/49-kronos-gold-monkey-test.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/50",
+  "title": "ICT turtle soup, silver bullet, unicorn",
+  "feeds": "web/lib/engine/ict.ts",
+  "file": "archive/chat/50-ict-turtle-soup-silver-bullet-unicorn.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/51",
+  "title": "Liquidity sweep and inducement",
+  "feeds": "web/lib/engine/liquidity.ts",
+  "file": "archive/chat/51-liquidity-sweep-inducement.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/52",
+  "title": "EMA 50 regime",
+  "feeds": "web/lib/engine/trend.ts emaRegime, mtfBias",
+  "file": "archive/chat/52-ema50-regime.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/53",
+  "title": "Parabolic SAR vs MA cross",
+  "feeds": "web/lib/engine/trend.ts psar",
+  "file": "archive/chat/53-parabolic-sar-vs-ma-cross.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/54",
+  "title": "Ravish options podcast",
+  "feeds": "web/lib/engine/options.ts structures and model backtests",
+  "file": "archive/chat/54-ravish-options-podcast.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/55",
+  "title": "Annie GEX flow podcast",
+  "feeds": "web/lib/engine/options.ts flowPlaybook",
+  "file": "archive/chat/55-annie-gex-flow-podcast.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/56",
+  "title": "Demand second leg",
+  "feeds": "web/lib/engine/demand.ts secondLeg",
+  "file": "archive/chat/56-demand-second-leg.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/57",
+  "title": "Sharp reversal flag stops",
+  "feeds": "web/lib/engine/demand.ts sharpReversal",
+  "file": "archive/chat/57-sharp-reversal-flag-stops.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/58",
+  "title": "Best indicator EMA anchor",
+  "feeds": "web/lib/engine/demand.ts anchorDiscount",
+  "file": "archive/chat/58-best-indicator-ema-anchor.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/59",
+  "title": "Reversals rubber band + GWS",
+  "feeds": "web/lib/engine/demand.ts gwsReversal",
+  "file": "archive/chat/59-reversals-rubber-band-gws.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/60",
+  "title": "Consistency and deal flow (Urban Forex)",
+  "feeds": "web/lib/engine/urban.ts currencyStrength, dealFlow",
+  "file": "archive/chat/60-consistency-deal-flow.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/61",
+  "title": "S/R day trading memory zones (Urban Forex)",
+  "feeds": "web/lib/engine/urban.ts srMemory",
+  "file": "archive/chat/61-sr-day-trading-memory-zones.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/62",
+  "title": "Agent pixel office",
+  "feeds": "web/lib/policy.ts; docs/agent-safety-and-office.md",
+  "file": "archive/chat/62-agent-pixel-office.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/63",
+  "title": "Agent setup walkthrough",
+  "feeds": "web/lib/policy.ts purposeStale; docs/agent-safety-and-office.md",
+  "file": "archive/chat/63-agent-setup-walkthrough.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/64",
+  "title": "Agent pixel office 2",
+  "feeds": "web/lib/policy.ts newAgent low autonomy",
+  "file": "archive/chat/64-agent-pixel-office-2.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/65",
+  "title": "OpenBot agent co-worker",
+  "feeds": "web/lib/policy.ts gateway, audit, routines",
+  "file": "archive/chat/65-openbot-agent-coworker.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/66",
+  "title": "OpenCode Browse",
+  "feeds": "docs/agent-safety-and-office.md browser notes",
+  "file": "archive/chat/66-opencode-browse.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/67",
+  "title": "Free coding agent on DeepSeek",
+  "feeds": "/.claude/agents/build-buddy.md",
+  "file": "archive/chat/67-free-coding-agent-deepseek.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/68",
+  "title": "Model-agnostic workspace",
+  "feeds": "AGENTS.md",
+  "file": "archive/chat/68-model-agnostic-workspace.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/69",
+  "title": "Free model gateway with fallback",
+  "feeds": "web/lib/router.ts",
+  "file": "archive/chat/69-free-model-gateway-fallback.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
+  "id": "chat/70",
+  "title": "Local multi-agent workspace",
+  "feeds": "web/lib/policy.ts approval levels, shouldRun",
+  "file": "archive/chat/70-local-multi-agent-workspace.md",
+  "notes": "Paper only. Nothing installed."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",

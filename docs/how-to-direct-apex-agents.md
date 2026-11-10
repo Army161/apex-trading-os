@@ -68,3 +68,18 @@ Apex has local commits for every checkpoint. They go to GitHub as soon as the `a
 - **Trust tags.** Research numbers come tagged [verified], [unverified] or [suspicious]. Act only on verified ones.
 - **Scan before you install.** Run `python tools/skill_scan.py <folder>` on any new skill or MCP server. Give AI tools one test folder before anything wider.
 - **Watch the spend.** Setup shows today's AI spend. Also set a monthly limit in the Anthropic Console.
+
+## Orchestrator and workers, blast radius, inverse pyramid (archive/chat/71)
+- **The orchestrator plans and checks. Coding agents do the work.** Any job longer than a short question is handed to a coding agent along with an **acceptance test**. The orchestrator checks the proof, opens a pull request and reports back. The job board (`web/lib/jobs.ts`) and agent team (`web/lib/team.ts`) already follow this shape.
+- **Score every change by blast radius** before it merges:
+  - **Green**: docs, archive, UI text and tests. These can merge after checks pass.
+  - **Yellow**: strategy logic, backtests and the dashboard. These need AI review plus the self-tests.
+  - **Red**: anything touching trading, orders, keys, money, risk checks or the paper/live switch. These **never auto-merge** and always wait for Jeremy's review.
+- **The inverse pyramid.** When the same mistake happens twice, fix it as high up this list as possible:
+  1. In the code, so the easy path is the right path: types, a single gateway, pure functions.
+  2. In a deterministic check: a lint rule, a self-test in `npm test`, or CI.
+  3. In a rules file: `AGENTS.md` or a skill.
+  4. Human review comes last, because it doesn't scale.
+- **Lock the doors.** Agents run sandboxed with scoped credentials, read-only wherever possible. They open PRs but never merge them. Bots never share a machine that holds another bot's logins. Controls live in the environment, not in the agent's good intentions.
+- **Backlog triage.** Score with RICE (reach × impact × confidence ÷ effort) and use the blast-radius colour as a tie-breaker: at the same score, green work goes first. Don't let a bot fill the backlog just because it can, and don't run hourly context-farming routines. They burn tokens.
+- The orchestrator tools in the video (Grockbot, T3 Code) and the sponsor plug (a hosted database) are not used. Nothing was installed.

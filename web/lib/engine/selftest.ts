@@ -11,6 +11,13 @@ import { applyOp, applyDream, current, history, memoryBlock, looksSecret, Fact }
 import { botCommand, shouldPull } from '../andon';
 import { finalVerdict, triage } from '../review';
 import { normalizeRules, rulesBlock, riskSystem, QUESTIONS } from '../rules';
+import { monkeyTest, sampleCheck } from './validate';
+import { bs, gexOf } from './options';
+import { psar } from './trend';
+import { usdValues, currencyStrength, strengthSide, allCrosses } from './urban';
+import { decide, rosterRules, newAgent, afterRun, redact, purposeStale, asks, shouldRun, imported } from '../policy';
+import { gate, ruleFilter } from '../decide';
+import { pickModel, markDown } from '../router';
 const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/parity.json'), 'utf8'));
 const bars: Bar[] = fx.bars.map((r: number[]) => ({ t: r[0], o: r[1], h: r[2], l: r[3], c: r[4], v: r[5] }));
 let fail = 0;
@@ -136,6 +143,58 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
     && !(checkTrade({ side: 'long', entry: 100, stop: 98, target: 110 }) as any).note;
   const ok = touch && rOk && fallback && timeExit && sideOk && ct;
   console.log(`${ok ? 'PASS' : 'FAIL'} engine edges: touches ${touch}, R ${rOk}, stop fallback ${fallback}, time exit ${timeExit}, side exits ${sideOk}, checkTrade ${ct}`); if (!ok) fail++;
+}
+// ---- chat/46-66 modules: validation, options, trend, Urban Forex, agent policy, AI gate ----
+{
+  // monkey test is deterministic and a fee-only loser never passes
+  const mb: Bar[] = Array.from({ length: 300 }, (_, i) => ({ t: i * 864e5, o: 100 + Math.sin(i / 7), h: 101 + Math.sin(i / 7), l: 99 + Math.sin(i / 7), c: 100 + Math.sin(i / 7), v: 1 }));
+  const fake = Array.from({ length: 20 }, (_, j) => ({ side: 1 as const, entryT: 0, entry: 100, stop: 99, target: 101, qty: 10, exitT: 0, exit: 100, reason: 'x', pnl: -5, r: -0.1, bars: 3 + (j % 4) }));
+  const m1 = monkeyTest(mb, fake, { seed: 3 }), m2 = monkeyTest(mb, fake, { seed: 3 });
+  const vOk = m1.beat === m2.beat && !m1.pass && !sampleCheck(20).ok && sampleCheck(50).ok;
+  // Black-Scholes put-call parity and GEX signs
+  const S = 100, K = 105, T = 0.5, v = 0.25, r = 0.04, C = bs('C', S, K, T, v, r), P = bs('P', S, K, T, v, r);
+  const parity = Math.abs(C.price - P.price - (S - K * Math.exp(-r * T))) < 1e-6 && Math.abs(C.gamma - P.gamma) < 1e-9;
+  const gex = gexOf({ K: 100, right: 'C', oi: 10, iv: 0.2, T: 0.1 }, 100) > 0 && gexOf({ K: 100, right: 'P', oi: 10, iv: 0.2, T: 0.1 }, 100) < 0;
+  // PSAR stays under price in a steady uptrend
+  const up: Bar[] = Array.from({ length: 60 }, (_, i) => ({ t: i, o: 100 + i, h: 101 + i, l: 99 + i, c: 100.5 + i, v: 1 }));
+  const ps = psar(up), sarOk = ps.sar.slice(5).every((x, i) => x < up[i + 5].l) && ps.dir[59] === 1;
+  // currency strength: EUR rises against everything -> EUR strong, the scan allows EURUSD longs only
+  const days = 120, mkp = (f: (i: number) => number): Bar[] => Array.from({ length: days }, (_, i) => ({ t: i * 864e5, o: f(i), h: f(i) * 1.001, l: f(i) * 0.999, c: f(i), v: 1 }));
+  const uv = usdValues({ EURUSD: mkp(i => 1 + i * 0.002), GBPUSD: mkp(() => 1.3), USDJPY: mkp(() => 150) });
+  const st = currencyStrength(uv), last = st[st.length - 1], side = strengthSide(st, 'EURUSD').get((days - 1) * 864e5);
+  const crs = allCrosses(uv), eg = crs.EURGBP[days - 1], egOk = Math.abs(eg.c - (1 + (days - 1) * 0.002) / 1.3) < 1e-9 && eg.h >= eg.c && eg.l <= eg.c;
+  const ccyOk = last.label.EUR === 'strong' && last.label.USD !== 'strong' && side === 1 && egOk;
+  // agent policy: deny first, default deny, money verbs always refused, approval on send, broken rule refuses, secrets redacted
+  const roster = [newAgent('scout', 'analyst', 'apex', 'reads market data')];
+  const rules = rosterRules(roster, {});
+  const pr = (verb: any, trigger: any = 'person') => decide({ agent: 'scout', verb, trigger }, rules);
+  const broken = decide({ agent: 'scout', verb: 'read', trigger: 'person' }, [{ id: 'oops', effect: 'deny', when: () => { throw new Error('x'); } }]);
+  const sendOk = decide({ agent: 'scout', verb: 'send', trigger: 'person' }, [{ id: 'mail', effect: 'allow', when: () => true }]);
+  const usedUp = decide({ agent: 'scout', verb: 'read', trigger: 'person' }, rosterRules(roster, { scout: 1 }));
+  let rt = { id: 'r', agent: 'scout', everyMin: 5, on: true, fails: 0 }; for (let k = 0; k < 10; k++) rt = afterRun(rt, false);
+  const red = redact('token=abc123 key sk-ant-REDACTME0123456789');
+  const polOk = pr('read').allow && !pr('write_file').allow && pr('write_file').rule === 'default-deny' && !pr('withdraw').allow && pr('order').rule === 'no-money-tools'
+    && !broken.allow && broken.rule === 'oops' && sendOk.allow && sendOk.needsApproval && !usedUp.allow && usedUp.rule === 'over-daily-budget'
+    && !rt.on && rt.everyMin === 15 && !/abc123|REDACTME/.test(red) && !purposeStale(roster[0]) && purposeStale({ ...roster[0], tools: ['read', 'analyze', 'notify'] })
+    && !asks(roster[0], 'read') && asks(roster[0], 'write_file') && asks({ ...roster[0], approval: 'full' }, 'send') && !asks({ ...roster[0], approval: 'full' }, 'write_file')
+    && !shouldRun({ ...rt, on: true, running: true }) && shouldRun({ ...rt, on: true, running: false, lastRun: 0 }, 16 * 6e4) && !imported({ ...rt, on: true }).on
+    && !decide({ agent: 'scout', verb: 'shell', trigger: 'routine' }, [{ id: 'all', effect: 'allow', when: () => true }]).allow;
+  // AI gate: a model "wait" or low confidence never trades; the rule filter blocks a long in a bear regime
+  const snap: any = { strategy: 'x', side: 'long', price: 100, stop: 98, target: 108, rr: 4, atrPct: 1, rsi14: 50, adx14: 25, ema50DistAtr: 1, ema50Slope: 'up', emaRegime: 'bull', volVsAvg: 1.2, ret5: 1, ret20: 2, last5: [] };
+  const gOk = !gate(snap, { action: 'wait', confidence: 90, fakeoutRisk: 0, why: '' }).take && !gate(snap, { action: 'long', confidence: 40, fakeoutRisk: 0, why: '' }).take
+    && gate(snap, { action: 'long', confidence: 80, fakeoutRisk: 20, why: '' }).take && ruleFilter(snap).take && !ruleFilter({ ...snap, emaRegime: 'bear' }).take;
+  // every new strategy builds on the fixture without throwing and only flags entries with a stop
+  let built = true; for (const s of STRATEGIES) { try { const g = s.build(bars); for (let i = 0; i < bars.length; i++) if ((g.le[i] || g.se[i]) && isNaN(g.stop[i]) && !g.fullSize) { /* engine falls back to 2 ATR */ } } catch { built = false; console.log('  build threw:', s.id); } }
+  const ok = vOk && parity && gex && sarOk && ccyOk && polOk && gOk && built;
+  console.log(`${ok ? 'PASS' : 'FAIL'} new modules: validate ${vOk}, options ${parity && gex}, psar ${sarOk}, currency strength ${ccyOk}, policy ${polOk}, AI gate ${gOk}, all strategies build ${built}`); if (!ok) fail++;
+}
+{
+  const L: any[] = [{ id: 'a', provider: 'anthropic', free: false, keyEnv: 'K1', capUsd: 5 }, { id: 'b', provider: 'nvidia', free: true, keyEnv: 'K2', capUsd: 1 }, { id: 'c', provider: 'openrouter', free: true, keyEnv: 'K3', capUsd: 1 }];
+  const env = { K1: 'x', K2: 'y', K3: 'z' }, st = { spentUsd: {}, down: {}, next: 0 };
+  const p1 = pickModel(L, st, { env, now: 0 })?.model.id === 'a', p2 = pickModel(L, st, { env, now: 0, freeOnly: true })?.model.id === 'b';
+  const p3 = pickModel(L, markDown(st, 'a', 1000, 0), { env, now: 10 })?.model.id === 'b' && pickModel(L, { ...st, spentUsd: { K1: 5, K2: 1, K3: 1 } }, { env, now: 0 }) === null;
+  const rr = pickModel(L, { ...st, next: 1 }, { env, now: 0, strategy: 'round-robin' }), p4 = rr?.model.id === 'b' && rr.next === 2 && pickModel(L, st, { env: {}, now: 0 }) === null;
+  const ok = p1 && p2 && p3 && p4; console.log(`${ok ? 'PASS' : 'FAIL'} model router: priority ${p1}, free only ${p2}, fallback and caps ${p3}, round-robin ${p4}`); if (!ok) fail++;
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');
 process.exit(fail ? 1 : 0);

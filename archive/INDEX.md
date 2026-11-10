@@ -53,6 +53,30 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 45 | [chat/45-memecoin-incent-five-secrets.md](chat/45-memecoin-incent-five-secrets.md) | 2026-11-10 18:14 | 14,640 |
 | 46 | [chat/46-three-ai-bots-claude-jev.md](chat/46-three-ai-bots-claude-jev.md) | 2026-11-10 18:15 | 33,766 |
 | 47 | [chat/47-gex-last-half-hour-mes.md](chat/47-gex-last-half-hour-mes.md) | 2026-11-10 18:17 | 8,083 |
+| 48 | [chat/48-golden-cross-vs-ai-gold.md](chat/48-golden-cross-vs-ai-gold.md) | 2026-11-10 18:18 | 10,406 |
+| 49 | [chat/49-kronos-gold-monkey-test.md](chat/49-kronos-gold-monkey-test.md) | 2026-11-10 18:19 | 11,109 |
+| 50 | [chat/50-ict-turtle-soup-silver-bullet-unicorn.md](chat/50-ict-turtle-soup-silver-bullet-unicorn.md) | 2026-11-10 18:20 | 14,936 |
+| 51 | [chat/51-liquidity-sweep-inducement.md](chat/51-liquidity-sweep-inducement.md) | 2026-11-10 18:21 | 16,519 |
+| 52 | [chat/52-ema50-regime.md](chat/52-ema50-regime.md) | 2026-11-10 18:23 | 52,477 |
+| 53 | [chat/53-parabolic-sar-vs-ma-cross.md](chat/53-parabolic-sar-vs-ma-cross.md) | 2026-11-10 18:23 | 15,636 |
+| 54 | [chat/54-ravish-options-podcast.md](chat/54-ravish-options-podcast.md) | 2026-11-10 18:24 | 66,737 |
+| 55 | [chat/55-annie-gex-flow-podcast.md](chat/55-annie-gex-flow-podcast.md) | 2026-11-10 18:25 | 74,228 |
+| 56 | [chat/56-demand-second-leg.md](chat/56-demand-second-leg.md) | 2026-11-10 18:28 | 23,495 |
+| 57 | [chat/57-sharp-reversal-flag-stops.md](chat/57-sharp-reversal-flag-stops.md) | 2026-11-10 18:29 | 22,392 |
+| 58 | [chat/58-best-indicator-ema-anchor.md](chat/58-best-indicator-ema-anchor.md) | 2026-11-10 18:30 | 40,198 |
+| 59 | [chat/59-reversals-rubber-band-gws.md](chat/59-reversals-rubber-band-gws.md) | 2026-11-10 18:31 | 48,371 |
+| 60 | [chat/60-consistency-deal-flow.md](chat/60-consistency-deal-flow.md) | 2026-11-10 18:31 | 48,706 |
+| 61 | [chat/61-sr-day-trading-memory-zones.md](chat/61-sr-day-trading-memory-zones.md) | 2026-11-10 18:32 | 47,550 |
+| 62 | [chat/62-agent-pixel-office.md](chat/62-agent-pixel-office.md) | 2026-11-10 18:32 | 10,150 |
+| 63 | [chat/63-agent-setup-walkthrough.md](chat/63-agent-setup-walkthrough.md) | 2026-11-10 18:33 | 49,609 |
+| 64 | [chat/64-agent-pixel-office-2.md](chat/64-agent-pixel-office-2.md) | 2026-11-10 18:36 | 9,893 |
+| 65 | [chat/65-openbot-agent-coworker.md](chat/65-openbot-agent-coworker.md) | 2026-11-10 18:37 | 8,786 |
+| 66 | [chat/66-opencode-browse.md](chat/66-opencode-browse.md) | 2026-11-10 18:38 | 8,176 |
+| 67 | [chat/67-free-coding-agent-deepseek.md](chat/67-free-coding-agent-deepseek.md) | 2026-11-10 18:39 | 15,913 |
+| 68 | [chat/68-model-agnostic-workspace.md](chat/68-model-agnostic-workspace.md) | 2026-11-10 18:40 | 7,543 |
+| 69 | [chat/69-free-model-gateway-fallback.md](chat/69-free-model-gateway-fallback.md) | 2026-11-10 18:42 | 12,075 |
+| 70 | [chat/70-local-multi-agent-workspace.md](chat/70-local-multi-agent-workspace.md) | 2026-11-10 18:43 | 12,036 |
+| 71 | [chat/71-orchestrator-bot-software-factory.md](chat/71-orchestrator-bot-software-factory.md) | 2026-11-10 18:44 | 18,828 |
 
 ## Uploaded files
 
