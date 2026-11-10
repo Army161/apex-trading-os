@@ -12,6 +12,12 @@ export type MMOpts = {
   maxInventory?: number;  // stop quoting the side that would push inventory past this
   markoutMs?: number;     // how long after a fill to measure adverse selection
   improve?: number;       // fraction of the spread to step inside the best quote (0 = join the best quote)
+  // chat/87: a model's predicted mid move (as a fraction of mid) shifts both quotes the same way; the spread is unchanged.
+  predict?: (t: number, mid: number) => number;
+  skewK?: number;         // how much of the predicted move to shift by (1 = all of it)
+  // chat/87: widen to volSpreadK x recent mid volatility (std of mid changes over the last volWindow quotes), never inside the book
+  volSpreadK?: number;
+  volWindow?: number;
 };
 
 export type MMResult = {
@@ -34,6 +40,13 @@ function quoteAt(qs: Quote[], t: number) {
   return ans < 0 ? null : qs[ans];
 }
 
+/** Standard deviation of mid-to-mid changes over the last n quotes before t. */
+function volAt(qs: Quote[], t: number, n: number) {
+  let lo = 0, hi = qs.length - 1, k = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (qs[m].t <= t) { k = m; lo = m + 1; } else hi = m - 1; }
+  if (k < 2) return 0; const d: number[] = []; for (let i = Math.max(1, k - n + 1); i <= k; i++) d.push(mid(qs[i]) - mid(qs[i - 1]));
+  const mu = d.reduce((a, b) => a + b, 0) / d.length; return Math.sqrt(d.reduce((a, b) => a + (b - mu) ** 2, 0) / d.length);
+}
+
 /** Naive two-sided quoting replayed against real prints. Our bid fills when a seller hits at or below it, our ask when a
  *  buyer lifts at or above it. This is optimistic (we assume we are first in the queue), so treat a loss here as a real loss
  *  and a profit here as an upper bound. */
@@ -42,7 +55,10 @@ export function simulateMM(quotes: Quote[], prints: Print[], o: MMOpts = {}): MM
   let inv = 0, cash = 0, spreadPnl = 0, fees = 0, adverse = 0, buys = 0, sells = 0;
   for (const p of prints) {
     const q = quoteAt(quotes, p.t); if (!q || q.ask <= q.bid) continue;
-    const sp = q.ask - q.bid, myBid = q.bid + imp * sp / 2, myAsk = q.ask - imp * sp / 2, m = mid(q);
+    const m = mid(q), sp = q.ask - q.bid;
+    let myBid = q.bid + imp * sp / 2, myAsk = q.ask - imp * sp / 2;
+    if (o.volSpreadK) { const half = Math.max((myAsk - myBid) / 2, o.volSpreadK * volAt(quotes, p.t, o.volWindow ?? 50)); myBid = m - half; myAsk = m + half; }
+    if (o.predict) { const shift = (o.skewK ?? 1) * o.predict(p.t, m) * m; myBid += shift; myAsk += shift; }
     let side: 1 | -1 | 0 = 0, px = 0;
     if (p.side === 'sell' && p.price <= myBid && inv + size <= maxInv) { side = 1; px = myBid; }
     else if (p.side === 'buy' && p.price >= myAsk && inv - size >= -maxInv) { side = -1; px = myAsk; }

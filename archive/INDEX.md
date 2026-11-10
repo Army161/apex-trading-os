@@ -92,6 +92,9 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 84 | [chat/84-btc-cme-futures-bot-livestream.md](chat/84-btc-cme-futures-bot-livestream.md) | 2026-11-10 20:00 | 26,005 |
 | 85 | [chat/85-micro-btc-futures-sample-bot-walkthrough.md](chat/85-micro-btc-futures-sample-bot-walkthrough.md) | 2026-11-10 20:00 | 25,317 |
 | 86 | [chat/86-scaling-100-futures-bots-free-samples.md](chat/86-scaling-100-futures-bots-free-samples.md) | 2026-11-10 20:01 | 27,936 |
+| 87 | [chat/87-intro-quant-trading-models-ev.md](chat/87-intro-quant-trading-models-ev.md) | 2026-11-10 20:08 | 42,087 |
+| 88 | [chat/88-peak-commodity-algo-course.md](chat/88-peak-commodity-algo-course.md) | 2026-11-10 20:09 | 148,745 |
+| 89 | [chat/89-breaking-into-quant-careers.md](chat/89-breaking-into-quant-careers.md) | 2026-11-10 20:13 | 37,031 |
 
 ## Uploaded files
 

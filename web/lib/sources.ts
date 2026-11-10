@@ -603,6 +603,27 @@ export const SOURCES = [
   "notes": "Neither rule beat always-on in our tests. 4 wins and 0 losses means nothing yet."
  },
  {
+  "id": "chat/87",
+  "title": "Intro to quant trading: models, expected value, making and taking",
+  "feeds": "engine quant.ts (AR(1) OLS/SGD, EV, book walk, sizing, time/threshold taking); mm.ts skew and volatility spread",
+  "file": "archive/chat/87-intro-quant-trading-models-ev.md",
+  "notes": "IWM 12h mean reversion is a lead only (deflated Sharpe 0.33)."
+ },
+ {
+  "id": "chat/88",
+  "title": "Commodity futures algo trading course",
+  "feeds": "engine peak.ts (fade, low-volume reversal, dueling momentum, stop breakout, walk-forward, correlation matrix, incubation)",
+  "file": "archive/chat/88-peak-commodity-algo-course.md",
+  "notes": "Uploaded file. His examples came from ~1.5M tests; none passed ours."
+ },
+ {
+  "id": "chat/89",
+  "title": "Breaking into quant firms: career blueprint",
+  "feeds": "docs/quant-learning-path.md (reading list only)",
+  "file": "archive/chat/89-breaking-into-quant-careers.md",
+  "notes": "Career video, nothing to build. No book download, no accelerator signup."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",

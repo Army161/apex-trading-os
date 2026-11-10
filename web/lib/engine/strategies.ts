@@ -1,6 +1,7 @@
 import { dealFlow, srMemory } from './urban';
 import { swingCount, prevRange } from './dave';
 import { garchIntraday } from './garch';
+import { extremeFade, duelingMomentum, stopBreakout } from './peak';
 import { Bar, Sig, atr, sma, ema, rsi, adx, rollMax, rollMin, shift, stdev, candles, swings, supertrend } from './core';
 import { goldenCross, turtleSoup, silverBullet, unicorn, ictPoints } from './ict';
 import { sarReverse, maCross, bandRevert, withEmaRegime, withAdx, regimePoints } from './trend';
@@ -105,6 +106,10 @@ export const STRATEGIES: StratDef[] = [
     build: prevRange() },
   { id: 'garch_vol_premium', name: 'GARCH Volatility Premium Fade', source: 'chat/82', direction: 'both', tf: '30m', desc: 'Daily: GARCH(1,1) forecast vs 180-day variance; when the premium is beyond 1.5 of its own standard deviations, fade an intraday RSI(20) + Bollinger extreme the next day and exit before the close. The course used simulated data. On real SPY/QQQ/IWM it made 1 to 4 trades in two years: too few to judge.',
     build: garchIntraday() },
+  { id: 'peak_extreme_fade', name: '35-Bar Extreme Fade', source: 'chat/88', direction: 'both', tf: '1d', desc: 'Short the highest close of 35 bars, buy the lowest; out after 20 bars, 2 ATR stop. His cocoa example came from a 1.5 million-test search; unproven.', build: extremeFade() },
+  { id: 'peak_low_vol_reversal', name: 'Low-Volume Reversal', source: 'chat/88', direction: 'both', tf: '1d', desc: 'The 35-bar extreme fade, only when volume is below its 20-bar average; out after 20 bars. Unproven.', build: extremeFade(35, 20, true) },
+  { id: 'peak_dueling_momentum', name: 'Dueling Momentum', source: 'chat/88', direction: 'both', tf: '1d', desc: 'Long when the close is above the close 50 bars ago but below the close 100 bars ago (mirror for shorts); out after 20 bars. Unproven.', build: duelingMomentum() },
+  { id: 'peak_stop_breakout', name: '45-Bar Stop Breakout + Time Exit', source: 'chat/88', direction: 'both', tf: '1d', desc: 'First touch of the 45-bar high goes long, 45-bar low goes short; out after 20 bars, 2 ATR stop. Unproven.', build: stopBreakout() },
   { id: 'buy_hold', name: 'Buy & Hold (benchmark)', source: 'benchmark', direction: 'long', tf: 'any', desc: 'Buys the first bar and holds.',
     build: b => { const s = empty(b.length); s.le[0] = true; s.stop[0] = b[0].c * 1e-4; s.fullSize = true; return s; } },
 ];

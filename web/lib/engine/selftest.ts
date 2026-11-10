@@ -23,6 +23,8 @@ import { makeTrailer, TrailMode } from './trail';
 import { boardRow, strictGate, deflatedSharpe, expectedMaxSharpe } from '../leaderboard';
 import { parseFeed, digest } from '../news';
 import { garchFit } from './garch';
+import { correlationMatrix, lockForIncubation, incubationReport, walkForward } from './peak';
+import { olsFit, sgdFit, behaviour, expectedValue, walkBook, size as qsize, logReturns } from './quant';
 import { simulateMM, leadLag, convert } from './mm';
 import { timeSplit, holdSameBalances } from './validate';
 const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/parity.json'), 'utf8'));
@@ -264,6 +266,35 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
   const gf = garchFit(sim), l5 = Math.abs(gf.alpha - 0.1) < 0.05 && Math.abs(gf.beta - 0.85) < 0.07;
   const ok = l1 && l2 && l3 && l4 && l5;
   console.log(`${ok ? 'PASS' : 'FAIL'} leaderboard and gates: luck caught by the 500-try charge ${l1} (best Sharpe ${best.sharpe.toFixed(2)}), board row ${l2}, daily target stop ${l3}, news digest ${l4}, GARCH fit ${l5} (a ${gf.alpha.toFixed(3)} b ${gf.beta.toFixed(3)})`); if (!ok) fail++;
+}
+{
+  // chat/87: AR(1) fits recover a known weight both ways; EV catches the "wins more but loses money" coin; book walk; sizing caps;
+  // market-making skew moves both quotes the same way.
+  let seed = 5; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647 - 0.5; };
+  const r: number[] = [0]; for (let i = 1; i < 3000; i++) r.push(-0.4 * r[i - 1] + 0.01 * rnd());
+  const x = r.slice(0, -1), y = r.slice(1), o = olsFit(x, y), g = sgdFit(x, y, { epochs: 30 });
+  const q1 = Math.abs(o.w + 0.4) < 0.05 && Math.abs(g.w + 0.4) < 0.06 && behaviour(o) === 'mean_reversion' && behaviour({ w: 0.3, b: 0 }) === 'momentum';
+  const coin = expectedValue([...Array(55).fill(1), ...Array(45).fill(-1.25)]), q2 = coin.winRate === 0.55 && coin.ev < 0 && Math.abs(coin.ev - coin.check) < 1e-12;
+  const wb = walkBook([[115, 3], [116, 4], [117, 5]], 10), q3 = wb.filled === 10 && Math.abs(wb.avgPrice - (3 * 115 + 4 * 116 + 3 * 117) / 10) < 1e-9 && wb.levelsUsed === 3;
+  const q4 = qsize(0.5, 'constant', 100) === 100 && qsize(5, 'hardtanh', 100) === 100 && qsize(0.5, 'hardtanh', 100) === 50 && Math.abs(qsize(-9, 'tanh', 100)) <= 100 && qsize(-0.1, 'constant', 100) === -100;
+  const q5 = Math.abs(logReturns([100, 120, 100])[0] + logReturns([100, 120, 100])[1]) < 1e-12;   // log returns are symmetric
+  const qs = Array.from({ length: 100 }, (_, i) => ({ t: i * 1000, bid: 99, ask: 101 }));
+  const ps = [{ t: 50500, price: 99.5, side: 'sell' as const, qty: 1 }];
+  const noSkew = simulateMM(qs, ps, {}).fills, up = simulateMM(qs, ps, { predict: () => 0.006 }).fills;   // the bid moves from 99 up to 99.6, so a seller at 99.5 now fills it
+  const q6 = noSkew === 0 && up === 1 && simulateMM(qs, ps, { volSpreadK: 3 }).fills === 0;
+  const ok = q1 && q2 && q3 && q4 && q5 && q6;
+  console.log(`${ok ? 'PASS' : 'FAIL'} quant kit: AR(1) ols ${o.w.toFixed(3)} sgd ${g.w.toFixed(3)} ${q1}, EV beats win rate ${q2}, book walk ${q3}, sizing caps ${q4}, symmetric log returns ${q5}, mm skew ${q6}`); if (!ok) fail++;
+}
+{
+  // chat/88: correlation matrix signs, incubation only scores bars after the lock, walk-forward stitches only test windows.
+  const a = new Map<number, number>(), b2 = new Map<number, number>(), c2 = new Map<number, number>();
+  for (let d = 0; d < 50; d++) { const v = Math.sin(d * 1.3); a.set(d, v); b2.set(d, 2 * v + 0.1); c2.set(d, -v); }
+  const m = correlationMatrix({ a, b: b2, c: c2 }), p1 = Math.abs(m.a.b - 1) < 1e-9 && Math.abs(m.a.c + 1) < 1e-9 && Math.abs(m.a.a - 1) < 1e-9;
+  const inc = lockForIncubation('supertrend', { n: 10 }, bars[600].t), same = lockForIncubation('supertrend', { n: 10 }, 0).hash === inc.hash, diff = lockForIncubation('supertrend', { n: 11 }, 0).hash !== inc.hash;
+  const rep = incubationReport(bars, byId('supertrend').build, inc, { minMonths: 1 }), p2 = same && diff && rep.status !== 'waiting' && rep.months > 1;
+  const wf = walkForward(bars, (n: number) => byId('supertrend').build, [1, 2], { train: 300, test: 100 }), p3 = wf.windows.length === Math.floor((bars.length - 300) / 100) && wf.windows.every(w => w.from > bars[299].t);
+  const ok = p1 && p2 && p3;
+  console.log(`${ok ? 'PASS' : 'FAIL'} portfolio tools: correlation ${p1}, incubation lock ${p2} (${rep.status}), walk-forward windows ${p3} (${wf.windows.length})`); if (!ok) fail++;
 }
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');

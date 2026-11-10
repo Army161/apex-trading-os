@@ -16,7 +16,7 @@ export const STYLE: Record<string, Style> = {
   liq_trend_sweep: 'sweep', liq_reversal: 'reversal', liq_fx_levels: 'reversal', psar_reverse: 'trend', psar_adx: 'trend',
   sma_10_20: 'trend', ema50_bands: 'mean_reversion', ict_turtle_soup_ema: 'sweep', liq_reversal_ema: 'reversal',
   demand_second_leg: 'pullback', sharp_reversal_aoi: 'reversal', gws_reversal: 'reversal', anchor_discount: 'pullback',
-  urban_deal_flow: 'pullback', urban_sr_memory: 'reversal', dave_swing_count: 'reversal', dave_prev_range: 'pullback', garch_vol_premium: 'mean_reversion',
+  urban_deal_flow: 'pullback', urban_sr_memory: 'reversal', dave_swing_count: 'reversal', dave_prev_range: 'pullback', garch_vol_premium: 'mean_reversion', peak_extreme_fade: 'mean_reversion', peak_low_vol_reversal: 'mean_reversion', peak_dueling_momentum: 'trend', peak_stop_breakout: 'breakout',
 };
 
 export const bucket = (tf: string): TfBucket | null =>

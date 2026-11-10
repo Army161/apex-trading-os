@@ -171,3 +171,43 @@ Tested on SPY, QQQ and IWM at 30m and 1h (6 sets each), averages across sets:
 - Skipping the midday lull cut losses a little on the sweep rule but cost the candidate 1.4 points.
 - The author's "4 wins, 0 losses" bots are far below our 50-trade minimum and mean nothing yet.
 - Reproduce with `npx tsx scripts/validate-session.ts`.
+
+## chat/87: AR(1) taking strategy (run 2026-11-10)
+
+`web/lib/engine/quant.ts`: the feature is the log return over the last h bars and the target is the next h bars. The model
+is fit by OLS (and by SGD as a check) on the first 60% in time order and traded on the last 40%. Every bar opens a 1/h slice
+held h bars (frequency scaling), with 0.02% fees a side on SPY/QQQ/IWM 1h. There are 84 configurations in total, so the
+deflated Sharpe is charged for 84 tries.
+
+- **Every fitted weight was negative (mean reversion)** on every market and horizon.
+- **1-hour horizon:** fees eat it. The net EV is about -3.5 to -4.5 basis points a slice on all three ETFs, and -68% to -77% at constant size.
+- **12-hour horizon:** SPY and QQQ never beat buy-and-hold in 28 tries (best +1.9% vs +8.7% and +8.3%). IWM made +15% to +21% vs +6.9%,
+  with a Sharpe of 0.9 to 1.5 and a 51% to 56% win rate. That is the video's "tiny edge, many bets" shape, but the deflated Sharpe
+  after 84 tries is only 0.10 to 0.33 (we need 0.95). **It is a lead for forward paper trading, not an edge.**
+- **The threshold filter** (keep only the strongest 30% of predictions) raised EV per trade on IWM 12h from +0.5 to +1.9 bp, while cutting trades by 72%.
+- **tanh and hardtanh sizing** matched constant sizing once the scale was set from the training predictions. Neither beat it clearly.
+- **Daily BTC, GLD and EURUSD:** about 200 to 300 test days. Nothing was significant (best deflated Sharpe 0.03).
+- Stops and targets were not added. The video's rule is to add them only if they raise EV, and our trailing-stop tests (chat/81) never did.
+- Reproduce with `npx tsx scripts/validate-quant.ts`. The market-making simulator also gained a model skew (`predict`, `skewK`) and a
+  volatility spread (`volSpreadK`). These are untested on real quotes because the recorder hasn't run yet.
+
+## chat/88: commodity course example systems (run 2026-11-10)
+
+His examples (profit factor 1.7 to 4.2) were picked from about 1.5 million entry, exit and market tests. We ran our versions on 8 sets:
+GLD, USO, QQQ, BTC and EURUSD daily, and SPY, QQQ and IWM 4h. Each had a 20-bar time exit and a 2 ATR stop.
+
+| System | Best result | Sets passing 6/6 |
+|---|---|---|
+| 35-bar extreme fade | 4/6 on QQQ 1d (24 trades) and SPY 4h (+8.2%, vs +25.4% hold) | 0 of 8 |
+| Low-volume reversal | 4/6 on QQQ and BTC 1d, under 20 trades each | 0 of 8 |
+| Dueling momentum 50/100 | 4/6 on USO 1d, 10 trades | 0 of 8 |
+| 45-bar stop breakout | 4/6 on GLD, USO and BTC 1d, 12 to 20 trades; lost on all 4h sets | 0 of 8 |
+
+- **None passed.** Daily data gives too few trades, and on 4h bars, where there are enough trades, most of these systems lose money.
+- **Walk-forward** (re-tuning on about a year of bars, then trading the next quarter, on SPY 4h): the extreme fade made -1.8% out of sample
+  and the breakout made -27.2%. The chosen lookback kept changing from window to window, which is the instability walk-forward is meant to expose.
+- **Correlation matrix** of the 16 system-market daily return series: the average pair correlation is 0.00 (from -0.73 to +0.69). So
+  the diversification point holds, but diversifying across rules that don't make money doesn't help.
+- **Incubation** is now a locked record (`lockForIncubation`) plus a report that scores only bars after the lock
+  (`incubationReport`, 6 months minimum). This is the same idea as forward paper trading.
+- Reproduce with `npx tsx scripts/validate-peak.ts`.
