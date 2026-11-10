@@ -49,6 +49,10 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 41 | [chat/41-herder-hermes-agent-team.md](chat/41-herder-hermes-agent-team.md) | 2026-11-10 18:07 | 7,529 |
 | 42 | [chat/42-grokbot-marketplace.md](chat/42-grokbot-marketplace.md) | 2026-11-10 18:08 | 5,191 |
 | 43 | [chat/43-memecoin-trader-five-secrets.md](chat/43-memecoin-trader-five-secrets.md) | 2026-11-10 18:09 | 20,092 |
+| 44 | [chat/44-memecoin-november-event-bet.md](chat/44-memecoin-november-event-bet.md) | 2026-11-10 18:10 | 24,851 |
+| 45 | [chat/45-memecoin-incent-five-secrets.md](chat/45-memecoin-incent-five-secrets.md) | 2026-11-10 18:14 | 14,640 |
+| 46 | [chat/46-three-ai-bots-claude-jev.md](chat/46-three-ai-bots-claude-jev.md) | 2026-11-10 18:15 | 33,766 |
+| 47 | [chat/47-gex-last-half-hour-mes.md](chat/47-gex-last-half-hour-mes.md) | 2026-11-10 18:17 | 8,083 |
 
 ## Uploaded files
 

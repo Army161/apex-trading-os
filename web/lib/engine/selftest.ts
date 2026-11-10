@@ -131,7 +131,7 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
   const timeExit = T1?.reason === 'signal' && T1.exitT === tb[22].t;
   const T2 = one(mk(n), sig(n, 19, { st: 50, sx: Array(n).fill(true) }));
   const sideOk = T2?.reason === 'end';
-  const ct = (checkTrade({ side: 'long', entry: 100, stop: 100, target: 110 }) as any).ok === false && (checkTrade({ side: 'long', entry: 100, stop: 95, target: 100 }) as any).ok === false
+  const ct = (checkTrade({ side: 'long', entry: 100, stop: 100, target: 110 }) as any).ok === false && /target/.test((checkTrade({ side: 'long', entry: 100, stop: 95, target: 100 }) as any).problem ?? '')
     && (checkTrade({ side: 'short', entry: 100, stop: 100, target: 90 }) as any).ok === false && !!(checkTrade({ side: 'short', entry: 100, stop: 102, target: 90 }) as any).note
     && !(checkTrade({ side: 'long', entry: 100, stop: 98, target: 110 }) as any).note;
   const ok = touch && rOk && fallback && timeExit && sideOk && ct;

@@ -1,10 +1,12 @@
-// Telegram bot webhook: /positions /orders /pnl /strategies /bots. Answers only TELEGRAM_CHAT_ID; Telegram signs each call
+// Telegram bot webhook: /state /positions /orders /pnl /strategies /bots /halt /release. Answers only TELEGRAM_CHAT_ID; Telegram signs each call
 // with TELEGRAM_WEBHOOK_SECRET in the X-Telegram-Bot-Api-Secret-Token header.
 import { sendTelegram } from '@/lib/telegram';
 import { bots, trades } from '@/lib/bots';
 import { allStrategies, evaluate } from '@/lib/strategies';
 import { runChat } from '@/lib/chat';
 import { getJSON, setJSON } from '@/lib/store';
+import { state, stateText } from '@/lib/state';
+import { pullCord, releaseCord } from '@/lib/andon';
 export const maxDuration = 120;
 
 const f = (x: number) => `${x < 0 ? '-' : ''}$${Math.abs(x).toFixed(2)}`;
@@ -29,8 +31,11 @@ async function reply(cmd: string) {
     const t = await trades(10);
     return t.length ? t.map((x: any) => `${new Date(x.ts).toISOString().slice(5, 16)} ${x.bot} ${x.side} ${x.symbol} ${x.status ?? ''}${typeof x.pnl === 'number' ? ` pnl ${x.pnl}` : ''}`).join('\n') : 'No orders reported yet.';
   }
+  if (c === '/state') return stateText(await state());
+  if (c === '/halt') { const why = cmd.replace(/^\/halt(@\S+)?\s*/i, '').trim() || 'halted from Telegram'; await pullCord('you (Telegram)', why); return `Halted. Every bot is told to pause. Reason: ${why}\nSend /release when it is safe.`; }
+  if (c === '/release') { await releaseCord('you (Telegram)'); return 'Released. Bots resume on their next check-in unless the kill switch is on.'; }
   if (c === '/bots') { const b = await bots(); return b.map(x => `${x.lastSeen && Date.now() - x.lastSeen < 9e5 ? 'ON ' : 'off'} ${x.name} (${x.mode})`).join('\n'); }
-  return 'Apex commands: /positions /orders /pnl /strategies /bots /new\nOr just type a question ("how are my bots doing?", "backtest supertrend on ETH 4h") and Apex AI answers here.\nEverything is paper unless you switched a bot live on your own machine.';
+  return 'Apex commands: /state /positions /orders /pnl /strategies /bots /halt <reason> /release /new\nOr just type a question ("how are my bots doing?", "backtest supertrend on ETH 4h") and Apex AI answers here.\nEverything is paper unless you switched a bot live on your own machine.';
 }
 
 export async function POST(req: Request) {

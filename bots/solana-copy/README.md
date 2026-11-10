@@ -46,3 +46,15 @@ you can lose. Live mode signs Jupiter swaps locally; keys never leave the machin
 Live fills use Jupiter's priority-fee setting, and the tip is folded into that fee rather than sent as a separate Jito bundle.
 
 The bot shows up on the Apex dashboard as **Solana Copy Bot** once `APEX_DASHBOARD_URL` and `APEX_INGEST_TOKEN` are set.
+
+## Attention helpers (archive/chat/43 and chat/44), research and paper only
+`src/attention.ts` adds pure helpers taken from two memecoin trader videos: a discovery-stage tag (launchpad through mainstream),
+a cross-source score (several separate groups mentioning a token in the same hour beats one loud group), a count of survived 70%
+drops, a picker for copycat tokens on one theme, size by market cap (a quarter of `MAX_SOL_PER_TRADE` under $50k, never above the
+cap), targets scaled by the fear and greed index, a "where does the next crowd come from" exit check, an event calendar with
+one-week and two-week run-up dates, and an event-bet planner that splits a budget by your own probability guesses with a small hedge.
+
+From archive/chat/45: an edge check (a paper trade must name its edge, such as catalyst ahead or several separate sources, and say why in a sentence, or it is skipped), a ceiling for copycat tokens (a slice of the parent token's market cap, moved by market mood), and a "will outsiders keep coming?" check from search interest and upcoming dates. Nothing here launches tokens from tweets, and nothing will.
+
+**Read these videos for what they are:** all three are pitches for the same paid group, the trader results are not verified, the wins shown are hand-picked, and the
+speakers say their own numbers are guesses. Most memecoins go to zero. None of these helpers sends, signs or launches anything.

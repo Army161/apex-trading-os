@@ -1,6 +1,7 @@
 'use client';
 import { useVoice, VoiceButtons } from './voice';
 import TraderRules from './Rules';
+import { StateStrip, MemoryCard, Agents } from './Factory';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { STRATEGIES, confluence } from '@/lib/engine/strategies';
@@ -10,7 +11,7 @@ import { SOURCES } from '@/lib/sources';
 const Chart = dynamic(() => import('./Chart'), { ssr: false });
 import Strategies from './Strategies';
 import Assistants from './Assistants';
-const TABS = ['Command', 'Strategies', 'Strategy Lab', 'Signals', 'Journal', 'Council', 'Assistants', 'Apex AI', 'Library', 'Setup'] as const;
+const TABS = ['Command', 'Strategies', 'Strategy Lab', 'Signals', 'Journal', 'Council', 'Agents', 'Assistants', 'Apex AI', 'Library', 'Setup'] as const;
 type Tab = typeof TABS[number];
 const pct = (x?: number, d = 1) => (x == null || !Number.isFinite(x) ? '–' : `${(x * 100).toFixed(d)}%`);
 const num = (x?: number, d = 2) => (x == null || !Number.isFinite(x) ? '–' : x.toLocaleString(undefined, { maximumFractionDigits: d }));
@@ -35,11 +36,12 @@ export default function App() {
       <div className="wrap">
         {state && !state.persistent && <div className="banner warn">Storage is in-memory, so bot history resets when the server restarts. Add Upstash Redis from the Vercel Marketplace to keep it (see Setup).</div>}
         {state && !state.ingestTokenSet && <div className="banner warn">No APEX_INGEST_TOKEN is set, so anyone with the URL can post bot data. Set one in Vercel env vars (see Setup).</div>}
-        {tab === 'Command' && <Command s={state} reload={load} />}
+        {tab === 'Command' && <><StateStrip /><Command s={state} reload={load} /></>}
         {tab === 'Strategies' && <Strategies aiEnabled={state?.aiEnabled} />}
         {tab === 'Strategy Lab' && <Lab />}
         {tab === 'Signals' && <Signals />}
-        {tab === 'Journal' && <><TraderRules /><Journal risk={state?.risk} /></>}
+        {tab === 'Journal' && <><TraderRules /><MemoryCard /><Journal risk={state?.risk} /></>}
+        {tab === 'Agents' && <Agents />}
         {tab === 'Council' && <Council />}
         {tab === 'Assistants' && <Assistants aiEnabled={state?.aiEnabled} />}
         {tab === 'Apex AI' && <Ai enabled={state?.aiEnabled} />}

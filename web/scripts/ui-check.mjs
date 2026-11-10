@@ -10,7 +10,7 @@ let pw; try { pw = req('playwright'); } catch { pw = createRequire(`${process.en
 const { chromium } = pw;
 import fs from 'node:fs';
 const URL = process.env.APEX_URL || 'http://localhost:3000';
-const TABS = ['Command', 'Strategies', 'Strategy Lab', 'Signals', 'Journal', 'Council', 'Assistants', 'Apex AI', 'Library', 'Setup'];
+const TABS = ['Command', 'Strategies', 'Strategy Lab', 'Signals', 'Journal', 'Council', 'Agents', 'Assistants', 'Apex AI', 'Library', 'Setup'];
 // Market data can be blocked where you test (sandboxes, some networks): set UI_OFFLINE=1 to ignore /api/candles failures.
 const IGNORE = [/favicon/, ...(process.env.UI_OFFLINE ? [/\/api\/candles/, /502 \(Bad Gateway\)/] : [])];
 fs.mkdirSync('ui-check', { recursive: true });
