@@ -1,0 +1,266 @@
+{"id":"turtle_55_20","data":"SPY 1h","n":74,"ret":-2.2,"dd":-9.4,"monkey":0.32,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"turtle_55_20","data":"SPY 4h","n":22,"ret":-1.2,"dd":-7.6,"monkey":0.285,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"turtle_55_20","data":"GLD 1d","n":3,"ret":15.5,"dd":-7.5,"monkey":0.69,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"turtle_55_20","data":"USO 1d","n":3,"ret":8.2,"dd":-7.6,"monkey":0.725,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"turtle_55_20","data":"QQQ 1d","n":5,"ret":3.1,"dd":-2.9,"monkey":0.295,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"turtle_55_20","data":"EURUSD 1d","n":6,"ret":-0.6,"dd":-5.7,"monkey":0.335,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"turtle_55_20","data":"BTC 1d","n":7,"ret":-1.5,"dd":-4.7,"monkey":0.43,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sma50_trend","data":"SPY 1h","n":274,"ret":-17.6,"dd":-19.4,"monkey":0.09,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sma50_trend","data":"SPY 4h","n":80,"ret":-6.8,"dd":-8.9,"monkey":0.09,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sma50_trend","data":"GLD 1d","n":7,"ret":12.7,"dd":-7.6,"monkey":0.71,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"sma50_trend","data":"USO 1d","n":16,"ret":10.2,"dd":-4.6,"monkey":0.705,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"sma50_trend","data":"QQQ 1d","n":18,"ret":1.9,"dd":-2.7,"monkey":0.32,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"sma50_trend","data":"EURUSD 1d","n":23,"ret":0.6,"dd":-3.1,"monkey":0.435,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"sma50_trend","data":"BTC 1d","n":23,"ret":2.5,"dd":-4.1,"monkey":0.73,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"rsi2_dip","data":"SPY 1h","n":202,"ret":-1.4,"dd":-1.4,"monkey":0.375,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"rsi2_dip","data":"SPY 4h","n":54,"ret":0.4,"dd":-0.5,"monkey":0.74,"passed":4,"of":6,"fails":["monkey test","locked test window"]}
+{"id":"rsi2_dip","data":"GLD 1d","n":7,"ret":-0.6,"dd":-1.8,"monkey":0.195,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"rsi2_dip","data":"USO 1d","n":9,"ret":-1,"dd":-2.3,"monkey":0.245,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"rsi2_dip","data":"QQQ 1d","n":14,"ret":0.2,"dd":-1.1,"monkey":0.45,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"rsi2_dip","data":"EURUSD 1d","n":11,"ret":-0.3,"dd":-0.4,"monkey":0.225,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"rsi2_dip","data":"BTC 1d","n":12,"ret":1.5,"dd":-0.6,"monkey":0.845,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"breakout_50_20","data":"SPY 1h","n":10,"ret":0.3,"dd":-0.4,"monkey":0.425,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"breakout_50_20","data":"SPY 4h","n":1,"ret":0.6,"dd":-0.3,"monkey":0.605,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"breakout_50_20","data":"GLD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"breakout_50_20","data":"USO 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"breakout_50_20","data":"QQQ 1d","n":1,"ret":-0.7,"dd":-1.6,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"breakout_50_20","data":"EURUSD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"breakout_50_20","data":"BTC 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"bb_squeeze","data":"SPY 1h","n":105,"ret":-6.1,"dd":-13.2,"monkey":0.46,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"bb_squeeze","data":"SPY 4h","n":30,"ret":-4.2,"dd":-11.5,"monkey":0.36,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"bb_squeeze","data":"GLD 1d","n":5,"ret":2.4,"dd":-2.5,"monkey":0.935,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"bb_squeeze","data":"USO 1d","n":4,"ret":-0.7,"dd":-3.8,"monkey":0.2,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"bb_squeeze","data":"QQQ 1d","n":6,"ret":-1.6,"dd":-5.1,"monkey":0.38,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"bb_squeeze","data":"EURUSD 1d","n":12,"ret":-2.4,"dd":-5.4,"monkey":0.355,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"bb_squeeze","data":"BTC 1d","n":9,"ret":-4.7,"dd":-7.4,"monkey":0.1,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"rsi_regime","data":"SPY 1h","n":100,"ret":-14.3,"dd":-17.2,"monkey":0.115,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"rsi_regime","data":"SPY 4h","n":18,"ret":-2.1,"dd":-4,"monkey":0.395,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"rsi_regime","data":"GLD 1d","n":5,"ret":0.4,"dd":-2.9,"monkey":0.485,"passed":2,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later"]}
+{"id":"rsi_regime","data":"USO 1d","n":5,"ret":-4.8,"dd":-7,"monkey":0.195,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"rsi_regime","data":"QQQ 1d","n":5,"ret":0.4,"dd":-2,"monkey":0.41,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"rsi_regime","data":"EURUSD 1d","n":6,"ret":-1.4,"dd":-3.5,"monkey":0.38,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"rsi_regime","data":"BTC 1d","n":9,"ret":-5.3,"dd":-6.9,"monkey":0.1,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"failure_test_2b","data":"SPY 1h","n":244,"ret":-5.4,"dd":-13.3,"monkey":0.63,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"failure_test_2b","data":"SPY 4h","n":113,"ret":-12.8,"dd":-17.4,"monkey":0.185,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"failure_test_2b","data":"GLD 1d","n":28,"ret":-9.2,"dd":-16.4,"monkey":0.47,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"failure_test_2b","data":"USO 1d","n":31,"ret":8.2,"dd":-7.1,"monkey":0.82,"passed":3,"of":6,"fails":["enough trades","monkey test","act one bar later"]}
+{"id":"failure_test_2b","data":"QQQ 1d","n":37,"ret":-10.6,"dd":-17.1,"monkey":0.205,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"failure_test_2b","data":"EURUSD 1d","n":30,"ret":-5.5,"dd":-7.5,"monkey":0.255,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"failure_test_2b","data":"BTC 1d","n":47,"ret":-8,"dd":-13.3,"monkey":0.415,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"smc_sweep_lite","data":"SPY 1h","n":88,"ret":-8.2,"dd":-10.5,"monkey":0.21,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"smc_sweep_lite","data":"SPY 4h","n":30,"ret":-14,"dd":-14.5,"monkey":0.01,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"smc_sweep_lite","data":"GLD 1d","n":1,"ret":0,"dd":0,"monkey":0.4,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"smc_sweep_lite","data":"USO 1d","n":4,"ret":0.7,"dd":-1.3,"monkey":0.54,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"smc_sweep_lite","data":"QQQ 1d","n":5,"ret":-1.2,"dd":-4.4,"monkey":0.31,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"smc_sweep_lite","data":"EURUSD 1d","n":3,"ret":0.9,"dd":-1.7,"monkey":0.545,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"smc_sweep_lite","data":"BTC 1d","n":11,"ret":-0.4,"dd":-3.6,"monkey":0.545,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"wyckoff_spring","data":"SPY 1h","n":114,"ret":-12.4,"dd":-17,"monkey":0.27,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"wyckoff_spring","data":"SPY 4h","n":40,"ret":-11.6,"dd":-13.6,"monkey":0.045,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"wyckoff_spring","data":"GLD 1d","n":1,"ret":-1,"dd":-1,"monkey":0.03,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"wyckoff_spring","data":"USO 1d","n":4,"ret":0.2,"dd":-3,"monkey":0.73,"passed":2,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later"]}
+{"id":"wyckoff_spring","data":"QQQ 1d","n":7,"ret":-3.2,"dd":-3.5,"monkey":0.125,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"wyckoff_spring","data":"EURUSD 1d","n":6,"ret":2,"dd":-1.5,"monkey":0.715,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"wyckoff_spring","data":"BTC 1d","n":8,"ret":-2.7,"dd":-6.1,"monkey":0.245,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"confluence","data":"SPY 1h","n":230,"ret":-11.3,"dd":-15.1,"monkey":0.42,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"confluence","data":"SPY 4h","n":49,"ret":15.1,"dd":-9,"monkey":0.845,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"confluence","data":"GLD 1d","n":11,"ret":4,"dd":-4.1,"monkey":0.77,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"confluence","data":"USO 1d","n":8,"ret":-1.9,"dd":-8.3,"monkey":0.475,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"confluence","data":"QQQ 1d","n":9,"ret":-0.2,"dd":-5.2,"monkey":0.365,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"confluence","data":"EURUSD 1d","n":13,"ret":-3.1,"dd":-5.9,"monkey":0.305,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"confluence","data":"BTC 1d","n":17,"ret":1,"dd":-5.7,"monkey":0.6,"passed":2,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later"]}
+{"id":"supertrend","data":"SPY 1h","n":120,"ret":-15.2,"dd":-16.8,"monkey":0.055,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"supertrend","data":"SPY 4h","n":40,"ret":-3.1,"dd":-5.9,"monkey":0.475,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"supertrend","data":"GLD 1d","n":24,"ret":-3.3,"dd":-9.4,"monkey":0.36,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"supertrend","data":"USO 1d","n":20,"ret":-1.9,"dd":-11.2,"monkey":0.665,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"supertrend","data":"QQQ 1d","n":15,"ret":-0.2,"dd":-7.5,"monkey":0.59,"passed":2,"of":6,"fails":["enough trades","monkey test","double costs","costs under half the moves"]}
+{"id":"supertrend","data":"EURUSD 1d","n":8,"ret":-3.2,"dd":-3.4,"monkey":0.075,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"supertrend","data":"BTC 1d","n":18,"ret":3,"dd":-6.8,"monkey":0.775,"passed":3,"of":6,"fails":["enough trades","monkey test","act one bar later"]}
+{"id":"golden_cross","data":"SPY 1h","n":27,"ret":-0.7,"dd":-13,"monkey":0.185,"passed":2,"of":6,"fails":["enough trades","monkey test","double costs","costs under half the moves"]}
+{"id":"golden_cross","data":"SPY 4h","n":5,"ret":11,"dd":-6.6,"monkey":0.16,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"golden_cross","data":"GLD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"golden_cross","data":"USO 1d","n":1,"ret":74.8,"dd":-32.5,"monkey":0.69,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"golden_cross","data":"QQQ 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"golden_cross","data":"EURUSD 1d","n":1,"ret":-0.7,"dd":-1.2,"monkey":0.29,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"golden_cross","data":"BTC 1d","n":1,"ret":-4.4,"dd":-13.6,"monkey":0.435,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup","data":"SPY 1h","n":58,"ret":-10.6,"dd":-14.1,"monkey":0.175,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup","data":"SPY 4h","n":15,"ret":-3.8,"dd":-8.2,"monkey":0.16,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup","data":"GLD 1d","n":4,"ret":-4.1,"dd":-4.1,"monkey":0.035,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup","data":"USO 1d","n":4,"ret":2.3,"dd":-2.4,"monkey":0.63,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"ict_turtle_soup","data":"QQQ 1d","n":4,"ret":-1.2,"dd":-3,"monkey":0.39,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup","data":"EURUSD 1d","n":3,"ret":-2.1,"dd":-3,"monkey":0.045,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup","data":"BTC 1d","n":1,"ret":2,"dd":-1.6,"monkey":0.79,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"ict_silver_bullet","data":"SPY 1h","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_silver_bullet","data":"SPY 4h","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_silver_bullet","data":"GLD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_silver_bullet","data":"USO 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_silver_bullet","data":"QQQ 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_silver_bullet","data":"EURUSD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_silver_bullet","data":"BTC 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_unicorn","data":"SPY 1h","n":210,"ret":-31,"dd":-31.9,"monkey":0.005,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_unicorn","data":"SPY 4h","n":35,"ret":-5.3,"dd":-10.1,"monkey":0.22,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_unicorn","data":"GLD 1d","n":33,"ret":-10.1,"dd":-14.6,"monkey":0.115,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"ict_unicorn","data":"USO 1d","n":38,"ret":-10.6,"dd":-16.5,"monkey":0.255,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_unicorn","data":"QQQ 1d","n":25,"ret":-4.6,"dd":-7.9,"monkey":0.17,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_unicorn","data":"EURUSD 1d","n":4,"ret":0,"dd":-2.4,"monkey":0.215,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_unicorn","data":"BTC 1d","n":23,"ret":-2,"dd":-8.2,"monkey":0.43,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_trend_sweep","data":"SPY 1h","n":13,"ret":-3.4,"dd":-4.5,"monkey":0.25,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_trend_sweep","data":"SPY 4h","n":11,"ret":-0.5,"dd":-8.2,"monkey":0.23,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_trend_sweep","data":"GLD 1d","n":3,"ret":9.4,"dd":-7,"monkey":0.64,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"liq_trend_sweep","data":"USO 1d","n":7,"ret":-3.4,"dd":-6.4,"monkey":0.135,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_trend_sweep","data":"QQQ 1d","n":6,"ret":-2.3,"dd":-8,"monkey":0.135,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_trend_sweep","data":"EURUSD 1d","n":8,"ret":0.7,"dd":-4,"monkey":0.575,"passed":2,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later"]}
+{"id":"liq_trend_sweep","data":"BTC 1d","n":7,"ret":-7.1,"dd":-7.2,"monkey":0.015,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_reversal","data":"SPY 1h","n":15,"ret":0.6,"dd":-5.4,"monkey":0.595,"passed":3,"of":6,"fails":["enough trades","monkey test","act one bar later"]}
+{"id":"liq_reversal","data":"SPY 4h","n":15,"ret":-3,"dd":-6.6,"monkey":0.17,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_reversal","data":"GLD 1d","n":3,"ret":5.9,"dd":-4.4,"monkey":0.72,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"liq_reversal","data":"USO 1d","n":2,"ret":3.7,"dd":-3.1,"monkey":0.66,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"liq_reversal","data":"QQQ 1d","n":5,"ret":0.5,"dd":-6.9,"monkey":0.1,"passed":2,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later"]}
+{"id":"liq_reversal","data":"EURUSD 1d","n":7,"ret":1.2,"dd":-2.8,"monkey":0.555,"passed":2,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later"]}
+{"id":"liq_reversal","data":"BTC 1d","n":9,"ret":-4.5,"dd":-6.4,"monkey":0.2,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_fx_levels","data":"SPY 1h","n":29,"ret":-5.6,"dd":-6.2,"monkey":0.125,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"liq_fx_levels","data":"SPY 4h","n":13,"ret":0.1,"dd":-4.2,"monkey":0.495,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"liq_fx_levels","data":"GLD 1d","n":3,"ret":-3.1,"dd":-4.1,"monkey":0.27,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_fx_levels","data":"USO 1d","n":4,"ret":-1.6,"dd":-3.2,"monkey":0.565,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_fx_levels","data":"QQQ 1d","n":6,"ret":3.6,"dd":-2.6,"monkey":0.93,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"liq_fx_levels","data":"EURUSD 1d","n":7,"ret":-4.5,"dd":-4.6,"monkey":0.105,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_fx_levels","data":"BTC 1d","n":12,"ret":4.8,"dd":-3.7,"monkey":0.82,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"psar_reverse","data":"SPY 1h","n":419,"ret":-35.9,"dd":-38.9,"monkey":0.015,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"psar_reverse","data":"SPY 4h","n":123,"ret":-20.7,"dd":-22.8,"monkey":0.08,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"psar_reverse","data":"GLD 1d","n":21,"ret":2.2,"dd":-5,"monkey":0.46,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"psar_reverse","data":"USO 1d","n":22,"ret":3.7,"dd":-7.3,"monkey":0.415,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"psar_reverse","data":"QQQ 1d","n":25,"ret":-3.4,"dd":-5.9,"monkey":0.155,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"psar_reverse","data":"EURUSD 1d","n":28,"ret":-2.6,"dd":-5.7,"monkey":0.365,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"psar_reverse","data":"BTC 1d","n":32,"ret":-1.1,"dd":-5.9,"monkey":0.55,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"psar_adx","data":"SPY 1h","n":284,"ret":-30.6,"dd":-33.7,"monkey":0.005,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"psar_adx","data":"SPY 4h","n":75,"ret":-11.1,"dd":-15,"monkey":0.135,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"psar_adx","data":"GLD 1d","n":15,"ret":1.6,"dd":-5,"monkey":0.565,"passed":3,"of":6,"fails":["enough trades","monkey test","act one bar later"]}
+{"id":"psar_adx","data":"USO 1d","n":11,"ret":8.4,"dd":-4.2,"monkey":0.925,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"psar_adx","data":"QQQ 1d","n":14,"ret":1.7,"dd":-5.1,"monkey":0.57,"passed":3,"of":6,"fails":["enough trades","monkey test","act one bar later"]}
+{"id":"psar_adx","data":"EURUSD 1d","n":21,"ret":-1.9,"dd":-4.8,"monkey":0.405,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"psar_adx","data":"BTC 1d","n":23,"ret":-0.7,"dd":-6.1,"monkey":0.52,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"sma_10_20","data":"SPY 1h","n":217,"ret":-18.6,"dd":-21.9,"monkey":0.33,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sma_10_20","data":"SPY 4h","n":58,"ret":-7.1,"dd":-13.8,"monkey":0.285,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sma_10_20","data":"GLD 1d","n":12,"ret":-0.4,"dd":-3.4,"monkey":0.845,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"sma_10_20","data":"USO 1d","n":14,"ret":-3.5,"dd":-5.2,"monkey":0.35,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sma_10_20","data":"QQQ 1d","n":13,"ret":-0.4,"dd":-3.3,"monkey":0.72,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sma_10_20","data":"EURUSD 1d","n":20,"ret":0.3,"dd":-2.2,"monkey":0.465,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"sma_10_20","data":"BTC 1d","n":21,"ret":-0.3,"dd":-4,"monkey":0.545,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ema50_bands","data":"SPY 1h","n":87,"ret":-1,"dd":-6.6,"monkey":0.645,"passed":2,"of":6,"fails":["monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"ema50_bands","data":"SPY 4h","n":22,"ret":4.7,"dd":-2.1,"monkey":0.88,"passed":3,"of":6,"fails":["enough trades","monkey test","act one bar later"]}
+{"id":"ema50_bands","data":"GLD 1d","n":4,"ret":1.1,"dd":-3.8,"monkey":0.415,"passed":3,"of":6,"fails":["enough trades","monkey test","act one bar later"]}
+{"id":"ema50_bands","data":"USO 1d","n":3,"ret":-0.8,"dd":-3.9,"monkey":0.365,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"ema50_bands","data":"QQQ 1d","n":5,"ret":-2,"dd":-2.3,"monkey":0.065,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"ema50_bands","data":"EURUSD 1d","n":5,"ret":2.4,"dd":-1.6,"monkey":0.82,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"ema50_bands","data":"BTC 1d","n":6,"ret":-0.7,"dd":-2.3,"monkey":0.41,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup_ema","data":"SPY 1h","n":3,"ret":-2.6,"dd":-2.6,"monkey":0.055,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup_ema","data":"SPY 4h","n":4,"ret":-1.1,"dd":-3.7,"monkey":0.16,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup_ema","data":"GLD 1d","n":1,"ret":-1,"dd":-1.3,"monkey":0.155,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup_ema","data":"USO 1d","n":3,"ret":1.3,"dd":-2.4,"monkey":0.545,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"ict_turtle_soup_ema","data":"QQQ 1d","n":2,"ret":-2.1,"dd":-2.1,"monkey":0.325,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup_ema","data":"EURUSD 1d","n":2,"ret":-1.1,"dd":-2,"monkey":0.08,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"ict_turtle_soup_ema","data":"BTC 1d","n":1,"ret":2,"dd":-1.6,"monkey":0.79,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"liq_reversal_ema","data":"SPY 1h","n":2,"ret":-0.4,"dd":-1.1,"monkey":0.325,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_reversal_ema","data":"SPY 4h","n":8,"ret":-1.3,"dd":-5,"monkey":0.265,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_reversal_ema","data":"GLD 1d","n":3,"ret":5.9,"dd":-4.4,"monkey":0.72,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"liq_reversal_ema","data":"USO 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_reversal_ema","data":"QQQ 1d","n":2,"ret":-2.4,"dd":-2.7,"monkey":0.055,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_reversal_ema","data":"EURUSD 1d","n":4,"ret":-3.8,"dd":-3.8,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"liq_reversal_ema","data":"BTC 1d","n":4,"ret":-3,"dd":-3.5,"monkey":0.22,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"demand_second_leg","data":"SPY 1h","n":55,"ret":-3.6,"dd":-7.2,"monkey":0.485,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"demand_second_leg","data":"SPY 4h","n":14,"ret":-5.1,"dd":-5.1,"monkey":0.095,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"demand_second_leg","data":"GLD 1d","n":1,"ret":-1.1,"dd":-1.5,"monkey":0.375,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"demand_second_leg","data":"USO 1d","n":3,"ret":12.1,"dd":-1.2,"monkey":0.975,"passed":5,"of":6,"fails":["enough trades"]}
+{"id":"demand_second_leg","data":"QQQ 1d","n":2,"ret":-2,"dd":-4.2,"monkey":0.105,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"demand_second_leg","data":"EURUSD 1d","n":3,"ret":-2.3,"dd":-3.2,"monkey":0.12,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"demand_second_leg","data":"BTC 1d","n":4,"ret":-4.1,"dd":-4.1,"monkey":0.115,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sharp_reversal_aoi","data":"SPY 1h","n":5,"ret":1.2,"dd":-1.3,"monkey":0.725,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"sharp_reversal_aoi","data":"SPY 4h","n":1,"ret":1.4,"dd":-0.2,"monkey":0.84,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"sharp_reversal_aoi","data":"GLD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sharp_reversal_aoi","data":"USO 1d","n":1,"ret":-1.1,"dd":-1.1,"monkey":0.225,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sharp_reversal_aoi","data":"QQQ 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sharp_reversal_aoi","data":"EURUSD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"sharp_reversal_aoi","data":"BTC 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"gws_reversal","data":"SPY 1h","n":2,"ret":-0.8,"dd":-0.8,"monkey":0.16,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"gws_reversal","data":"SPY 4h","n":3,"ret":0,"dd":-2.9,"monkey":0.395,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"gws_reversal","data":"GLD 1d","n":2,"ret":-2.1,"dd":-2.2,"monkey":0.28,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"gws_reversal","data":"USO 1d","n":1,"ret":-1.7,"dd":-4.7,"monkey":0.115,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"gws_reversal","data":"QQQ 1d","n":1,"ret":-1.1,"dd":-2,"monkey":0.105,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"gws_reversal","data":"EURUSD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"gws_reversal","data":"BTC 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"anchor_discount","data":"SPY 1h","n":69,"ret":-4.7,"dd":-5.4,"monkey":0.335,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"anchor_discount","data":"SPY 4h","n":16,"ret":-1.9,"dd":-3.4,"monkey":0.25,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"anchor_discount","data":"GLD 1d","n":1,"ret":-1,"dd":-1,"monkey":0.05,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"anchor_discount","data":"USO 1d","n":2,"ret":-0.6,"dd":-1.2,"monkey":0.14,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"anchor_discount","data":"QQQ 1d","n":6,"ret":-1,"dd":-2.3,"monkey":0.22,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"anchor_discount","data":"EURUSD 1d","n":3,"ret":-1.2,"dd":-2.1,"monkey":0.275,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"anchor_discount","data":"BTC 1d","n":4,"ret":0.3,"dd":-2.1,"monkey":0.62,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"urban_deal_flow","data":"SPY 1h","n":24,"ret":-7.2,"dd":-8,"monkey":0.1,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"urban_deal_flow","data":"SPY 4h","n":9,"ret":-3.3,"dd":-4.9,"monkey":0.2,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"urban_deal_flow","data":"GLD 1d","n":3,"ret":1.6,"dd":-2,"monkey":0.735,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"urban_deal_flow","data":"USO 1d","n":4,"ret":-4.1,"dd":-4.6,"monkey":0.13,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"urban_deal_flow","data":"QQQ 1d","n":1,"ret":2.4,"dd":-1.2,"monkey":0.75,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"urban_deal_flow","data":"EURUSD 1d","n":1,"ret":-1,"dd":-1,"monkey":0.04,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"urban_deal_flow","data":"BTC 1d","n":2,"ret":-2,"dd":-3.7,"monkey":0.275,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"urban_sr_memory","data":"SPY 1h","n":31,"ret":-2.8,"dd":-8.2,"monkey":0.39,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"urban_sr_memory","data":"SPY 4h","n":3,"ret":0,"dd":-2.2,"monkey":0.375,"passed":1,"of":6,"fails":["enough trades","monkey test","locked test window","double costs","costs under half the moves"]}
+{"id":"urban_sr_memory","data":"GLD 1d","n":1,"ret":0.2,"dd":-1.1,"monkey":0.67,"passed":3,"of":6,"fails":["enough trades","monkey test","act one bar later"]}
+{"id":"urban_sr_memory","data":"USO 1d","n":2,"ret":9.2,"dd":-1.5,"monkey":0.875,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"urban_sr_memory","data":"QQQ 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"urban_sr_memory","data":"EURUSD 1d","n":1,"ret":-1,"dd":-1.2,"monkey":0.03,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"urban_sr_memory","data":"BTC 1d","n":1,"ret":-1,"dd":-1,"monkey":0.17,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_swing_count","data":"SPY 1h","n":6,"ret":-0.6,"dd":-1.5,"monkey":0.39,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_swing_count","data":"SPY 4h","n":4,"ret":0.6,"dd":-1.4,"monkey":0.54,"passed":3,"of":6,"fails":["enough trades","monkey test","act one bar later"]}
+{"id":"dave_swing_count","data":"GLD 1d","n":2,"ret":-1.7,"dd":-1.7,"monkey":0.31,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_swing_count","data":"USO 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_swing_count","data":"QQQ 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_swing_count","data":"EURUSD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_swing_count","data":"BTC 1d","n":1,"ret":-1.1,"dd":-1.1,"monkey":0.12,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_prev_range","data":"SPY 1h","n":51,"ret":9.1,"dd":-8.3,"monkey":0.975,"passed":6,"of":6,"fails":[]}
+{"id":"dave_prev_range","data":"SPY 4h","n":25,"ret":11.9,"dd":-3.7,"monkey":0.985,"passed":5,"of":6,"fails":["enough trades"]}
+{"id":"dave_prev_range","data":"GLD 1d","n":1,"ret":0,"dd":-0.5,"monkey":0.255,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_prev_range","data":"USO 1d","n":6,"ret":-6.7,"dd":-6.7,"monkey":0.025,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_prev_range","data":"QQQ 1d","n":5,"ret":-1.7,"dd":-2.8,"monkey":0.525,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"dave_prev_range","data":"EURUSD 1d","n":8,"ret":3.1,"dd":-3.8,"monkey":0.895,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"dave_prev_range","data":"BTC 1d","n":9,"ret":-1.2,"dd":-4.3,"monkey":0.335,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"garch_vol_premium","data":"SPY 1h","n":1,"ret":0.4,"dd":-0.4,"monkey":0.845,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"garch_vol_premium","data":"SPY 4h","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"garch_vol_premium","data":"GLD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"garch_vol_premium","data":"USO 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"garch_vol_premium","data":"QQQ 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"garch_vol_premium","data":"EURUSD 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"garch_vol_premium","data":"BTC 1d","n":0,"ret":0,"dd":0,"monkey":0,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_extreme_fade","data":"SPY 1h","n":410,"ret":-29.1,"dd":-33.5,"monkey":0.265,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_extreme_fade","data":"SPY 4h","n":98,"ret":8.2,"dd":-10.1,"monkey":0.885,"passed":4,"of":6,"fails":["monkey test","act one bar later"]}
+{"id":"peak_extreme_fade","data":"GLD 1d","n":37,"ret":-14.9,"dd":-21.9,"monkey":0.24,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_extreme_fade","data":"USO 1d","n":27,"ret":-6.9,"dd":-12.9,"monkey":0.35,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_extreme_fade","data":"QQQ 1d","n":24,"ret":6.6,"dd":-8.5,"monkey":0.92,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"peak_extreme_fade","data":"EURUSD 1d","n":29,"ret":-6.5,"dd":-7.5,"monkey":0.135,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_extreme_fade","data":"BTC 1d","n":36,"ret":0.1,"dd":-6.8,"monkey":0.57,"passed":2,"of":6,"fails":["enough trades","monkey test","double costs","costs under half the moves"]}
+{"id":"peak_low_vol_reversal","data":"SPY 1h","n":272,"ret":-17.1,"dd":-21.3,"monkey":0.46,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_low_vol_reversal","data":"SPY 4h","n":77,"ret":-8.3,"dd":-10.7,"monkey":0.46,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_low_vol_reversal","data":"GLD 1d","n":10,"ret":-9.1,"dd":-9.2,"monkey":0.17,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_low_vol_reversal","data":"USO 1d","n":14,"ret":-0.3,"dd":-7.4,"monkey":0.45,"passed":2,"of":6,"fails":["enough trades","monkey test","double costs","costs under half the moves"]}
+{"id":"peak_low_vol_reversal","data":"QQQ 1d","n":17,"ret":2.2,"dd":-8.2,"monkey":0.855,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"peak_low_vol_reversal","data":"EURUSD 1d","n":11,"ret":-0.3,"dd":-4.2,"monkey":0.585,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_low_vol_reversal","data":"BTC 1d","n":18,"ret":4.6,"dd":-2.7,"monkey":0.83,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"peak_dueling_momentum","data":"SPY 1h","n":190,"ret":-26.2,"dd":-29.7,"monkey":0.05,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_dueling_momentum","data":"SPY 4h","n":58,"ret":-14.6,"dd":-20.9,"monkey":0.15,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_dueling_momentum","data":"GLD 1d","n":8,"ret":-4.8,"dd":-5.8,"monkey":0.295,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_dueling_momentum","data":"USO 1d","n":10,"ret":4.2,"dd":-3.5,"monkey":0.7,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"peak_dueling_momentum","data":"QQQ 1d","n":9,"ret":-2.9,"dd":-5.3,"monkey":0.41,"passed":0,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_dueling_momentum","data":"EURUSD 1d","n":16,"ret":-1.5,"dd":-3.6,"monkey":0.445,"passed":1,"of":6,"fails":["enough trades","monkey test","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_dueling_momentum","data":"BTC 1d","n":10,"ret":3.2,"dd":-4.1,"monkey":0.835,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"peak_stop_breakout","data":"SPY 1h","n":295,"ret":-39.7,"dd":-41.9,"monkey":0.005,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_stop_breakout","data":"SPY 4h","n":82,"ret":-26.9,"dd":-29.6,"monkey":0,"passed":1,"of":6,"fails":["monkey test","locked test window","act one bar later","double costs","costs under half the moves"]}
+{"id":"peak_stop_breakout","data":"GLD 1d","n":12,"ret":8.8,"dd":-4.8,"monkey":0.835,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"peak_stop_breakout","data":"USO 1d","n":13,"ret":4.8,"dd":-5.3,"monkey":0.695,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"peak_stop_breakout","data":"QQQ 1d","n":20,"ret":0.7,"dd":-5.7,"monkey":0.44,"passed":2,"of":6,"fails":["enough trades","monkey test","locked test window","act one bar later"]}
+{"id":"peak_stop_breakout","data":"EURUSD 1d","n":17,"ret":1.5,"dd":-3.9,"monkey":0.615,"passed":3,"of":6,"fails":["enough trades","monkey test","locked test window"]}
+{"id":"peak_stop_breakout","data":"BTC 1d","n":20,"ret":5.4,"dd":-4.5,"monkey":0.875,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"buy_hold","data":"SPY 1h","n":1,"ret":25.4,"dd":-20.5,"monkey":0,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"buy_hold","data":"SPY 4h","n":1,"ret":25.4,"dd":-20.5,"monkey":0,"passed":4,"of":6,"fails":["enough trades","monkey test"]}
+{"id":"buy_hold","data":"GLD 1d","n":1,"ret":57.1,"dd":-28.3,"monkey":1,"passed":5,"of":6,"fails":["enough trades"]}
+{"id":"buy_hold","data":"USO 1d","n":1,"ret":98.5,"dd":-32.5,"monkey":1,"passed":5,"of":6,"fails":["enough trades"]}
+{"id":"buy_hold","data":"QQQ 1d","n":1,"ret":32.2,"dd":-22.9,"monkey":1,"passed":5,"of":6,"fails":["enough trades"]}
+{"id":"buy_hold","data":"EURUSD 1d","n":1,"ret":4.7,"dd":-7.5,"monkey":1,"passed":4,"of":6,"fails":["enough trades","locked test window"]}
+{"id":"buy_hold","data":"BTC 1d","n":1,"ret":-6.7,"dd":-53.1,"monkey":1,"passed":1,"of":6,"fails":["enough trades","locked test window","act one bar later","double costs","costs under half the moves"]}
