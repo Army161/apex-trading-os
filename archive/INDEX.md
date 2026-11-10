@@ -95,6 +95,7 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 87 | [chat/87-intro-quant-trading-models-ev.md](chat/87-intro-quant-trading-models-ev.md) | 2026-11-10 20:08 | 42,087 |
 | 88 | [chat/88-peak-commodity-algo-course.md](chat/88-peak-commodity-algo-course.md) | 2026-11-10 20:09 | 148,745 |
 | 89 | [chat/89-breaking-into-quant-careers.md](chat/89-breaking-into-quant-careers.md) | 2026-11-10 20:13 | 37,031 |
+| 90 | [chat/90-sharpe-ratio-explainer.md](chat/90-sharpe-ratio-explainer.md) | 2026-11-10 20:15 | 15,707 |
 
 ## Uploaded files
 

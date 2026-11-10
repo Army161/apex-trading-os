@@ -624,6 +624,13 @@ export const SOURCES = [
   "notes": "Career video, nothing to build. No book download, no accelerator signup."
  },
  {
+  "id": "chat/90",
+  "title": "Sharpe ratio explainer: risk, correlation, leverage, t-stat",
+  "feeds": "web/lib/sharpe.ts (annualised Sharpe, t-stat, SPY benchmark, correlation-aware combiner, leverage research only)",
+  "file": "archive/chat/90-sharpe-ratio-explainer.md",
+  "notes": "Same message repeated the chat/89 careers text; archived once. In-sample max-Sharpe weights lost out of sample."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",

@@ -211,3 +211,50 @@ GLD, USO, QQQ, BTC and EURUSD daily, and SPY, QQQ and IWM 4h. Each had a 20-bar 
 - **Incubation** is now a locked record (`lockForIncubation`) plus a report that scores only bars after the lock
   (`incubationReport`, 6 months minimum). This is the same idea as forward paper trading.
 - Reproduce with `npx tsx scripts/validate-peak.ts`.
+
+## chat/90: Sharpe reports, SPY benchmark, correlation-aware combiner (run 2026-11-10)
+
+`web/lib/sharpe.ts` and `web/scripts/validate-sharpe.ts`. Annualised Sharpe uses √252 for daily bars and √12 for monthly. The t-stat equals the per-period Sharpe × √n.
+
+**Buy and hold, about 2 years of daily bars:**
+
+| Asset | Sharpe | t-stat | one-sided p |
+|---|---|---|---|
+| SPY (benchmark) | 0.73 | 1.06 | 0.14 |
+| QQQ | 0.68 | 1.00 | 0.16 |
+| IWM | 0.45 | 0.66 | 0.26 |
+| GLD | 1.04 | 1.47 | 0.07 |
+| USO | 1.05 | 1.48 | 0.07 |
+| BTC (√365) | 0.14 | 0.20 | 0.42 |
+| EURUSD | 0.31 | 0.49 | 0.31 |
+
+None of these clears t ≥ 1.96. Two years is too short to tell even SPY's Sharpe from zero. The video quotes 0.45 for SPY over 20 years; our window was a good one.
+
+**Combiner:** weights were fitted on the first half (497 common days) and scored on the second.
+
+| Method | Test Sharpe | Annual vol | Sharpe vs the average single asset |
+|---|---|---|---|
+| Equal weight | 1.08 | 14.0% | 2.32× |
+| Inverse vol | 1.02 | 11.0% | 2.20× |
+| Min variance | 1.04 | 5.8% | 2.23× |
+| Max Sharpe (tangency) | 0.36 | 21.3% | 0.78× |
+
+Diversification works: low correlations helped. SPY/QQQ/IWM have correlations of 0.8–0.95; USO, EURUSD and GLD sit near zero. But the "optimal" max-Sharpe weights, fitted in-sample, were the worst out of sample. They loaded 61% on GLD just before it cooled off. Use equal weight or inverse vol unless the weights hold up on fresh data.
+
+**IWM AR(1) 12h lead vs SPY (208 test days):**
+- Sharpe 1.48 against SPY's 0.83 on the same days.
+- t-stat 1.34, p = 0.09.
+- Correlation 0.30, beta 0.26.
+- Alpha +15.2% a year, information ratio 0.40.
+
+This is still a lead only. It isn't significant on its own, and its deflated Sharpe after 84 tries is 0.33.
+
+**Leverage, research only** (with a 5% a year borrow cost):
+
+| Leverage | Sharpe | Max drawdown |
+|---|---|---|
+| 1× | 1.48 | −6.7% |
+| 2× | 1.27 | −13.7% |
+| 3× | 1.21 | −20.4% |
+
+Borrowing costs make Sharpe fall, not hold steady, and drawdown scales with leverage. Leverage is not a setting anywhere in the bots.

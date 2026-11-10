@@ -59,4 +59,5 @@ The status tags mean:
 - The best of many tries looks good by luck alone: the best of 500 no-edge bots has a Sharpe near 2.6. Count every try (`docs/bot-factory-and-leaderboard.md`).
 - Judge on expected value per trade after fees, not win rate (chat/87). At 1-hour horizons, fees turned every AR(1) model negative.
 - Lock the inputs and incubate for 6 months or more before trusting a rule (chat/88).
+- Report Sharpe with its t-stat (Sharpe per period × √n). Over 2 years even SPY only reaches t = 1.06. Diversify with equal or inverse-vol weights: in-sample "max Sharpe" weights were the worst out of sample. Leverage does not raise Sharpe once you pay to borrow, and it is research only (chat/90).
 - Gaps in the library are listed in `docs/strategy-gaps.md`.

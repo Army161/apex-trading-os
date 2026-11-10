@@ -1,4 +1,5 @@
 // Parity + sanity checks between the TS port and the Python engine. Run: npm test
+import { sharpeReport, combine, leveredResearch, vsBenchmark } from '../sharpe';
 import fs from 'node:fs';
 import path from 'node:path';
 import { backtest, atr, Bar, Sig } from './core';
@@ -295,6 +296,22 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
   const wf = walkForward(bars, (n: number) => byId('supertrend').build, [1, 2], { train: 300, test: 100 }), p3 = wf.windows.length === Math.floor((bars.length - 300) / 100) && wf.windows.every(w => w.from > bars[299].t);
   const ok = p1 && p2 && p3;
   console.log(`${ok ? 'PASS' : 'FAIL'} portfolio tools: correlation ${p1}, incubation lock ${p2} (${rep.status}), walk-forward windows ${p3} (${wf.windows.length})`); if (!ok) fail++;
+}
+{
+  // chat/90: annualising (√252 daily, √12 monthly), t-stat = per-period Sharpe × √n equals the textbook mean/(sd/√n),
+  // two equal-Sharpe series with negative correlation combine into a higher Sharpe, and leverage leaves Sharpe unchanged.
+  let seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647 - 0.5; };
+  const common = Array.from({ length: 1000 }, () => rnd()), red = new Map<number, number>(), blue = new Map<number, number>();
+  for (let i = 0; i < 1000; i++) { red.set(i, 0.001 + 0.01 * common[i] + 0.004 * rnd()); blue.set(i, 0.001 - 0.01 * common[i] + 0.004 * rnd()); }
+  const rr = [...red.values()], d = sharpeReport(rr, 252), mo = sharpeReport(rr, 12);
+  const m = rr.reduce((a, b) => a + b, 0) / rr.length, s = Math.sqrt(rr.reduce((a, b) => a + (b - m) ** 2, 0) / (rr.length - 1));
+  const s1 = Math.abs(d.sharpe / mo.sharpe - Math.sqrt(252 / 12)) < 1e-9 && Math.abs(d.tStat - m / (s / Math.sqrt(rr.length))) < 1e-9;
+  const c = combine({ red, blue }, { train: 0.5 }), eq = c.methods.find(x => x.method === 'equal')!;
+  const s2 = c.correlation[0][1] < -0.5 && eq.diversification > 1.5 && c.methods.every(x => Math.abs(Object.values(x.weights).reduce((a, b) => a + b, 0) - 1) < 1e-6);
+  const l2 = leveredResearch(rr, 2), s3 = Math.abs(sharpeReport(l2.returns, 252).sharpe - d.sharpe) < 1e-9 && l2.maxDrawdown < leveredResearch(rr, 1).maxDrawdown && leveredResearch([0.1, -0.6], 2).ruined;
+  const vb = vsBenchmark(rr, [...blue.values()]), s4 = vb.beta < 0 && Math.abs(vb.correlation - c.correlation[0][1]) < 1e-3;
+  const ok = s1 && s2 && s3 && s4;
+  console.log(`${ok ? 'PASS' : 'FAIL'} sharpe reports: annualise and t-stat ${s1}, correlation-aware mix ${s2} (corr ${c.correlation[0][1]}, ${eq.diversification.toFixed(2)}x), leverage keeps Sharpe and deepens drawdown ${s3}, benchmark beta ${s4}`); if (!ok) fail++;
 }
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');
