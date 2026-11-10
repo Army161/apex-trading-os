@@ -40,6 +40,8 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 32 | [chat/32-seven-repos-supercharge-claude.md](chat/32-seven-repos-supercharge-claude.md) | 2026-11-10 17:43 | 31,502 |
 | 33 | [chat/33-fable-5-2-prompts.md](chat/33-fable-5-2-prompts.md) | 2026-11-10 17:45 | 17,819 |
 | 34 | [chat/34-five-things-pros-do-with-claude.md](chat/34-five-things-pros-do-with-claude.md) | 2026-11-10 17:46 | 12,571 |
+| 35 | [chat/35-honcho-evolving-second-brain.md](chat/35-honcho-evolving-second-brain.md) | 2026-11-10 17:54 | 14,547 |
+| 36 | [chat/36-delete-90-percent-of-skills.md](chat/36-delete-90-percent-of-skills.md) | 2026-11-10 17:55 | 48,585 |
 
 ## Uploaded files
 
