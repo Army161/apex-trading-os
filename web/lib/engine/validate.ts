@@ -103,3 +103,18 @@ export function stressSuite(b: Bar[], build: (b: Bar[]) => Sig, o: Opts & { nudg
   return { metrics: m, costs: cb, monkey: { beat: mk.beat }, checks, passed, of: checks.length, edge: passed === checks.length,
     verdict: passed === checks.length ? 'survived every check (past data only, still paper first)' : `passed ${passed} of ${checks.length}: not an edge yet` };
 }
+
+/** chat/77: time-ordered train / validation / test split. The test slice is always the newest data and is never shuffled,
+ *  so a model can't see the future it is graded on. */
+export function timeSplit<T>(rows: T[], train = 0.6, val = 0.2) {
+  const a = Math.floor(rows.length * train), b = Math.floor(rows.length * (train + val));
+  return { train: rows.slice(0, a), val: rows.slice(a, b), test: rows.slice(b) };
+}
+
+/** chat/77: what the same starting balances would be worth if nothing had traded. A market maker has to hold coins to quote
+ *  both sides, so its result only counts if it beats simply holding those coins. Balances in units, prices in the quote currency. */
+export function holdSameBalances(start: Record<string, number>, priceStart: Record<string, number>, priceEnd: Record<string, number>) {
+  const value = (p: Record<string, number>) => Object.entries(start).reduce((s, [k, q]) => s + q * (k === 'USD' ? 1 : p[k] ?? NaN), 0);
+  const v0 = value(priceStart), v1 = value(priceEnd);
+  return { start: v0, end: v1, ret: v1 / v0 - 1 };
+}

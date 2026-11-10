@@ -1,6 +1,6 @@
 # Apex trading playbook
 
-This is every testable rule in the archive, boiled down. The method comes from archive/chat/75, and `.claude/agents/playbook-distiller.md` keeps it up to date. The tested status comes only from `docs/validation-results.md` (real data, run 2026-11-10), never from what a speaker claimed. **No rule here has a proven edge yet.** Profit screenshots in the videos are unproven.
+This is every testable rule in the archive, boiled down. The method comes from archive/chat/75, and `.claude/agents/playbook-distiller.md` keeps it up to date. The tested status comes only from `docs/validation-results.md` (real data, run 2026-11-10), never from what a speaker claimed. **No rule here has a proven edge yet.** The closest is the chat/78 previous-range pullback, which passes all six checks on SPY and IWM intraday but still needs forward paper trading (see `docs/validation-results.md`). Profit screenshots in the videos are unproven.
 
 The status tags mean:
 - **no edge**: tested, failed the checks.
@@ -43,6 +43,8 @@ The status tags mean:
 | Second leg | Skip leg one; enter leg two after a 30–79% pullback | chat/56 | `demand_second_leg` | closest on USO, but only 3 trades |
 | Pullback speed | After an impulse, wait for a 38%+ discount, then the fast return | chat/60 | `urban_deal_flow` | no edge |
 | S/R memory + DNA | The second push into a zone is choppier; enter on the failed retest | chat/61 | `urban_sr_memory` | no edge |
+| Previous-range pullback | After a break of structure, a 50% retrace into the leg that broke it, a sweep and a close above the last down candle; target the high | chat/78 | `dave_prev_range` | **candidate**: 6/6 on SPY 30m/1h and on fresh IWM 30m/1h; fails on 4h and daily; mostly shorts |
+| Swing-count reversal | Counter-trend only after 4+ swings into a higher-timeframe level | chat/78 | `dave_swing_count` | too few trades to judge |
 | Insider buying | Officer or director open-market buys of $10k or more; hold 5 sessions | chat/46 | `bots/alpaca/daytrader/insider.py` | untested on real data |
 
 ## 5. What the tests taught

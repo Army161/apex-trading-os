@@ -1,4 +1,5 @@
 import { dealFlow, srMemory } from './urban';
+import { swingCount, prevRange } from './dave';
 import { Bar, Sig, atr, sma, ema, rsi, adx, rollMax, rollMin, shift, stdev, candles, swings, supertrend } from './core';
 import { goldenCross, turtleSoup, silverBullet, unicorn, ictPoints } from './ict';
 import { sarReverse, maCross, bandRevert, withEmaRegime, withAdx, regimePoints } from './trend';
@@ -97,6 +98,10 @@ export const STRATEGIES: StratDef[] = [
     build: dealFlow() },
   { id: 'urban_sr_memory', name: 'S/R Memory Zones + DNA Test', source: 'chat/61', direction: 'both', tf: '1h', desc: 'Zones where price once left fast. With the higher timeframe, the second push into a zone must be choppier and fail to make a new extreme; enter on the failed retest. 2R. Not an edge yet in our tests.',
     build: srMemory() },
+  { id: 'dave_swing_count', name: 'Swing-Count Reversal (4 swings)', source: 'chat/78', direction: 'both', tf: '1h', desc: 'Counter-trend only at a higher-timeframe swing point, and only after 4+ lower lows and 4+ lower highs (mirror for shorts); sweep of the prior low, close above the last down candle. 2R. His P&L claims are unproven.',
+    build: swingCount() },
+  { id: 'dave_prev_range', name: 'Previous-Range Pullback', source: 'chat/78', direction: 'both', tf: '1h', desc: 'After a break of structure, wait for a 50% retrace into the range that caused it, a sweep and a close above the last down candle; target the high it retraced from. Candidate: passed all 6 checks on SPY and IWM 30m/1h (mostly shorts), fails on 4h/daily; needs forward paper trading. His P&L claims are unproven.',
+    build: prevRange() },
   { id: 'buy_hold', name: 'Buy & Hold (benchmark)', source: 'benchmark', direction: 'long', tf: 'any', desc: 'Buys the first bar and holds.',
     build: b => { const s = empty(b.length); s.le[0] = true; s.stop[0] = b[0].c * 1e-4; s.fullSize = true; return s; } },
 ];

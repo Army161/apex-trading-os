@@ -8,4 +8,4 @@ These must always stay true. `python3 tools/drift_check.py` checks them.
 - No bot has a withdraw or transfer function. Exchange and broker keys are trade-only, with withdrawals turned off on the exchange side.
 - Keys come only from environment variables, never from files in the repo, command-line flags, chat or logs.
 
-Not yet true everywhere (to do): the andon cord and kill switch (`web/lib/andon.ts`) are checked by the Solana copy, Polymarket copy and day-trader bots, but not yet by the nightly Alpaca, Freqtrade or keeper bots.
+Not yet true everywhere (to do): the andon cord and kill switch (`web/lib/andon.ts`) are handled by the Solana copy and Polymarket copy bots (pause, resume and kill commands from the dashboard) and by the paper exchange's risk gate (`bots/paper-exchange`), but not yet by the Alpaca nightly and day-trader, Freqtrade or keeper bots.

@@ -533,6 +533,34 @@ export const SOURCES = [
   "notes": "Not used. No sign-up. Unvetted reseller; pricing claims are an ad."
  },
  {
+  "id": "chat/77",
+  "title": "Crypto HFT market-making talk",
+  "feeds": "web/lib/engine/mm.ts, bots/orderbook-recorder, validate.ts timeSplit + holdSameBalances",
+  "file": "archive/chat/77-crypto-hft-market-making-talk.md",
+  "notes": "Paper only. The talk says its simple edges have shrunk. Claims unproven."
+ },
+ {
+  "id": "chat/78",
+  "title": "Fractal M1 scalper interview",
+  "feeds": "web/lib/engine/dave.ts (dave_swing_count, dave_prev_range), scripts/validate-dave.ts",
+  "file": "archive/chat/78-fractal-m1-scalper-interview.md",
+  "notes": "Paper only, fixed-fraction sizing. The $700 to $89k claim is unverified. Prop-firm promos skipped."
+ },
+ {
+  "id": "chat/79",
+  "title": "HFT system architecture explainer",
+  "feeds": "bots/paper-exchange (book, events, risk gate, order log, latency)",
+  "file": "archive/chat/79-hft-system-architecture.md",
+  "notes": "FPGA, colocation and kernel bypass skipped. Speed edges not viable for Apex."
+ },
+ {
+  "id": "chat/80",
+  "title": "Low-latency C++ trading talk",
+  "feeds": "bots/paper-exchange book layout (best price at the end), latency percentiles",
+  "file": "archive/chat/80-low-latency-cpp-trading-talk.md",
+  "notes": "Uploaded file. Ideas only; nothing installed."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",

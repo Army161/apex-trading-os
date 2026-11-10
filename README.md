@@ -1,6 +1,6 @@
 # Apex Trading OS
 
-One repo for every bot, strategy and tool built from Jeremy's 90 transcripts and uploads.
+One repo for every bot, strategy and tool built from Jeremy's 94 transcripts and uploads.
 **Everything starts in paper/test mode.** No strategy here is guaranteed to make money; backtests are shown as they are.
 
 | Folder | What it is |

@@ -19,6 +19,8 @@ import { decide, rosterRules, newAgent, afterRun, redact, purposeStale, asks, sh
 import { gate, ruleFilter } from '../decide';
 import { pickModel, markDown } from '../router';
 import { gapScan } from './gaps';
+import { simulateMM, leadLag, convert } from './mm';
+import { timeSplit, holdSameBalances } from './validate';
 const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/parity.json'), 'utf8'));
 const bars: Bar[] = fx.bars.map((r: number[]) => ({ t: r[0], o: r[1], h: r[2], l: r[3], c: r[4], v: r[5] }));
 let fail = 0;
@@ -199,6 +201,26 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
 {
   const g = gapScan(); const ok = g.unstyled.length === 0 && g.emptyCells.length > 0;
   console.log(`${ok ? 'PASS' : 'FAIL'} gap scan: every strategy has a style ${g.unstyled.length === 0}${g.unstyled.length ? ' (missing: ' + g.unstyled.join(', ') + ')' : ''}, ${g.emptyCells.length} empty cells`); if (!ok) fail++;
+}
+{
+  // chat/77 market making: a flat 99/101 book with sellers hitting 99 and buyers lifting 101 earns the spread minus fees.
+  const qs = Array.from({ length: 100 }, (_, i) => ({ t: i * 1000, bid: 99, ask: 101 }));
+  const ps = Array.from({ length: 40 }, (_, i) => ({ t: i * 2000 + 500, price: i % 2 ? 101 : 99, side: (i % 2 ? 'buy' : 'sell') as 'buy' | 'sell', qty: 1 }));
+  const r = simulateMM(qs, ps, { makerFee: 0.001 });
+  const m1 = r.fills === 40 && r.endInventory === 0 && Math.abs(r.net - (40 * 1 - r.fees)) < 1e-9 && r.adverse === 0 && r.spreadVsFee.spreadBeatsFees;
+  // a book that moves 2 against every fill: adverse selection shows up as a cost
+  const qs2 = Array.from({ length: 200 }, (_, i) => ({ t: i * 1000, bid: 99 - i, ask: 101 - i }));
+  const r2 = simulateMM(qs2, [{ t: 10500, price: 89, side: 'sell', qty: 1 }], { markoutMs: 2000 });
+  const m2 = r2.adverse > 0;
+  // lead-lag: b copies a three seconds later, 1% cheaper. The offset is removed and a is found to lead by 3 steps.
+  const a = Array.from({ length: 400 }, (_, i) => ({ t: i * 1000, p: 100 * Math.exp(0.01 * Math.sin(i / 3) + 0.003 * Math.sin(i * 1.7)) }));
+  const b = a.map((x, i) => ({ t: x.t, p: 0.99 * a[Math.max(0, i - 3)].p }));
+  const ll = leadLag(a, b, { maxLag: 10 }); const m3 = ll.best.lag === 3 && ll.leader === 'a' && Math.abs(ll.offsetPct - 0.0101) < 0.002;
+  const conv = convert([{ t: 0, p: 90 }], [{ t: 0, p: 1.1 }]); const m4 = Math.abs(conv[0].p - 99) < 1e-9;
+  const sp = timeSplit([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); const m5 = sp.train.join() === '1,2,3,4,5,6' && sp.test.join() === '9,10';
+  const h = holdSameBalances({ BTC: 1, USD: 1000 }, { BTC: 100 }, { BTC: 110 }); const m6 = Math.abs(h.ret - 10 / 1100) < 1e-12;
+  const ok = m1 && m2 && m3 && m4 && m5 && m6;
+  console.log(`${ok ? 'PASS' : 'FAIL'} market making: spread capture ${m1}, adverse selection ${m2}, lead-lag ${m3} (lag ${ll.best.lag}, offset ${(ll.offsetPct * 100).toFixed(2)}%), fx convert ${m4}, time split ${m5}, hold benchmark ${m6}`); if (!ok) fail++;
 }
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');

@@ -86,3 +86,33 @@ Results are from `web/scripts/validate-urban.ts` at FX costs (1 bp a side). "Avg
 - Nothing gets promoted from paper on these numbers.
 
 Rerun with `cd web && npx tsx scripts/validate-all.ts` and `npx tsx scripts/validate-urban.ts`.
+
+## chat/78 rules (fractal scalper interview), added 2026-11-10
+Scripts: `web/scripts/validate-dave.ts` (21 variants × 7 data sets = 139 runs) and `web/scripts/validate-dave-oos.ts` (QQQ and IWM 30m, fetched afterwards as fresh data). Sizing is the engine's 1% fixed fraction, never the 5–8% from the video. The "$700 to $89,000 in three weeks" claim is **unverified**.
+
+**The first result here that passes all six checks, with caveats.** The previous-range pullback (`dave_prev_range`, 50% retrace, fixed target back to the high) is it:
+
+| Data | Trades | Return | Monkey | Checks |
+|---|---|---|---|---|
+| SPY 30m | 109 | +9.9% | 0.995 | 6/6 |
+| SPY 1h | 51 | +9.1% | 0.975 | 6/6 |
+| SPY 4h | 25 | +11.9% | 0.985 | 5/6 (too few trades) |
+| **IWM 30m (fresh data)** | 73 | +11.6% | 0.97 | **6/6** |
+| **IWM 1h (fresh data)** | 56 | +12.7% | 0.995 | **6/6** |
+| QQQ 30m (fresh data) | 96 | +8.9% | 0.945 | 5/6 (just misses the monkey bar) |
+| QQQ 1h / 4h, IWM 4h | 49 / 27 / 21 | −4.9% / −3.0% / −1.8% | ~0.5 | fails |
+| Daily bars (GLD, QQQ, EURUSD, BTC) | 1–9 each | mixed | — | fails (too few trades) |
+
+Why this is a **candidate, not a proven edge**:
+- **It was one of 21 variants tried.** The 50% depth and the fixed target were the video's own defaults, chosen before testing, which helps. Still, some passes are expected by chance at this many tries.
+- **The fresh-data check uses the same two years** of US index ETFs that move together. It's a check on new markets, not on a new time period.
+- **About 90% of the trades are shorts, in a rising market.** Buy and hold made +25.6% on SPY, +31.6% on QQQ and +17.3% on IWM, so the rule earned less than holding. Its value would be as a hedge that makes money when holding doesn't, not as a replacement.
+- **Costs matter.** On SPY 30m, raising fees to 2.5× cuts the return from +9.9% to +0.7%. It passes the doubled-fee check only narrowly.
+- **It only works intraday (30m and 1h).** On 4h and daily it fails.
+- **Next step:** paper trade it forward on SPY, QQQ and IWM 30m from today, and judge it only on trades made after today.
+
+**Other chat/78 claims:**
+- **"Wait for 4 higher highs and 4 higher lows" (`dave_swing_count`)** almost never triggers: 18 trades across all 7 sets, and 4–6 on each fresh set. That is too few to prove or disprove it. With 2 swings it passed on SPY 30m (57 trades, 6/6) but lost on SPY 1h and 4h and on IWM and QQQ, so that pass looks like chance. **Unproven.**
+- **Exits:** the fixed target beat all three trailing exits (bullish candle lows, swing lows, 21 EMA close-below) on most sets. A swing-low trail at a 70% depth also passed on SPY 30m (72 trades).
+- **Skipping the first hour of the New York open** made little difference. It cut about 17% of trades and passed 6/6 on SPY 30m and IWM 30m, but it fell to 4/6 on IWM 1h.
+- **Top-down alignment (4× and 16× timeframes agree)** cut trades by about 85% and made results worse. We have no 1m or 15m data, so his exact daily/4h/15m/1m stack couldn't be tested.

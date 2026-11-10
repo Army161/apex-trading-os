@@ -82,6 +82,10 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 74 | [chat/74-elephant-goldfish-planning.md](chat/74-elephant-goldfish-planning.md) | 2026-11-10 18:46 | 18,889 |
 | 75 | [chat/75-claude-use-cases-list.md](chat/75-claude-use-cases-list.md) | 2026-11-10 18:52 | 17,867 |
 | 76 | [chat/76-model-reseller-api-ad.md](chat/76-model-reseller-api-ad.md) | 2026-11-10 18:54 | 9,558 |
+| 77 | [chat/77-crypto-hft-market-making-talk.md](chat/77-crypto-hft-market-making-talk.md) | 2026-11-10 19:13 | 34,568 |
+| 78 | [chat/78-fractal-m1-scalper-interview.md](chat/78-fractal-m1-scalper-interview.md) | 2026-11-10 19:14 | 63,078 |
+| 79 | [chat/79-hft-system-architecture.md](chat/79-hft-system-architecture.md) | 2026-11-10 19:15 | 10,069 |
+| 80 | [chat/80-low-latency-cpp-trading-talk.md](chat/80-low-latency-cpp-trading-talk.md) | 2026-11-10 19:17 | 73,935 |
 
 ## Uploaded files
 
