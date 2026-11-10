@@ -6,6 +6,7 @@ import { scan, runBacktest, leaderboard } from './signals';
 import { STRATEGIES } from './engine/strategies';
 import { SOURCES } from './sources';
 
+import { getRules, rulesBlock } from './rules';
 const SYSTEM = `You are Apex, the AI operator of Jeremy's trading system. You can see every bot, trade, event, journal entry and
 the source library (the YouTube courses and guides the strategies were built from). Use tools for every number; never invent
 prices, P&L or backtest results. Be plain and honest: no strategy is guaranteed, past backtests are not future returns, and
@@ -48,7 +49,7 @@ export async function runChat(messages: { role: string; content: string }[], adm
   const msgs: Anthropic.Beta.BetaMessageParam[] = messages.slice(-20).map(m => ({ role: m.role as 'user' | 'assistant', content: String(m.content) }));
   const used: string[] = [];
   for (let step = 0; step < 6; step++) {
-    const r = await client.beta.messages.create({ model: MODEL, max_tokens: 2000, system: SYSTEM + extraSystem, tools: tools as any, messages: msgs,
+    const r = await client.beta.messages.create({ model: MODEL, max_tokens: 2000, system: SYSTEM + rulesBlock(await getRules()) + extraSystem, tools: tools as any, messages: msgs,
       output_config: { effort: 'medium' }, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' });
     await record('chat', MODEL, r.usage);
     if (r.stop_reason === 'refusal') return { reply: 'The model declined to answer that.', tools: used };

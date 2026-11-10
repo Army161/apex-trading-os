@@ -7,6 +7,7 @@ import { EXAMPLE, compile, validate, setPath, Spec } from './spec';
 import { paperRecord } from '../strategies';
 import { checkTrade, oversoldScore } from '../assistants';
 import { cost } from '../usage';
+import { normalizeRules, rulesBlock, riskSystem, QUESTIONS } from '../rules';
 const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/parity.json'), 'utf8'));
 const bars: Bar[] = fx.bars.map((r: number[]) => ({ t: r[0], o: r[1], h: r[2], l: r[3], c: r[4], v: r[5] }));
 let fail = 0;
@@ -59,6 +60,15 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
   const a = cost('claude-opus-5-5', { input_tokens: 1e6, output_tokens: 1e6 }), b = cost('claude-sonnet-5-5', { input_tokens: 1e6, server_tool_use: { web_search_requests: 10 } });
   const ok = Math.abs(a - 24) < 1e-9 && Math.abs(b - 2.1) < 1e-9 && cost('mystery', { output_tokens: 1e6 }) === 20 && cost('claude-opus-5-5', undefined) === 0;
   console.log(`${ok ? 'PASS' : 'FAIL'} AI spend estimate`); if (!ok) fail++;
+}
+// Trader rules + red team: no rules leaves prompts unchanged, rules are added with the house rules, HTML stripped, length capped
+{
+  const base = 'BASE';
+  const ok = rulesBlock(null) === '' && riskSystem(base, null) === base && riskSystem(base, { text: 'x' }).includes('house rules win')
+    && riskSystem(base, null, true).includes('RED TEAM') && !riskSystem(base, null, false).includes('RED TEAM')
+    && normalizeRules('<b>hi</b> there') === 'hi there' && normalizeRules('a'.repeat(9000)).length === 4000 && QUESTIONS.length === 20
+    && Math.abs(cost('claude-fable-5-2', { input_tokens: 1e6, output_tokens: 1e6 }) - 48) < 1e-9;
+  console.log(`${ok ? 'PASS' : 'FAIL'} trader rules, red team, Fable pricing`); if (!ok) fail++;
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');
 process.exit(fail ? 1 : 0);

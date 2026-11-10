@@ -7,6 +7,7 @@ import { candles } from '@/lib/market';
 import { rsi, sma, atr } from '@/lib/engine/core';
 import { push, list } from '@/lib/store';
 import { record, guard } from '@/lib/usage';
+import { getRules, riskSystem } from '@/lib/rules';
 export const maxDuration = 120;
 
 const SYSTEM = `You are Risk Mitigator, a conservative, contrarian trading coworker. Your job is to protect capital, not to cheer.
@@ -34,13 +35,14 @@ export async function GET() { return Response.json({ summaries: await list('risk
 
 export async function POST(req: Request) {
   if (!process.env.ANTHROPIC_API_KEY) return Response.json({ reply: 'Risk Mitigator needs ANTHROPIC_API_KEY in the Vercel environment.' });
-  const { messages, summarize } = await req.json();
+  const { messages, summarize, redteam } = await req.json();
+  const sys = riskSystem(SYSTEM, await getRules(), Boolean(redteam));
   try { await guard(); } catch (e: any) { return Response.json({ reply: e.message }); }
   const client = new Anthropic();
   const msgs: Anthropic.Beta.BetaMessageParam[] = (messages ?? []).slice(-24).map((m: any) => ({ role: m.role, content: String(m.content) }));
   if (summarize) {
     msgs.push({ role: 'user', content: 'Summarise this conversation for my trade journal in under 120 words: the idea, the numbers and ratio, the downside you raised, and what I decided or still need to decide.' });
-    const r = await client.beta.messages.create({ model: MODEL, max_tokens: 1500, system: SYSTEM, messages: msgs, output_config: { effort: 'low' }, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' });
+    const r = await client.beta.messages.create({ model: MODEL, max_tokens: 1500, system: sys, messages: msgs, output_config: { effort: 'low' }, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' });
     await record('risk', MODEL, r.usage);
     const text = r.content.filter(b => b.type === 'text').map((b: any) => b.text).join('');
     await push('risk_chats', { ts: Date.now(), summary: text }, 200);
@@ -48,7 +50,7 @@ export async function POST(req: Request) {
   }
   const used: string[] = [];
   for (let step = 0; step < 6; step++) {
-    const r = await client.beta.messages.create({ model: MODEL, max_tokens: 2000, system: SYSTEM, tools, messages: msgs, output_config: { effort: 'medium' },
+    const r = await client.beta.messages.create({ model: MODEL, max_tokens: 2000, system: sys, tools, messages: msgs, output_config: { effort: 'medium' },
       betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' });
     await record('risk', MODEL, r.usage);
     if (r.stop_reason === 'refusal') return Response.json({ reply: 'The model declined to answer that.' });
