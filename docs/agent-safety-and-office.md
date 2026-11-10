@@ -63,3 +63,12 @@ Do not use the tool's anti-bot-detection features on exchanges or brokers. That 
 DeepSeek V4.1 Flash is described in chat/67 as free inside Open Code, with fair-use limits. It is noted as one more option for Jeremy's pending model choice, alongside Ollama and NVIDIA. Apex stays on Claude until he decides.
 
 The site cloner from chat/67 was deliberately not built, because it copies other sites' layouts.
+
+## Inbox, webhooks and limits (chat/72)
+These ideas come from a multi-harness coding app video. Nothing was installed, and its license has not been checked. The sponsor segment is an ad.
+- **Inbox view** of bots and agent jobs. Each item can be settled, snoozed until a set time, or auto-settled when its PR merges or its job finishes. Items for a job that is still running stay hidden until there is something to look at.
+- **Webhook-triggered jobs**: an incoming webhook (for example a TradingView alert) starts a job. Every payload is saved so the job can be replayed later with the same input. Payloads go through `redact()` before they are stored, and a webhook can only start read or analyze work. It can never place an order.
+- **Load balancing across machines**: when more than one machine can run a job, send it to the least busy one that is healthy. This extends `web/lib/router.ts`, which already skips a model that errors.
+- **Usage and limits tab**: each provider's current usage, its limit and when the limit resets, next to the AI spend page (`web/lib/usage.ts`).
+- **Queued follow-up**: when a provider hits its rate limit, the follow-up waits in a queue and runs once the limit resets, instead of failing or retrying in a loop.
+- **Triage command**: one command bundles the recent logs, the audit rows, versions and the failing check into a single file for debugging. Secrets are redacted before anything is written.

@@ -77,6 +77,8 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 69 | [chat/69-free-model-gateway-fallback.md](chat/69-free-model-gateway-fallback.md) | 2026-11-10 18:42 | 12,075 |
 | 70 | [chat/70-local-multi-agent-workspace.md](chat/70-local-multi-agent-workspace.md) | 2026-11-10 18:43 | 12,036 |
 | 71 | [chat/71-orchestrator-bot-software-factory.md](chat/71-orchestrator-bot-software-factory.md) | 2026-11-10 18:44 | 18,828 |
+| 72 | [chat/72-t3-code-multi-harness.md](chat/72-t3-code-multi-harness.md) | 2026-11-10 18:44 | 48,575 |
+| 73 | [chat/73-pr-agent-open-source-review.md](chat/73-pr-agent-open-source-review.md) | 2026-11-10 18:45 | 9,459 |
 
 ## Uploaded files
 

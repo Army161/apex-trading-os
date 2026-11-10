@@ -491,6 +491,27 @@ export const SOURCES = [
   "notes": "Paper only. Nothing installed."
  },
  {
+  "id": "chat/71",
+  "title": "Orchestrator bot software factory",
+  "feeds": "docs/how-to-direct-apex-agents.md blast radius, RICE triage",
+  "file": "archive/chat/71-orchestrator-bot-software-factory.md",
+  "notes": "Nothing installed. Sponsor is an ad."
+ },
+ {
+  "id": "chat/72",
+  "title": "T3 Code multi-harness app",
+  "feeds": "docs/agent-safety-and-office.md inbox, webhooks, limits, triage",
+  "file": "archive/chat/72-t3-code-multi-harness.md",
+  "notes": "Nothing installed. License unchecked. Sponsor is an ad."
+ },
+ {
+  "id": "chat/73",
+  "title": "Open-source AI PR reviewer",
+  "feeds": "docs/code-review-bot.md (candidate for the Apex repo)",
+  "file": "archive/chat/73-pr-agent-open-source-review.md",
+  "notes": "Nothing installed. License unchecked. Sponsor plugs are ads."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",
