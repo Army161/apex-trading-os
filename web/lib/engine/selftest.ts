@@ -7,6 +7,7 @@ import { EXAMPLE, compile, validate, setPath, Spec } from './spec';
 import { paperRecord } from '../strategies';
 import { checkTrade, oversoldScore } from '../assistants';
 import { cost } from '../usage';
+import { applyOp, applyDream, current, history, memoryBlock, looksSecret, Fact } from '../memory';
 import { normalizeRules, rulesBlock, riskSystem, QUESTIONS } from '../rules';
 const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/parity.json'), 'utf8'));
 const bars: Bar[] = fx.bars.map((r: number[]) => ({ t: r[0], o: r[1], h: r[2], l: r[3], c: r[4], v: r[5] }));
@@ -69,6 +70,23 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
     && normalizeRules('<b>hi</b> there') === 'hi there' && normalizeRules('a'.repeat(9000)).length === 4000 && QUESTIONS.length === 20
     && Math.abs(cost('claude-fable-5-2', { input_tokens: 1e6, output_tokens: 1e6 }) - 48) < 1e-9;
   console.log(`${ok ? 'PASS' : 'FAIL'} trader rules, red team, Fable pricing`); if (!ok) fail++;
+}
+// Memory: newer fact on the same key replaces the old one (kept with date), retire ends it, dream ops apply, secrets dropped
+{
+  let fs: Fact[] = [];
+  fs = applyOp(fs, { op: 'add', key: 'Risk per trade', text: 'risks 1% per trade' }, 'chat', 1000);
+  fs = applyOp(fs, { op: 'replace', key: 'risk-per-trade', text: 'risks 0.5% per trade now' }, 'telegram', 2000);
+  const c1 = current(fs), h = history(fs, 'risk-per-trade');
+  const okReplace = c1.length === 1 && c1[0].text.includes('0.5%') && h.length === 2 && h[1].replacedAt === 2000;
+  fs = applyOp(fs, { op: 'retire', key: 'risk-per-trade' }, 'you', 3000);
+  const okRetire = current(fs).length === 0 && history(fs, 'risk-per-trade').length === 2;
+  const d = applyDream([], [{ op: 'add', key: 'tf', text: 'trades the 4h chart' }, { op: 'add', key: 'style', text: 'wants short answers' }, { op: 'replace', key: 'tf', text: 'moved to the daily chart' }, { op: 'nonsense' as any, key: 'x', text: 'y' }], 5000);
+  const okDream = current(d).length === 2 && current(d).some(f => f.text.includes('daily')) && !current(d).some(f => f.text.includes('4h'));
+  const okSecret = looksSecret('my key is sk-ant-abcdefghijklmnop') && looksSecret('0x' + 'a'.repeat(64)) && looksSecret('seed phrase: apple river stone cloud tiger lamp ocean ring fork salt wind moon')
+    && !looksSecret('I risk 1% and like the daily chart') && applyOp([], { op: 'add', key: 'k', text: 'sk-ant-abcdefghijklmnop' }, 'chat').length === 0;
+  const okBlock = memoryBlock([]) === '' && memoryBlock(current(d)).includes('daily');
+  const ok = okReplace && okRetire && okDream && okSecret && okBlock;
+  console.log(`${ok ? 'PASS' : 'FAIL'} memory: replace ${okReplace}, retire ${okRetire}, dream ${okDream}, secrets ${okSecret}, block ${okBlock}`); if (!ok) fail++;
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');
 process.exit(fail ? 1 : 0);
