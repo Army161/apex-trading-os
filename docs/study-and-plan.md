@@ -116,6 +116,56 @@ Each test counts as a try. Each runs on data we already have unless it says othe
 - **After 6 months:** zero to a few strategies may graduate. Expect small edges, not the screenshots in the videos.
 - **If nothing graduates:** the honest answer is the diversified core plus continued research. Apex will say so instead of inventing a win.
 
-## 5. One option for Jeremy
+## 5. My own ideas, added to the plan
 
-The one business model in the archive that clearly makes money is the vendors' own: selling tools and education. An honest version of that is Apex's validation gate as a product. It would answer "does this strategy really work?" with the six checks and the deflated Sharpe, for traders who buy bots and courses. That is a separate track from trading. It is Jeremy's call, and nothing is built for it unless he says so.
+These come from what the study showed is missing, not from the videos.
+
+1. **Claim checker.** Paste a transcript, a Pine script or a sales page. Apex pulls out the exact rules, writes them as a strategy spec, and runs the six checks plus the deflated Sharpe. It then gives a plain verdict: holds up, near miss, or no edge. That turns our slowest step (reading a video and hand-coding it) into one click. It is also the core of the product track (section 7).
+2. **A trial ledger with receipts.** Every test run is recorded with a hash of its inputs, the data and the result, so the deflated Sharpe always charges for every try. Paper results are also published as a verifiable record. This is the honest version of chat/84's "verifiable record".
+3. **Pre-registration.** Each test states its hypothesis and pass bar before it runs. The ledger rejects changes to the bar afterwards.
+4. **Drift alarm.** Each paper strategy's live trades are compared with its backtest distribution (win rate, average R, drawdown) using a CUSUM-style alarm. A strategy that drifts is paused automatically, before it reaches the drawdown limit.
+5. **Correlation dedupe.** A new strategy whose returns correlate above 0.8 with one already in paper counts as a variant, not as diversification. It doesn't get its own weight.
+6. **Data firewall.** Stale bars, gaps, bad prints or a feed that disagrees with a second source block trading for that symbol. Every report shows where the data came from.
+7. **Venue cost model.** Fees, spread and slippage per venue and asset are measured from the paper fills and fed back into the backtests, so costs aren't guessed.
+8. **A micro-live stage after graduation.** If Jeremy approves, a graduated strategy trades a tiny fixed amount first, for example 1% of the intended size. It only scales up once its live record matches paper.
+9. **Regime panel.** Trend or range, volatility level and correlation level, shown next to each strategy. This is context only: it never switches strategies on or off by itself, because regime filters didn't help in our tests.
+10. **A reviewer that didn't tune it.** An independent validator agent re-runs every promotion from scratch with its own data pull. Two agreeing runs are needed (chat/74).
+
+## 6. Extras Jeremy asked for, and what each is for
+
+All paper-first. None of them gets order, withdraw, pay or transfer tools.
+
+| Type | What to make | Why |
+|---|---|---|
+| Skills | `apex-archive` (save a transcript verbatim and index it), `apex-claim-check`, `apex-validate` (six checks on a described rule), `apex-daily-review`, `apex-risk-check` | Repeatable steps any Claude session can run the same way |
+| MCP server | Extend the read-only Apex MCP with the autopilot board, the trial ledger, run a queued test, the report, and data health | Claude Desktop, Claude Code or the mobile app can ask Apex anything without trade access |
+| Claude Code plugin | Bundle the skills, the MCP server and hooks. One hook blocks edits to risk limits or live flags unless a reviewer signs off | Guards the money code at the tool level |
+| Agents | Research scout (new sources and papers go into the test queue), data steward (pulls and checks data), validator, risk officer (read-only, can pull the andon cord), reporter, code reviewer. Each has a budget and a purpose in the policy roster | Research and oversight run 24/7 without touching money |
+| Automations | Daily autopilot run, hourly data health, weekly research digest, monthly re-validation of everything in paper, end-of-day report to Telegram | "Fully autonomous" in the parts where autonomy is safe |
+| Verification | GitHub Actions CI: types, unit tests, pytest, TS/Python parity, look-ahead tests, mutation tests, smoke tests of every API and cron route, golden-file reports. Also a canary paper run on each deploy | Nothing ships that breaks the honesty checks |
+| Risk | The existing guard (1% risk, loss limits, drawdown pause, hard stops, no leverage), plus a correlation cap, an asset-class exposure cap, the drift alarm, broker reconciliation before any order, and idempotent order ids | Caps the damage when something is wrong |
+| Terminal | `apex` command line: run, board, report, strategy details, ledger, data health | Fast control from a shell |
+| Web app | The Vercel dashboard, with an Autopilot tab (funnel, paper book, risk, research queue, ledger) | The main control room |
+| Mobile | An installable PWA of the dashboard, plus Telegram for alerts and commands | Phone access without app-store work. Native apps later only if needed |
+| Desktop | The same PWA installed as a desktop app. A Tauri wrapper later only if offline use matters | Covered without a second codebase |
+| API | Read-only, key-based REST for reports, the board and the ledger | Feeds the MCP server, the mobile app, extensions and the product |
+| Browser extension | Later: on a YouTube or TradingView page, send the transcript or script to the claim checker | Research and product channel |
+| SaaS | Only if Jeremy picks the product track: multi-user accounts, Stripe billing, per-user limits | A business, separate from trading |
+| Docs | White paper, architecture spec, a short spec and test plan per feature, runbooks (data outage, halt, going live), decision records | The design and build threads work from these |
+
+## 7. Product track (Jeremy's call)
+
+The one business model in the archive that clearly makes money is the vendors' own: selling tools and education. The honest version is the claim checker as a product. It answers "does this strategy or bot actually work?" with the six checks and the deflated Sharpe, for traders who buy bots and courses. Delivered as web, API, browser extension and an MCP or plugin for Claude users. It is separate from trading, and nothing is built for it unless he picks it.
+
+## 8. Phases and handover
+
+| Phase | Scope |
+|---|---|
+| 0 | Repo `apex-trading-os`, CI and the plugin's guard hook |
+| 1 | Autopilot core, trial ledger, risk additions, report |
+| 2 | Data (in parallel) |
+| 3 | Test queue and claim checker |
+| 4 | Surfaces: Autopilot tab, CLI terminal, MCP, skills, PWA, API |
+| 5 | Product track, only if chosen |
+
+Handover: once Jeremy approves, the design goes to a Fable 5.2 design thread, then the build to a Fable 5.2 build thread, both working from this document. A draft of the autopilot core (`web/lib/autopilot/risk.ts`, `pipeline.ts`) is in the container as a starting point. It isn't committed or tested yet.
