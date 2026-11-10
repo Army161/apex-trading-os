@@ -1,5 +1,7 @@
 # Archive study and recommended plan
 
+**Status: approved by Jeremy on 2026-11-10 at 23:26 UTC.** This covers all phases (0 to 5), all ten ideas in section 5, and the product track in section 7. Design and build go to Fable 5.2 threads.
+
 Written 2026-11-10, after reading all 105 archived sources in full (about 4.5 MB of transcripts) and re-running every strategy we have on real data. The per-source notes are in `docs/archive-study/batch0.md` to `batch8.md`. The full stress-test board is in `docs/archive-study/stress-board-2026-11-10.jsonl`.
 
 **Short version.** None of the sources proved a trading edge. Our own tests found one candidate and one lead. So the data does not support a machine that is guaranteed to make money. It does support a system that keeps searching, tests honestly, risks little, and only promotes what survives. That is what this plan builds. It may take months to find anything worth real money, or it may find nothing; this plan is built to say so either way.
@@ -164,9 +166,9 @@ From `docs/repo-catalog.md`. The build thread installs these. Each is scanned fi
 
 Freqtrade (GPL) and Fincept/Honcho (AGPL) stay separate or ideas-only.
 
-## 7. Product track (Jeremy's call)
+## 7. Product track (approved)
 
-The one business model in the archive that clearly makes money is the vendors' own: selling tools and education. The honest version is the claim checker as a product. It answers "does this strategy or bot actually work?" with the six checks and the deflated Sharpe, for traders who buy bots and courses. Delivered as web, API, browser extension and an MCP or plugin for Claude users. It is separate from trading, and nothing is built for it unless he picks it.
+The one business model in the archive that clearly makes money is the vendors' own: selling tools and education. The honest version is the claim checker as a product. It answers "does this strategy or bot actually work?" with the six checks and the deflated Sharpe, for traders who buy bots and courses. Delivered as web, API, browser extension and an MCP or plugin for Claude users. It is separate from trading. Jeremy approved it, so it is Phase 5.
 
 ## 8. Phases and handover
 
@@ -177,6 +179,6 @@ The one business model in the archive that clearly makes money is the vendors' o
 | 2 | Data (in parallel) |
 | 3 | Test queue and claim checker |
 | 4 | Surfaces: Autopilot tab, CLI terminal, MCP, skills, PWA, API |
-| 5 | Product track, only if chosen |
+| 5 | Product track (approved): claim checker as SaaS, API, browser extension, MCP/plugin |
 
 Handover: once Jeremy approves, the design goes to a Fable 5.2 design thread, then the build to a Fable 5.2 build thread, both working from this document. A draft of the autopilot core (`risk.ts`, `pipeline.ts`) is saved in the project files under `apex-drafts/autopilot/` as a starting point. It isn't committed or tested yet.
