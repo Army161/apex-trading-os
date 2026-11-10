@@ -39,6 +39,11 @@ class Reporter:
     def event(self, level: str, message: str):
         return self._post({"type": "event", "level": level, "message": message})
 
+    def halt(self, reason: str):
+        """Pull the andon cord: the dashboard pauses every bot and messages the owner. Use when something is wrong
+        that this bot cannot judge alone (data looks broken, fills disagree with the plan, an invariant failed)."""
+        return self.event("halt", reason)
+
     def command(self) -> str | None:
         """Returns 'pause', 'resume', 'kill' or None."""
         if not self.url:

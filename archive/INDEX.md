@@ -44,6 +44,7 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 36 | [chat/36-delete-90-percent-of-skills.md](chat/36-delete-90-percent-of-skills.md) | 2026-11-10 17:55 | 48,585 |
 | 37 | [chat/37-ai-software-factory-security.md](chat/37-ai-software-factory-security.md) | 2026-11-10 17:55 | 33,622 |
 | 38 | [chat/38-software-factory-v2.md](chat/38-software-factory-v2.md) | 2026-11-10 17:59 | 36,822 |
+| 39 | [chat/39-open-source-business-models.md](chat/39-open-source-business-models.md) | 2026-11-10 18:00 | 27580 |
 
 ## Uploaded files
 

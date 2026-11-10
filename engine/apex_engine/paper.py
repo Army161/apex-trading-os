@@ -57,8 +57,12 @@ class PaperTrader:
                 self.rep.trade({**self.pos, "status": "open"})
             else:
                 self.rep.event("blocked", f"{self.strat.id} {self.symbol}: {why}")
-        self.rep.heartbeat({"equity": self.guard.state.equity, "paused": self.guard.state.paused,
-                            "pause_reason": self.guard.state.pause_reason, "position": self.pos, "last_signal": sig})
+        st, cfg = self.guard.state, self.guard.cfg
+        # drawdown/day_return next to their limits let the dashboard pull the andon cord (archive/chat/37)
+        self.rep.heartbeat({"equity": st.equity, "paused": st.paused, "pause_reason": st.pause_reason, "position": self.pos, "last_signal": sig,
+                            "drawdown": st.equity / st.equity_peak - 1 if st.equity_peak else 0.0, "backtest_max_dd": cfg.backtest_max_dd,
+                            "day_return": st.equity / st.day_start_equity - 1 if st.day_start_equity else 0.0,
+                            "daily_loss_limit": cfg.daily_loss_limit_pct})
 
     def loop(self, every_sec: int | None = None):
         every = every_sec or max(60, data.TF_SECONDS[self.tf] // 4)
