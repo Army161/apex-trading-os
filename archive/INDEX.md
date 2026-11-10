@@ -81,6 +81,7 @@ Every transcript and guide Jeremy sent, saved verbatim. Chat items are in `chat/
 | 73 | [chat/73-pr-agent-open-source-review.md](chat/73-pr-agent-open-source-review.md) | 2026-11-10 18:45 | 9,459 |
 | 74 | [chat/74-elephant-goldfish-planning.md](chat/74-elephant-goldfish-planning.md) | 2026-11-10 18:46 | 18,889 |
 | 75 | [chat/75-claude-use-cases-list.md](chat/75-claude-use-cases-list.md) | 2026-11-10 18:52 | 17,867 |
+| 76 | [chat/76-model-reseller-api-ad.md](chat/76-model-reseller-api-ad.md) | 2026-11-10 18:54 | 9,558 |
 
 ## Uploaded files
 

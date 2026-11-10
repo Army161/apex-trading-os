@@ -72,3 +72,8 @@ These ideas come from a multi-harness coding app video. Nothing was installed, a
 - **Usage and limits tab**: each provider's current usage, its limit and when the limit resets, next to the AI spend page (`web/lib/usage.ts`).
 - **Queued follow-up**: when a provider hits its rate limit, the follow-up waits in a queue and runs once the limit resets, instead of failing or retrying in a loop.
 - **Triage command**: one command bundles the recent logs, the audit rows, versions and the failing check into a single file for debugging. Secrets are redacted before anything is written.
+
+## Model resellers (chat/76)
+The video is a sponsored walkthrough of an OpenAI-compatible reseller that sells many models through one key. **Apex won't use it.** It's an unvetted middleman, and every prompt and key would pass through it. The pricing and free-credit claims are an ad.
+
+If Jeremy adds providers later, each one connects directly to that provider (Anthropic, NVIDIA NIM, DeepSeek, or Ollama running locally), through `web/lib/gateway.ts`, with its own key in an environment variable and a spend cap in `web/lib/router.ts`. Today the router picks a model id and key name but has no base-URL field. A direct OpenAI-compatible provider would need a vetted base URL added there, which waits for Jeremy's pick.

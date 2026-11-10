@@ -526,6 +526,13 @@ export const SOURCES = [
   "notes": "Only the playbook and gap-scan ideas used. Hacking, jailbreak, dating-bot, decompiling and haggling items not acted on."
  },
  {
+  "id": "chat/76",
+  "title": "Model reseller API walkthrough (sponsored)",
+  "feeds": "docs/agent-safety-and-office.md model resellers note",
+  "file": "archive/chat/76-model-reseller-api-ad.md",
+  "notes": "Not used. No sign-up. Unvetted reseller; pricing claims are an ad."
+ },
+ {
   "id": "uploads/01",
   "title": "Build a trading bot with Claude masterclass",
   "feeds": "engine rsi2_dip, breakout_50_20, core_rotation, backtester self-tests, walk-forward; bots/alpaca nightly core+sleeves",
