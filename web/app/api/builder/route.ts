@@ -6,6 +6,7 @@ import { backtest } from '@/lib/engine/core';
 import { compile } from '@/lib/engine/spec';
 import { candles } from '@/lib/market';
 import { record, guard } from '@/lib/usage';
+import { ask } from '@/lib/gateway';
 export const maxDuration = 120;
 
 const SYSTEM = `You turn a trader's plain-English strategy into Apex's JSON strategy format. Rules of the format:
@@ -30,18 +31,16 @@ export async function POST(req: Request) {
     return Response.json({ spec: EXAMPLE, demo: true, note: 'No ANTHROPIC_API_KEY set, so this is the prebuilt Supertrend example from the video. Add the key in Vercel env vars to build from your own words.' });
   }
   try { await guard(); } catch (e: any) { return Response.json({ error: e.message }, { status: 429 }); }
-  const client = new Anthropic(); const model = process.env.APEX_BUILDER_MODEL || 'claude-opus-5-5';
+  const model = process.env.APEX_BUILDER_MODEL || 'claude-opus-5-5';
   const msgs: Anthropic.Beta.BetaMessageParam[] = [];
   for (const h of (history ?? []).slice(-6)) msgs.push({ role: h.role, content: String(h.content) });
   msgs.push({ role: 'user', content: current ? `Current strategy:\n${JSON.stringify(current)}\n\nChange requested: ${prompt}` : String(prompt) });
   let spec: Spec | null = null, errors: string[] = [], fallback = false;
   for (let round = 0; round < 2; round++) {
-    const r = await client.beta.messages.create({
+    const r = await ask('builder', {
       model, max_tokens: 8000, system: SYSTEM, messages: msgs,
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: SPEC_SCHEMA as any } },
-      betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
     });
-    await record('builder', model, r.usage);
     if ((r.usage as any)?.iterations?.some((x: any) => x.type === 'fallback_message')) fallback = true;
     if (r.stop_reason === 'refusal') return Response.json({ error: 'The model declined this request.' }, { status: 422 });
     if (r.stop_reason === 'max_tokens') return Response.json({ error: 'Reply was cut off. Try a shorter description.' }, { status: 502 });

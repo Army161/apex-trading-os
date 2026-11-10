@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { getJSON, setJSON } from './store';
 import { record, guard } from './usage';
 import { MODEL } from './assistants';
+import { ask } from './gateway';
 
 export const QUESTIONS = [
   'What are you trading for right now: steady income, long-term growth, learning, or something else?',
@@ -43,11 +44,9 @@ export function rulesBlock(r: { text: string } | null) {
 export async function draftRules(answers: string[]) {
   await guard();
   const qa = QUESTIONS.map((q, i) => `Q${i + 1}. ${q}\nA: ${String(answers[i] ?? '').slice(0, 600) || '(skipped)'}`).join('\n\n');
-  const client = new Anthropic();
-  const r = await client.beta.messages.create({ model: MODEL, max_tokens: 2000, output_config: { effort: 'medium' } as any,
+  const r = await ask('rules', { model: MODEL, max_tokens: 2000, output_config: { effort: 'medium' } as any,
     system: `Turn a trader's interview answers into a rules file an AI trading assistant will follow. Plain Markdown, short bullet rules under clear headings (Goals, Risk, Markets and timeframes, Setups, Never, Exits, Behaviour guards, When to say no). Under 400 words. Use his words where you can. Leave out anything he skipped. ${HOUSE} If an answer breaks a house rule (for example more than 1% risk), keep the house rule and add a line saying so.`,
-    messages: [{ role: 'user', content: qa }], betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' } as any);
-  await record('rules', MODEL, r.usage);
+    messages: [{ role: 'user', content: qa }] });
   if (r.stop_reason === 'refusal') throw new Error('the model declined');
   return normalizeRules(r.content.filter((b: any) => b.type === 'text').map((b: any) => b.text).join(''));
 }

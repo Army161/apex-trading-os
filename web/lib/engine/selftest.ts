@@ -8,6 +8,8 @@ import { paperRecord } from '../strategies';
 import { checkTrade, oversoldScore } from '../assistants';
 import { cost } from '../usage';
 import { applyOp, applyDream, current, history, memoryBlock, looksSecret, Fact } from '../memory';
+import { botCommand, shouldPull } from '../andon';
+import { finalVerdict, triage } from '../review';
 import { normalizeRules, rulesBlock, riskSystem, QUESTIONS } from '../rules';
 const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/parity.json'), 'utf8'));
 const bars: Bar[] = fx.bars.map((r: number[]) => ({ t: r[0], o: r[1], h: r[2], l: r[3], c: r[4], v: r[5] }));
@@ -87,6 +89,27 @@ const rb = backtest(bars, compile(rsiSpec)(bars)); if (!rb.equity.every(Number.i
   const okBlock = memoryBlock([]) === '' && memoryBlock(current(d)).includes('daily');
   const ok = okReplace && okRetire && okDream && okSecret && okBlock;
   console.log(`${ok ? 'PASS' : 'FAIL'} memory: replace ${okReplace}, retire ${okRetire}, dream ${okDream}, secrets ${okSecret}, block ${okBlock}`); if (!ok) fail++;
+}
+{ // andon cord: halt wins over any queued command; each reading pulls exactly at its line
+  const off = { on: false }, on = { on: true, reason: 'x' };
+  const cmdOk = botCommand(false, off, null) === null && botCommand(false, off, 'resume') === 'resume' && botCommand(true, off, 'resume') === 'pause'
+    && botCommand(false, on, 'resume') === 'pause' && botCommand(true, on, null) === 'pause';
+  const pullOk = shouldPull({ kind: 'drawdown', value: -0.26, limit: -0.25 }) && shouldPull({ kind: 'drawdown', value: -0.25, limit: -0.25 })
+    && !shouldPull({ kind: 'drawdown', value: -0.24, limit: -0.25 }) && shouldPull({ kind: 'daily_loss', value: -0.031, limit: -0.03 })
+    && !shouldPull({ kind: 'daily_loss', value: 0.01, limit: -0.03 }) && shouldPull({ kind: 'errors', value: 5, limit: 5 })
+    && !shouldPull({ kind: 'errors', value: 4, limit: 5 }) && !shouldPull({ kind: 'drawdown', value: NaN, limit: -0.25 });
+  const ok = cmdOk && pullOk;
+  console.log(`${ok ? 'PASS' : 'FAIL'} andon: commands ${cmdOk}, readings ${pullOk}`); if (!ok) fail++;
+}
+{ // review: only high-severity issues can block; the worst remaining verdict wins
+  const hi = { severity: 'high' as const, issue: 'a', fix: 'b' }, lo = { severity: 'low' as const, issue: 'c', fix: 'd' }, md = { severity: 'medium' as const, issue: 'e', fix: 'f' };
+  const ok = finalVerdict([{ step: 'qa', verdict: 'block', summary: '', issues: [hi] }]) === 'block'
+    && finalVerdict([{ step: 'qa', verdict: 'block', summary: '', issues: [lo, md] }]) === 'concerns'
+    && finalVerdict([{ step: 'a', verdict: 'ok', summary: '', issues: [] }, { step: 'b', verdict: 'concerns', summary: '', issues: [md] }]) === 'concerns'
+    && finalVerdict([{ step: 'a', verdict: 'ok', summary: '', issues: [] }]) === 'ok'
+    && finalVerdict([{ step: 'a', verdict: 'concerns', summary: '', issues: [] }, { step: 'b', verdict: 'block', summary: '', issues: [hi] }]) === 'block'
+    && triage([hi, md, lo]).serious.length === 1 && triage([hi, md, lo]).optional.length === 1 && triage([hi, md, lo]).ignore.length === 1;
+  console.log(`${ok ? 'PASS' : 'FAIL'} review: stop-overthinking verdict and triage`); if (!ok) fail++;
 }
 console.log(fail ? `${fail} failures` : 'all checks passed');
 process.exit(fail ? 1 : 0);

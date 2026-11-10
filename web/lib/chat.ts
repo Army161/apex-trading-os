@@ -7,11 +7,17 @@ import { STRATEGIES } from './engine/strategies';
 import { SOURCES } from './sources';
 
 import { getRules, rulesBlock } from './rules';
+import { memoryPrompt, logTurn } from './memory';
+import { PURPOSE, logDecision } from './gateway';
+import { pullCord } from './andon';
+import { ask } from './gateway';
 const SYSTEM = `You are Apex, the AI operator of Jeremy's trading system. You can see every bot, trade, event, journal entry and
 the source library (the YouTube courses and guides the strategies were built from). Use tools for every number; never invent
 prices, P&L or backtest results. Be plain and honest: no strategy is guaranteed, past backtests are not future returns, and
 "don't trade" is often the right answer. All bots run in paper/test mode unless the owner switched them on his own machine.
-You may pause or resume a bot when asked; you can never place trades, move funds or read keys. Keep answers short and concrete.`;
+You may pause or resume a bot when asked; you can never place trades, move funds or read keys. Keep answers short and concrete.
+If something looks wrong that you cannot judge alone (data looks broken, a bot behaves against its plan, losses past a limit), call pull_andon:
+it pauses every bot and messages the owner. Stay on purpose: ${PURPOSE} Politely decline unrelated tasks in one line.`;
 
 const tools: Anthropic.Tool[] = [
   { name: 'get_bots', description: 'All bots with status, mode, last heartbeat and latest status payload.', input_schema: { type: 'object', properties: {} } },
@@ -22,6 +28,7 @@ const tools: Anthropic.Tool[] = [
   { name: 'run_backtest', description: `Backtest one strategy on live exchange candles. Strategies: ${STRATEGIES.map(s => s.id).join(', ')}`, input_schema: { type: 'object', properties: { symbol: { type: 'string' }, tf: { type: 'string' }, strategy: { type: 'string' }, risk: { type: 'number' } }, required: ['symbol', 'strategy'] } },
   { name: 'leaderboard', description: 'Backtest every strategy on one symbol and rank by return per drawdown.', input_schema: { type: 'object', properties: { symbol: { type: 'string' }, tf: { type: 'string' } }, required: ['symbol'] } },
   { name: 'search_library', description: 'Search the source library (which course/guide became which component).', input_schema: { type: 'object', properties: { q: { type: 'string' } }, required: ['q'] } },
+  { name: 'pull_andon', description: 'Halt every bot and escalate to the owner. Use only for a real problem; give the reason in one sentence.', input_schema: { type: 'object', properties: { reason: { type: 'string' } }, required: ['reason'] } },
   { name: 'control_bot', description: 'Queue pause/resume/kill for a bot id. Only when the user explicitly asks.', input_schema: { type: 'object', properties: { id: { type: 'string' }, command: { type: 'string', enum: ['pause', 'resume', 'kill'] } }, required: ['id', 'command'] } },
 ];
 
@@ -35,6 +42,7 @@ async function call(name: string, a: any, admin: boolean) {
     case 'run_backtest': return runBacktest(a.symbol, a.tf ?? '1d', a.strategy, a.risk ?? 0.01);
     case 'leaderboard': { const l = await leaderboard(a.symbol, a.tf ?? '1d'); return { ...l, rows: l.rows.map(r => ({ id: r.id, totalReturn: r.totalReturn, maxDrawdown: r.maxDrawdown, trades: r.trades, winRate: r.winRate, profitFactor: r.profitFactor, buyHold: r.buyHold })) }; }
     case 'search_library': { const q = String(a.q).toLowerCase(); return SOURCES.filter(s => JSON.stringify(s).toLowerCase().includes(q)); }
+    case 'pull_andon': await logDecision('apex-ai', 'pulled the andon cord', String(a.reason)); return pullCord('apex-ai', String(a.reason));
     case 'control_bot': if (!admin) return { error: 'login required' }; await setCommand(a.id, a.command); return { ok: true };
   }
   return { error: 'unknown tool' };
@@ -43,15 +51,15 @@ async function call(name: string, a: any, admin: boolean) {
 const MODEL = process.env.APEX_CHAT_MODEL || 'claude-opus-5-5';
 
 /** Apex AI tool loop, shared by the dashboard chat and the Telegram bot. */
-export async function runChat(messages: { role: string; content: string }[], admin: boolean, extraSystem = '') {
-  await guard();
-  const client = new Anthropic();
+export async function runChat(messages: { role: string; content: string }[], admin: boolean, extraSystem = '', feature = 'chat') {
+  const lastUser = [...messages].reverse().find(m => m.role === 'user');
+  if (lastUser) await logTurn(feature, String(lastUser.content));
+  const system = SYSTEM + rulesBlock(await getRules()) + (await memoryPrompt()) + extraSystem;
   const msgs: Anthropic.Beta.BetaMessageParam[] = messages.slice(-20).map(m => ({ role: m.role as 'user' | 'assistant', content: String(m.content) }));
   const used: string[] = [];
   for (let step = 0; step < 6; step++) {
-    const r = await client.beta.messages.create({ model: MODEL, max_tokens: 2000, system: SYSTEM + rulesBlock(await getRules()) + extraSystem, tools: tools as any, messages: msgs,
-      output_config: { effort: 'medium' }, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' });
-    await record('chat', MODEL, r.usage);
+    const r = await ask(feature, { model: MODEL, max_tokens: 2000, system, tools: tools as any, messages: msgs,
+      output_config: { effort: 'medium' } });
     if (r.stop_reason === 'refusal') return { reply: 'The model declined to answer that.', tools: used };
     if (r.stop_reason !== 'tool_use') return { reply: r.content.filter(b => b.type === 'text').map((b: any) => b.text).join('\n'), tools: used };
     msgs.push({ role: 'assistant', content: r.content as any });

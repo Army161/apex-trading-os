@@ -7,6 +7,7 @@ import { rsi, sma, atr, Bar } from './engine/core';
 import { push, list } from './store';
 import { sendTelegram } from './telegram';
 import { record, guard } from './usage';
+import { ask } from './gateway';
 
 export const MODEL = process.env.APEX_ASSISTANT_MODEL || 'claude-opus-5-5';
 export const MIN_RR = Number(process.env.APEX_MIN_RR || 3);
@@ -14,13 +15,11 @@ export const MIN_RR = Number(process.env.APEX_MIN_RR || 3);
 /** One Claude call with web search; resumes server-side pauses; refusal fallbacks on. Returns text and source URLs. */
 export async function research(system: string, prompt: string, maxUses = 8, maxTokens = 6000, feature = 'assistant') {
   await guard();
-  const client = new Anthropic();
   const msgs: Anthropic.Beta.BetaMessageParam[] = [{ role: 'user', content: prompt }];
   let r: Anthropic.Beta.BetaMessage | undefined;
   for (let i = 0; i < 4; i++) {
-    r = await client.beta.messages.create({ model: MODEL, max_tokens: maxTokens, system, messages: msgs, output_config: { effort: 'medium' },
-      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: maxUses } as any], betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' });
-    await record(feature, MODEL, r.usage);
+    r = await ask(feature, { model: MODEL, max_tokens: maxTokens, system, messages: msgs, output_config: { effort: 'medium' },
+      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: maxUses } as any] });
     if (r.stop_reason !== 'pause_turn') break;
     msgs.splice(1, msgs.length - 1, { role: 'assistant', content: r.content as any });
   }

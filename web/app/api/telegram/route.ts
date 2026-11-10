@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       // Free text from your phone goes to Apex AI (same tools as the dashboard chat). Your verified chat id counts as logged in.
       const hist = await getJSON<{ role: string; content: string }[]>('tg:history', []);
       const next = [...hist, { role: 'user', content: m.text }].slice(-12);
-      const r = await runChat(next, true, '\nYou are replying in Telegram on a phone: plain text, no tables, under 150 words.');
+      const r = await runChat(next, true, '\nYou are replying in Telegram on a phone: plain text, no tables, under 150 words.', 'telegram');
       text = r.reply || '(no reply)'; await setJSON('tg:history', [...next, { role: 'assistant', content: text }].slice(-12));
     }
   } catch (e: any) { text = `Error: ${e.message}`; }
