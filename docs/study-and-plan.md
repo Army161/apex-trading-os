@@ -168,4 +168,4 @@ The one business model in the archive that clearly makes money is the vendors' o
 | 4 | Surfaces: Autopilot tab, CLI terminal, MCP, skills, PWA, API |
 | 5 | Product track, only if chosen |
 
-Handover: once Jeremy approves, the design goes to a Fable 5.2 design thread, then the build to a Fable 5.2 build thread, both working from this document. A draft of the autopilot core (`web/lib/autopilot/risk.ts`, `pipeline.ts`) is in the container as a starting point. It isn't committed or tested yet.
+Handover: once Jeremy approves, the design goes to a Fable 5.2 design thread, then the build to a Fable 5.2 build thread, both working from this document. A draft of the autopilot core (`risk.ts`, `pipeline.ts`) is saved in the project files under `apex-drafts/autopilot/` as a starting point. It isn't committed or tested yet.
