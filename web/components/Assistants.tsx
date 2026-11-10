@@ -38,9 +38,9 @@ function RiskChat() {
   const [saved, setSaved] = useState<any[]>([]); const [minRR, setMinRR] = useState(3); const v = useVoice();
   const loadSaved = () => fetch('/api/risk', { cache: 'no-store' }).then(r => r.json()).then(j => { setSaved(j.summaries ?? []); setMinRR(j.minRR ?? 3); });
   useEffect(() => { loadSaved(); }, []);
-  const send = async (text: string, summarize = false) => {
+  const send = async (text: string, summarize = false, redteam = false) => {
     if (!summarize && !text.trim()) return; const next = summarize ? msgs : [...msgs, { role: 'user', content: text }]; setMsgs(next); setQ(''); setBusy(true);
-    try { const r = await post('/api/risk', { messages: next.map(({ role, content }) => ({ role, content })), summarize }); if (summarize) loadSaved(); else { setMsgs([...next, { role: 'assistant', content: r.reply ?? r.error, tools: r.tools }]); v.speak(r.reply ?? ''); } }
+    try { const r = await post('/api/risk', { messages: next.map(({ role, content }) => ({ role, content })), summarize, redteam }); if (summarize) loadSaved(); else { setMsgs([...next, { role: 'assistant', content: r.reply ?? r.error, tools: r.tools }]); v.speak(r.reply ?? ''); } }
     catch (e: any) { setMsgs([...next, { role: 'assistant', content: `Error: ${e.message}` }]); } finally { setBusy(false); }
   };
   const ideas = ['I want to long BTC here at the current price with a stop 4% below. Target is the last high. Good idea?', 'Thinking of shorting SOL after this run-up. Talk me out of it or into it.', 'QQQ is near all-time highs. Buy now for a swing or wait for a pullback?'];
@@ -52,6 +52,7 @@ function RiskChat() {
     <div className="row" style={{ marginTop: 8 }}>
       <input style={{ flex: 1 }} value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => e.key === 'Enter' && send(q)} placeholder="Describe the trade: market, side, entry, stop, target…" />
       <button className="btn pri" disabled={busy} onClick={() => send(q)}>{busy ? '…' : 'Send'}</button>
+      <button className="btn" disabled={busy || !(q.trim() || msgs.length)} title="Argue against it like an investor who wants to pass, then name the one thing that would change its mind" onClick={() => send(q.trim() || 'Red team the trade we are discussing.', false, true)}>Red team it</button>
       <button className="btn" disabled={busy || msgs.length < 2} onClick={() => send('', true)}>Summarise to journal</button>
       <button className="btn" onClick={() => setMsgs([])}>New chat</button>
       <VoiceButtons v={v} onText={t => send(t)} />

@@ -1,5 +1,6 @@
 'use client';
 import { useVoice, VoiceButtons } from './voice';
+import TraderRules from './Rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { STRATEGIES, confluence } from '@/lib/engine/strategies';
@@ -38,7 +39,7 @@ export default function App() {
         {tab === 'Strategies' && <Strategies aiEnabled={state?.aiEnabled} />}
         {tab === 'Strategy Lab' && <Lab />}
         {tab === 'Signals' && <Signals />}
-        {tab === 'Journal' && <Journal risk={state?.risk} />}
+        {tab === 'Journal' && <><TraderRules /><Journal risk={state?.risk} /></>}
         {tab === 'Council' && <Council />}
         {tab === 'Assistants' && <Assistants aiEnabled={state?.aiEnabled} />}
         {tab === 'Apex AI' && <Ai enabled={state?.aiEnabled} />}
