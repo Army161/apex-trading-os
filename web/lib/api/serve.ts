@@ -4,7 +4,7 @@
 // The caller passes in the things that touch the outside (the key store, the session, the ledger, the two writes), so the
 // tests drive this exact code with no server.
 import { createHash } from 'node:crypto';
-import { PROBLEMS, RATE, ROUTES, matchRoute, routeClass, type Problem, type ProblemCode, type RouteDef, type Scope } from '@apex/sdk/contract';
+import { PROBLEMS, RATE, ROUTES, matchRoute, routeClass, type Problem, type ProblemCode, type RouteDef, type Responses, type RouteId, type Scope } from '@apex/sdk/contract';
 import { validate } from '@apex/sdk/validate';
 import type { LedgerEntry } from '@apex/kernel/ledger';
 import type { ApexConfig } from '@apex/kernel/config';
@@ -27,6 +27,22 @@ export type ServeDeps = Deps & {
 const TITLES: Record<ProblemCode, string> = { unauthorized: 'A key is needed', forbidden_scope: 'The key does not allow this', not_found: 'Not found', validation: 'The request is not valid', rate_limited: 'Too many calls',
   halted: 'Apex is halted', budget: 'The budget is used up', busy: 'A run is in progress', unavailable: 'Not available right now' };
 const MAX_BODY = 600_000;
+
+/** Call one route's handler from inside the dashboard, for a caller that was checked some other way (Telegram: the webhook
+ *  secret and the one chat id). It is the same handler, body check and halt rule as an API call, with no key and no HTTP.
+ *  It throws ApiFail, like a handler does. */
+export function direct(d: ServeDeps, actor: string) {
+  return async <K extends RouteId>(id: K, a: { params?: Record<string, string>; query?: Record<string, string | number | undefined>; body?: unknown } = {}): Promise<Responses[K]> => {
+    const route: RouteDef = ROUTES[id];
+    if (route.body) { const errs = validate(route.body, a.body); if (errs.length) throw new ApiFail('validation', errs.slice(0, 5).join('; ')); }
+    const status = await d.status(), l = await d.ledger();
+    if (!l.ok && id !== 'status' && id !== 'halt') throw new ApiFail('unavailable', `The ledger is not readable: ${l.note}`);
+    const query = new URLSearchParams(); for (const [k, v] of Object.entries(a.query ?? {})) if (v !== undefined) query.set(k, String(v));
+    const empty = { entries: [] as LedgerEntry[], view: null as unknown as LedgerView, cfg: null as unknown as ApexConfig };
+    const ctx: Ctx = { ...(l.ok ? l : empty), now: (d.now ?? Date.now)(), params: a.params ?? {}, query, body: a.body, status, actor, deps: d };
+    return await HANDLERS[id](ctx) as Responses[K];
+  };
+}
 
 export async function serve(req: Request, d: ServeDeps): Promise<Response> {
   const url = new URL(req.url), path = url.pathname.replace(/^.*?\/api\/v1/, '') || '/', std: Record<string, string> = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };

@@ -215,7 +215,7 @@ export function Setup({ s }: { s: any }) {
       <tr><td>APEX_INGEST_TOKEN (bots authenticate; while missing, bot reports are refused)</td><td>{ok(s?.ingestTokenSet)}</td></tr>
       <tr><td>APEX_ADMIN_PASSWORD (controls need login; while missing, the controls are refused)</td><td>{ok(s?.authEnabled)}</td></tr>
       <tr><td>ANTHROPIC_API_KEY (Apex AI chat + strategy builder)</td><td>{ok(s?.aiEnabled)}</td></tr>
-      <tr><td>TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID (trade alerts, /positions /orders /pnl)</td><td>{ok(s?.telegramOn)}</td></tr>
+      <tr><td>TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID (alerts, and commands: /state /report /board /slots /book /risk /data /queue /check /halt)</td><td>{ok(s?.telegramOn)}</td></tr>
       <tr><td>DISCORD_WEBHOOK_URL (optional, briefs to Discord)</td><td>{ok(s?.discordSet)}</td></tr>
       <tr><td>ALPACA_API_KEY_ID + ALPACA_API_SECRET_KEY (stocks in Deal Seeker; paper keys are enough)</td><td>{ok(s?.alpacaSet)}</td></tr>
       <tr><td>CRON_SECRET (morning brief, Deal Seeker, strategy signal checks)</td><td>{ok(s?.cronSecretSet)}</td></tr>

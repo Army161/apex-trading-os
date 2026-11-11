@@ -5,7 +5,8 @@
 import type { Book, ClaimCheck, ClaimCheckRow, Costs, DataHealth, DriftReading, Evaluation, EvaluationDetail, Fill, Funnel, Intent, LedgerEntry, LedgerHead, LedgerRow, LedgerVerify, Locks, Metric, Position, Queue, ReportRow, Risk, Slot, SlotDetail, SlotEvent, Status, Trade } from './contract';
 
 export const table = (rows: (string | number | null)[][]) => { const w = rows[0].map((_, c) => Math.max(...rows.map(r => String(r[c] ?? '').length))); return rows.map(r => r.map((x, c) => String(x ?? '').padEnd(w[c])).join('  ').trimEnd()).join('\n'); };
-const pct = (x: number, d = 1) => `${x >= 0 ? '+' : ''}${(x * 100).toFixed(d)}%`, share = (x: number, d = 1) => `${(x * 100).toFixed(d)}%`, usd = (x: number) => `${x < 0 ? '-' : ''}$${Math.abs(x).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const pct = (x: number, d = 1) => `${x >= 0 ? '+' : ''}${(x * 100).toFixed(d)}%`;
+export const share = (x: number, d = 1) => `${(x * 100).toFixed(d)}%`, usd = (x: number) => `${x < 0 ? '-' : ''}$${Math.abs(x).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 export const when = (iso: string | null) => (iso ? iso.slice(0, 16).replace('T', ' ') + 'Z' : 'never');
 const short = (h: string, n = 12) => h.slice(0, n), BASIS = { in_sample: 'past data', forward: 'forward', book: 'paper book' } as const;
 /** A figure in words for its unit. */

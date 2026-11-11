@@ -1,16 +1,20 @@
-// Telegram bot webhook: /state /positions /orders /pnl /strategies /bots /halt /release. Answers only TELEGRAM_CHAT_ID; Telegram signs each call
-// with TELEGRAM_WEBHOOK_SECRET in the X-Telegram-Bot-Api-Secret-Token header.
-import { sendTelegram } from '@/lib/telegram';
+// Telegram bot webhook. Answers only TELEGRAM_CHAT_ID; Telegram signs each call with TELEGRAM_WEBHOOK_SECRET in the
+// X-Telegram-Bot-Api-Secret-Token header. The Apex commands (reads, /check, /halt with a second tap) are in lib/tgcommands.ts and
+// go through the v1 handlers. The older bot commands (/positions /orders /pnl /strategies /bots) are answered here.
+// Nothing here resumes, releases or approves: those answer "that needs the dashboard".
+import { sendTelegram, tgCall, tgFileText } from '@/lib/telegram';
+import { callback, command, type Io } from '@/lib/tgcommands';
+import { direct } from '@/lib/api/serve';
+import { deps } from '@/lib/api/deps';
 import { bots, trades } from '@/lib/bots';
 import { allStrategies, evaluate } from '@/lib/strategies';
 import { runChat } from '@/lib/chat';
 import { getJSON, setJSON } from '@/lib/store';
 import { state, stateText } from '@/lib/state';
-import { pullCord, releaseCord } from '@/lib/andon';
 export const maxDuration = 120;
 
 const f = (x: number) => `${x < 0 ? '-' : ''}$${Math.abs(x).toFixed(2)}`;
-async function reply(cmd: string) {
+async function legacy(cmd: string): Promise<string | null> {
   const c = cmd.split(/[\s@]/)[0].toLowerCase();
   if (c === '/positions' || c === '/pnl' || c === '/strategies') {
     const live = (await allStrategies()).filter(s => s.deployment && s.deployment.status !== 'stopped');
@@ -31,31 +35,43 @@ async function reply(cmd: string) {
     const t = await trades(10);
     return t.length ? t.map((x: any) => `${new Date(x.ts).toISOString().slice(5, 16)} ${x.bot} ${x.side} ${x.symbol} ${x.status ?? ''}${typeof x.pnl === 'number' ? ` pnl ${x.pnl}` : ''}`).join('\n') : 'No orders reported yet.';
   }
-  if (c === '/state') return stateText(await state());
-  if (c === '/halt') { const why = cmd.replace(/^\/halt(@\S+)?\s*/i, '').trim() || 'halted from Telegram'; await pullCord('you (Telegram)', why); return `Halted. Every bot is told to pause. Reason: ${why}\nSend /release when it is safe.`; }
-  if (c === '/release') { await releaseCord('you (Telegram)'); return 'Released. Bots resume on their next check-in unless the kill switch is on.'; }
+  if (c === '/state') return `Bots: ${stateText(await state())}`;
   if (c === '/bots') { const b = await bots(); return b.map(x => `${x.lastSeen && Date.now() - x.lastSeen < 9e5 ? 'ON ' : 'off'} ${x.name} (${x.mode})`).join('\n'); }
-  return 'Apex commands: /state /positions /orders /pnl /strategies /bots /halt <reason> /release /new\nOr just type a question ("how are my bots doing?", "backtest supertrend on ETH 4h") and Apex AI answers here.\nEverything is paper unless you switched a bot live on your own machine.';
+  return null;
 }
 
 export async function POST(req: Request) {
   const want = process.env.TELEGRAM_WEBHOOK_SECRET;
   if (!want || req.headers.get('x-telegram-bot-api-secret-token') !== want) return new Response('forbidden', { status: 403 });
-  const u = await req.json(); const m = u.message ?? u.edited_message;
-  if (!m?.text || String(m.chat?.id) !== String(process.env.TELEGRAM_CHAT_ID)) return Response.json({ ok: true });
-  let text: string;
+  const u = await req.json(), CHAT = String(process.env.TELEGRAM_CHAT_ID);
+  const io: Io = { call: direct(deps, 'telegram'), origin: new URL(req.url).origin, now: Date.now, legacy,
+    pending: { get: k => getJSON<{ reason: string; ts: number } | null>(`tg:halt:${k}`, null), set: (k, v) => setJSON(`tg:halt:${k}`, v) } };
+
+  // The second tap of /halt. Only the one chat can tap, and only a fresh offer halts.
+  if (u.callback_query) { const q = u.callback_query;
+    if (String(q.message?.chat?.id) !== CHAT) return Response.json({ ok: true });
+    const r = await callback(String(q.data ?? ''), io);
+    await tgCall('answerCallbackQuery', { callback_query_id: q.id, text: r.toast });
+    await tgCall('editMessageText', { chat_id: q.message.chat.id, message_id: q.message.message_id, text: r.text.slice(0, 4000), disable_web_page_preview: true });
+    return Response.json({ ok: true }); }
+
+  const m = u.message ?? u.edited_message, said: string = m?.text ?? m?.caption ?? '';
+  if (!m || (!said && !m.document) || String(m.chat?.id) !== CHAT) return Response.json({ ok: true });
+  let text: string, buttons;
   try {
-    if (m.text.trim().toLowerCase() === '/new') { await setJSON('tg:history', []); text = 'Started a fresh conversation.'; }
-    else if (m.text.startsWith('/')) text = await reply(m.text);
+    if (said.trim().toLowerCase() === '/new') { await setJSON('tg:history', []); text = 'Started a fresh conversation.'; }
+    else if (m.document) { const body = /^\/check\b/i.test(said.trim()) ? await tgFileText(m.document.file_id) : null;
+      if (body === null) text = 'To check a file, send a text file under 800 KB with /check as its caption.'; else ({ text, buttons } = await command('/check', io, body)); }
+    else if (said.startsWith('/')) ({ text, buttons } = await command(said, io));
     else if (!process.env.ANTHROPIC_API_KEY) text = 'Apex AI needs ANTHROPIC_API_KEY in Vercel. Slash commands still work: /help';
     else {
       // Free text from your phone goes to Apex AI (same tools as the dashboard chat). Your verified chat id counts as logged in.
       const hist = await getJSON<{ role: string; content: string }[]>('tg:history', []);
-      const next = [...hist, { role: 'user', content: m.text }].slice(-12);
+      const next = [...hist, { role: 'user', content: said }].slice(-12);
       const r = await runChat(next, true, '\nYou are replying in Telegram on a phone: plain text, no tables, under 150 words.', 'telegram');
       text = r.reply || '(no reply)'; await setJSON('tg:history', [...next, { role: 'assistant', content: text }].slice(-12));
     }
   } catch (e: any) { text = `Error: ${e.message}`; }
-  await sendTelegram(text, String(m.chat.id));
+  await sendTelegram(text, String(m.chat.id), buttons);
   return Response.json({ ok: true });
 }
