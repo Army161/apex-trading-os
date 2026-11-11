@@ -14,18 +14,25 @@ export class ApexClient {
   private base: string; private key: string; private f: typeof fetch;
   constructor(o: ClientOptions) { this.base = o.baseUrl.replace(/\/+$/, '').replace(/\/api\/v1$/, '') + '/api/v1'; this.key = o.apiKey ?? ''; this.f = o.fetch ?? fetch; }
 
-  /** Call one route by its id in the contract. Throws `ApexApiError` with the problem the server sent. */
-  async call<K extends RouteId>(id: K, ...rest: K extends keyof Bodies ? [Args<K>] : [Args<K>?]): Promise<Responses[K]> {
-    const r: RouteDef = ROUTES[id], a = (rest[0] ?? {}) as Args<K>; let path: string = r.path;
+  private async send<K extends RouteId>(id: K, a: Args<K>): Promise<{ text: string; json: unknown }> {
+    const r: RouteDef = ROUTES[id]; let path: string = r.path;
     for (const p of pathParams(r.path)) { const v = a.params?.[p]; if (!v) throw new Error(`${id} needs ${p}`); path = path.replace(`{${p}}`, encodeURIComponent(v)); }
     const qs = new URLSearchParams(); for (const [k, v] of Object.entries(a.query ?? {})) if (v !== undefined) qs.set(k, String(v));
     const res = await this.f(`${this.base}${path}${qs.size ? `?${qs}` : ''}`, { method: r.method, headers: { accept: 'application/json', ...(this.key ? { authorization: `Bearer ${this.key}` } : {}), ...(a.body ? { 'content-type': 'application/json' } : {}) },
       body: a.body ? JSON.stringify(a.body) : undefined });
-    const text = await res.text(); let json: unknown = null; try { json = text ? JSON.parse(text) : null; } catch { /* not JSON: handled below */ }
+    const text = await res.text(); let json: unknown = null; try { json = text ? JSON.parse(text) : null; } catch { /* not JSON: a report's Markdown, or an error page handled below */ }
     if (!res.ok) { const p = json as Partial<Problem> | null, retry = Number(res.headers.get('retry-after'));
       throw new ApexApiError({ type: p?.type ?? 'about:blank', title: p?.title ?? `HTTP ${res.status}`, status: res.status, detail: p?.detail, code: p?.code ?? (res.status === 401 ? 'unauthorized' : 'unavailable') }, Number.isFinite(retry) && retry > 0 ? retry : null); }
-    return json as Responses[K];
+    return { text, json };
   }
+
+  /** Call one route by its id in the contract. Throws `ApexApiError` with the problem the server sent. */
+  async call<K extends RouteId>(id: K, ...rest: K extends keyof Bodies ? [Args<K>] : [Args<K>?]): Promise<Responses[K]> {
+    return (await this.send(id, (rest[0] ?? {}) as Args<K>)).json as Responses[K];
+  }
+
+  /** One run's report as the Markdown the run wrote. */
+  async reportMarkdown(id: string): Promise<string> { return (await this.send('report', { params: { id }, query: { format: 'md' } })).text; }
 
   /** Every item of a paged route, a page at a time. Stops after `max` items. */
   async *paginate<T>(fn: (cursor: string | undefined) => Promise<Page<T>>, max = 10_000): AsyncGenerator<T> {

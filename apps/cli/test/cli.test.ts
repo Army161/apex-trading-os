@@ -23,14 +23,14 @@ test('a dry run writes nothing; a real run writes a verified ledger and a report
   const lines = readFileSync(join(ctx.stateDir, 'ledger.jsonl'), 'utf8').trim().split('\n').map(l => JSON.parse(l));
   assert.equal(lines.filter(e => e.kind === 'trial_result').length, 2); assert.ok(lines.findIndex(e => e.kind === 'prereg') < lines.findIndex(e => e.kind === 'trial_result'));
   assert.equal((await run(ctx, 'ledger', 'verify')).code, 0); assert.match((await run(ctx, 'report')).text, /## 10\. Ledger/);
-  assert.match((await run(ctx, 'status')).text, /Trials ever \(N\): 2/); assert.match((await run(ctx, 'board')).text, /In-sample results on past data/);
+  assert.match((await run(ctx, 'status')).text, /^PAPER · 2 tries counted/); assert.match((await run(ctx, 'board')).text, /Results on past data\. None of this is a forward record/);
   assert.ok(!existsSync(join(ctx.stateDir, 'run.lock')), 'the run lock is released');
 });
 
 test('halt pulls the cord in the ledger, the next run sees it, and there is no resume command', async () => {
   const ctx = fresh(); assert.equal((await run(ctx, 'halt')).code, 2);
   assert.match((await run(ctx, 'halt', 'testing', 'the', 'cord')).text, /Andon cord pulled/);
-  assert.match((await run(ctx, 'status')).text, /Halts: andon cord/); assert.match((await run(ctx, 'risk')).text, /andon PULLED/);
+  assert.match((await run(ctx, 'status')).text, /HALTED: andon/); assert.match((await run(ctx, 'risk')).text, /Halts: andon \(by cli: testing the cord\)/);
   const r = await execute(ctx, { mode: 'tick', budget: 1 }); assert.ok(r.out.report.status.halts.some(h => /andon/.test(h)));
   const res = await run(ctx, 'resume'); assert.equal(res.code, 2); assert.match(res.text, /Unknown command/);
 });
@@ -81,7 +81,7 @@ test('claim: a saved extraction is checked, tested through the gate and recorded
   const real = await run(ctx, 'claim', src, '--extraction', fx); assert.equal(real.code, 0); assert.match(real.text, /Tries used by this check: 1 new of 1 run/); assert.ok(!/Hidden text/.test(real.text));
   const lines = readFileSync(join(ctx.stateDir, 'ledger.jsonl'), 'utf8').trim().split('\n').map(l => JSON.parse(l));
   assert.deepEqual(lines.map(e => e.kind), ['gate_version', 'prereg', 'trial_result', 'claim_check']); assert.equal(lines[1].payload.strategy.id, 'turtle_55_20'); assert.match(lines[1].payload.source, /^claim:chk_/);
-  assert.equal((await run(ctx, 'ledger', 'verify')).code, 0); assert.match((await run(ctx, 'status')).text, /Trials ever \(N\): 1/);
+  assert.equal((await run(ctx, 'ledger', 'verify')).code, 0); assert.match((await run(ctx, 'status')).text, /^PAPER · 1 try counted/);
   const again = await run(ctx, 'claim', src, '--extraction', fx); assert.match(again.text, /Tries used by this check: 0 new of 1 run/); assert.match(again.text, /already in the ledger, not counted again/);
   // The nightly run then treats that pair as already tried: it is not registered a second time.
   await run(ctx, 'run', '--budget', '400'); const after = readFileSync(join(ctx.stateDir, 'ledger.jsonl'), 'utf8').trim().split('\n').map(l => JSON.parse(l));

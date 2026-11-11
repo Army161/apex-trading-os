@@ -222,9 +222,11 @@ test('inventory: every HTTP route is accounted for, and none outside the dashboa
     assert.match(f.src, /isAdmin\(\)|ingestOk\(|CRON_SECRET|cronOk\(|serve\(req, deps\)/, `${f.name} changes something and names its check`); }
   // v1 is one catch-all file. It and everything it serves stay clear of the broker and of the session-only routes.
   assert.deepEqual(files.filter(f => f.name.startsWith('/v1')).map(f => f.name), ['/v1/[...path]']);
-  for (const p of ['app/api/v1/[...path]/route.ts', 'lib/api/serve.ts', 'lib/api/handlers.ts']) { const src = readFileSync(join(web, p), 'utf8');
+  for (const p of ['app/api/v1/[...path]/route.ts', 'lib/api/serve.ts', '../packages/api/src/handlers.ts', '../packages/api/src/queries.ts', '../packages/api/src/status.ts']) { const src = readFileSync(join(web, p), 'utf8');
     assert.doesNotMatch(src, /autopilot\/(src\/)?broker|app\/api\/(admin|resume|killswitch|live)|ledgerResume|releaseCord|createKey|revokeKey|setJSON\('killswitch'/, `${p} imports nothing that trades, resumes or makes keys`); }
-  assert.doesNotMatch(readFileSync(join(web, 'lib/api/handlers.ts'), 'utf8'), /from '\.\.\/(store|andon|ledger|auth)'|next\/headers|process\.env/, 'handlers reach the outside only through what they are handed');
+  // The handlers and the queries under them live in packages/api so the terminal can use the very same ones. They take what they are handed.
+  for (const f of ['handlers', 'queries', 'status']) { assert.doesNotMatch(readFileSync(join(web, '../packages/api/src', `${f}.ts`), 'utf8'), /from '(\.\.\/|@\/|next\/)|node:fs|node:child_process|process\.env|\bfetch\(/, `packages/api/src/${f}.ts reaches the outside only through what it is handed`);
+    assert.match(readFileSync(join(web, f === 'handlers' ? 'lib/api/handlers.ts' : `lib/${f}.ts`), 'utf8'), new RegExp(`^export \\* from '@apex/api/${f}';\\s*$`, 'm'), `web/lib ${f} is the shared one`); }
   assert.deepEqual(READ_SCOPES.filter(s => !s.startsWith('read:')), []);
 });
 

@@ -18,7 +18,7 @@ import { createHash, createHmac } from 'node:crypto';
 import { createInterface } from 'node:readline';
 export type Env = Record<string, string | undefined>;
 /** `confirm` asks a person at the keyboard to type `expect`. It is absent when there is no real terminal, and commands that need a person refuse. */
-export type Ctx = { root: string; env: Env; stateDir: string; now: () => number; confirm?: (question: string, expect: string) => Promise<boolean> };
+export type Ctx = { root: string; env: Env; stateDir: string; now: () => number; confirm?: (question: string, expect: string) => Promise<boolean>; fetch?: typeof fetch };
 export const makeCtx = (root: string, env: Env = process.env, now: () => number = Date.now): Ctx => ({ root, env, stateDir: env.APEX_STATE_DIR || join(root, '.apex'), now });
 
 export type Opened = { store: LedgerStore; kind: 'postgres' | 'file'; where: string; lock: () => Promise<(() => Promise<void>) | null>; saveReport: (id: string, at: number, md: string, summary: unknown) => Promise<string>; close: () => Promise<void> };

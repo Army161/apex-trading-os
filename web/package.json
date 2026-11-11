@@ -23,7 +23,8 @@
     "@apex/data": "*",
     "@apex/store": "*",
     "@apex/ui": "*",
-    "@apex/sdk": "*"
+    "@apex/sdk": "*",
+    "@apex/api": "*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
