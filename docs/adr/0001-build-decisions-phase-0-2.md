@@ -22,6 +22,7 @@ Date: 2026-11-11. Status: in force. These are the places where the build had to 
 | 16 | Fingerprint fixtures are frozen copies of three committed data files | Deterministic across machines. They must never be refreshed |
 | 17 | The `protected-paths` check stays red on a red-path pull request opened under Jeremy's account, and he merges with the admin bypass | GitHub does not let an author approve their own pull request, and agents open pull requests under his account. A hard lock needs a separate agent account (`docs/branch-protection.md`) |
 | 18 | Research-queue tests are ordinary registered strategies with a `queue` tag. They pair only with the `queue-etf-intraday` panel on their own timeframe, are pre-registered as `queue:<id>`, go first in the plan's order, and always wait for the weekly trial budget (25), even in a seeded run | Keeps the queue inside the one factory path, so every queue pair is pre-registered and counted. A queue table in Postgres (design `04` section 16) waits for the database |
+| 19 | Rule language version 2 is the same `Spec` with optional parts, and templates are a separate catalog whose defaults must reproduce a built-in fingerprint | Saved version 1 specs keep their exact signals (pinned by a test). Partial exits are left out because the fill engine has no partial fills. A session is clock time and does not know exchange half days |
 
 ## Open question for Jeremy
 

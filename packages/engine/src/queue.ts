@@ -4,8 +4,9 @@
 //
 // No look-ahead, by construction and by test (packages/engine/test/lookahead.test.ts): the signal on bar i uses bars 0..i only.
 // A pivot is used only after the bars that confirm it have closed. Session rules key off the bar's own New York time, never
-// the next bar's. Intraday rules trade the regular session (09:30 to 16:00 New York) and are flat before the close.
-import { Bar, Sig, atr, candles, macd, rollMax, rollMin, shift } from './core';
+// the next bar's. Intraday rules trade the regular session (09:30 to 16:00 New York) and are flat before the close. The session
+// is clock time only: on an exchange half day the exit fills on the next bar the data has.
+import { Bar, Sig, atr, candles, macd, rollMax, rollMin, rsi, shift } from './core';
 import { nyHM } from './ict';
 
 const N = NaN;
@@ -39,15 +40,17 @@ export function sessionBars(b: Bar[]): SessionBar[] {
 const flatAtClose = (s: Sig, ses: SessionBar[]) => { for (let i = 0; i < ses.length; i++) if (ses[i].flat) { s.lx[i] = true; s.sx[i] = true; } return s; };
 
 // ---------------- 2. opening-range breakout ----------------
-/** The first regular-session bar sets the range. The first later bar that closes beyond it enters in that direction.
- *  Stop at the other side of the range, target 2R, one trade a day, flat before the close. */
-export const openingRange = (rr = 2) => (b: Bar[]): Sig => {
+/** The first `minutes` of the regular session set the range. The first later bar that closes beyond it enters in that direction.
+ *  Stop at the other side of the range, target `rr` R, one trade a day, flat before the close. */
+export const openingRange = (rr = 2, minutes = 30) => (b: Bar[]): Sig => {
   const s = empty(b.length), ses = sessionBars(b);
   let hi = N, lo = N, done = true;
   for (let i = 0; i < b.length; i++) {
-    if (ses[i].first) { hi = b[i].h; lo = b[i].l; done = false; continue; }
     if (!ses[i].rth) { done = true; continue; }
-    if (done || !ses[i].canEnter || !(hi > lo)) continue;
+    if (ses[i].first) { hi = b[i].h; lo = b[i].l; done = false; continue; }
+    if (done) continue;
+    if (ses[i].min < OPEN + minutes) { hi = Math.max(hi, b[i].h); lo = Math.min(lo, b[i].l); continue; }
+    if (!ses[i].canEnter || !(hi > lo)) continue;
     const c = b[i].c;
     if (c > hi) { s.le[i] = true; s.stop[i] = lo; s.target[i] = c + rr * (c - lo); done = true; }
     else if (c < lo) { s.se[i] = true; s.stop[i] = hi; s.target[i] = c - rr * (hi - c); done = true; }
@@ -68,32 +71,32 @@ export function sessionVwap(b: Bar[], ses = sessionBars(b)) {
   }
   return { vwap, sd };
 }
-/** Trend pullback: VWAP rising and the last two closes above it; a bar dips to within half a band of VWAP and closes up, above it.
+/** Trend pullback: VWAP rising and the last two closes above it; a bar dips to within `band` (half a band by default) of VWAP and closes up, above it.
  *  Stop one band below VWAP (or the bar's low if lower), target 2R, one trade a day, flat before the close. */
-export const vwapPullback = (rr = 2) => mirror((b: Bar[]): Sig => {
+export const vwapPullback = (rr = 2, band = 0.5) => mirror((b: Bar[]): Sig => {
   const s = empty(b.length), ses = sessionBars(b), { vwap, sd } = sessionVwap(b, ses);
   let day = -1, traded = -1;
   for (let i = 0; i < b.length; i++) {
     if (ses[i].first) day = i;
     if (i < 2 || !ses[i].canEnter || ses[i].n < 4 || traded === day || !(sd[i] > 0)) continue;
     const rising = vwap[i] > vwap[i - 1] && vwap[i - 1] > vwap[i - 2], above = b[i - 1].c > vwap[i - 1] && b[i - 2].c > vwap[i - 2];
-    if (rising && above && b[i].l <= vwap[i] + 0.5 * sd[i] && b[i].c > vwap[i] && b[i].c > b[i].o) {
+    if (rising && above && b[i].l <= vwap[i] + band * sd[i] && b[i].c > vwap[i] && b[i].c > b[i].o) {
       const stop = Math.min(b[i].l, vwap[i] - sd[i]);
       if (stop < b[i].c) { s.le[i] = true; s.stop[i] = stop; s.target[i] = b[i].c + rr * (b[i].c - stop); traded = day; }
     }
   }
   return flatAtClose(s, ses);
 });
-/** Flat-VWAP fade: VWAP has moved less than a quarter band in four bars; a bar trades through the second band and closes back
+/** Flat-VWAP fade: VWAP has moved less than a quarter band in four bars; a bar trades through band `band` (the second by default) and closes back
  *  inside it. Stop beyond the bar's extreme, target VWAP, one trade a day, flat before the close. */
-export const vwapFade = () => mirror((b: Bar[]): Sig => {
+export const vwapFade = (band = 2) => mirror((b: Bar[]): Sig => {
   const s = empty(b.length), ses = sessionBars(b), { vwap, sd } = sessionVwap(b, ses);
   let day = -1, traded = -1;
   for (let i = 0; i < b.length; i++) {
     if (ses[i].first) day = i;
     if (i < 4 || !ses[i].canEnter || ses[i].n < 5 || traded === day || !(sd[i] > 0)) continue;
-    const band = vwap[i] - 2 * sd[i];
-    if (Math.abs(vwap[i] - vwap[i - 4]) <= 0.25 * sd[i] && b[i].l < band && b[i].c > band && b[i].c > b[i].o && b[i].c < vwap[i]) {
+    const edge = vwap[i] - band * sd[i];
+    if (Math.abs(vwap[i] - vwap[i - 4]) <= 0.25 * sd[i] && b[i].l < edge && b[i].c > edge && b[i].c > b[i].o && b[i].c < vwap[i]) {
       s.le[i] = true; s.stop[i] = b[i].l - 0.1 * sd[i]; s.target[i] = vwap[i]; traded = day;
     }
   }
@@ -101,24 +104,25 @@ export const vwapFade = () => mirror((b: Bar[]): Sig => {
 });
 
 // ---------------- 4. momentum-candle breakout ----------------
-/** A candle whose body is at least twice the average of the prior three, closing beyond the prior 20-bar high and in the top
+/** A candle whose body is at least `mult` times (twice by default) the average of the prior three, closing beyond the prior 20-bar high and in the top
  *  quarter of its own range. Stop under the candle, target 2R, regular session only, flat before the close. */
-export const momentumBreakout = (lookback = 20, rr = 2) => mirror((b: Bar[]): Sig => {
-  const s = empty(b.length), ses = sessionBars(b), cd = candles(b), top = shift(rollMax(b.map(x => x.h), lookback));
+export const momentumBreakout = (lookback = 20, rr = 2, mult = 2) => mirror((b: Bar[]): Sig => {
+  const s = empty(b.length), ses = sessionBars(b), body = b.map(x => Math.abs(x.c - x.o)), top = shift(rollMax(b.map(x => x.h), lookback));
   for (let i = lookback; i < b.length; i++) {
     const rng = b[i].h - b[i].l;
-    if (!ses[i].canEnter || !cd[i].momBull || !(b[i].c > top[i]) || !(rng > 0) || b[i].h - b[i].c > 0.25 * rng) continue;
+    const mom = i >= 3 && b[i].c > b[i].o && body[i] >= mult * ((body[i - 1] + body[i - 2] + body[i - 3]) / 3);
+    if (!ses[i].canEnter || !mom || !(b[i].c > top[i]) || !(rng > 0) || b[i].h - b[i].c > 0.25 * rng) continue;
     s.le[i] = true; s.stop[i] = b[i].l; s.target[i] = b[i].c + rr * (b[i].c - b[i].l);
   }
   return flatAtClose(s, ses);
 });
 
 // ---------------- 5. divergence with a confirmed pivot ----------------
-/** Bullish divergence on the MACD 3-10 line: a pivot low (3 bars each side, so known 3 bars late) below the previous pivot low
+/** Bullish divergence on the MACD 3-10 line (or RSI 14 with `indicator` 'rsi'): a pivot low (3 bars each side, so known 3 bars late) below the previous pivot low
  *  while the line is higher than it was there. Then, within `wait` bars and with the pivot low still intact, a hammer or bullish
  *  engulfing candle enters. Stop under the pivot low, target 2R. Plain crossovers are not used (they lose, chat/16). */
-export const divergencePivot = (side = 3, wait = 6, rr = 2) => mirror((b: Bar[]): Sig => {
-  const s = empty(b.length), a = atr(b, 14), m = macd(b.map(x => x.c), 3, 10, 16).macd, cd = candles(b), lows = b.map(x => x.l), winLo = rollMin(lows, 2 * side + 1);
+export const divergencePivot = (side = 3, wait = 6, rr = 2, indicator: 'macd' | 'rsi' = 'macd') => mirror((b: Bar[]): Sig => {
+  const s = empty(b.length), a = atr(b, 14), cl = b.map(x => x.c), m = indicator === 'rsi' ? rsi(cl, 14).map(x => x - 50) : macd(cl, 3, 10, 16).macd, cd = candles(b), lows = b.map(x => x.l), winLo = rollMin(lows, 2 * side + 1);
   let prev = -1, last = -1, armedUntil = -1, floor = N;
   for (let i = 2 * side; i < b.length; i++) {
     const k = i - side;
