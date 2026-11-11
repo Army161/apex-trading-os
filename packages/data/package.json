@@ -1,0 +1,7 @@
+{
+  "name": "@apex/data",
+  "version": "0.1.0",
+  "private": true,
+  "exports": { ".": "./src/index.ts", "./*": "./src/*.ts" },
+  "dependencies": { "@apex/engine": "*", "@apex/kernel": "*" }
+}
