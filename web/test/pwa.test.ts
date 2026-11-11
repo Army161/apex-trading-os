@@ -106,3 +106,10 @@ test('offline: the shell turns every control in a screen off and says so, and Ha
   assert.match(shell, /process\.env\.NODE_ENV === 'production' && 'serviceWorker' in navigator/);
   const off = readFileSync(join(web, 'public/offline.html'), 'utf8'); assert.doesNotMatch(off, /<script|<form|<button/, 'the offline page has no control and no script');
 });
+
+test('layout: nothing of ours is rendered in the page head, and the theme script is the first thing in the body', () => {
+  // The loader adds and removes its own script tags in the head while the page is being made live. An element of ours there
+  // was matched against a head that was changing, and on a slow machine that was a page error on about 1 load in 13.
+  const layout = readFileSync(join(web, 'app/layout.tsx'), 'utf8').replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
+  assert.doesNotMatch(layout, /<head[\s>]/); assert.match(layout, /<body><script dangerouslySetInnerHTML=\{\{ __html: THEME_SCRIPT \}\} \/><Shell/);
+});

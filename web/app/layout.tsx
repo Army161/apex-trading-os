@@ -17,8 +17,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const status = await shellStatus();
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} /></head>
-      <body><Shell initial={status}>{children}</Shell></body>
+      {/* The theme script is the first thing in the body, not in a head of our own. The loader adds and removes its script tags
+          in the head while the page is still being made live, and on a slow machine that broke the match between what the server
+          sent and what the browser built (a page error on about 1 load in 13). Nothing of ours in the head means nothing to break. */}
+      <body><script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} /><Shell initial={status}>{children}</Shell></body>
     </html>
   );
 }
