@@ -2,7 +2,7 @@
 // New claim check (docs/design/07 s4.10). Two steps: plan, which reads the source and counts the tries and writes nothing, and
 // run, which uses those tries. A result is only ever shown after it has been counted.
 import { useRouter } from 'next/navigation';
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import type { ClaimExtraction, ClaimResult } from '@apex/claims';
 import { count } from '@apex/ui';
 import type { ClaimPlan } from '@/lib/claimrun';
@@ -18,6 +18,14 @@ export default function ClaimForm({ triesSoFar, aiEnabled, signedIn, maxChars, n
   const [text, setText] = useState(''), [kind, setKind] = useState('transcript'), [saved, setSaved] = useState(''), [step, setStep] = useState<Step>('idle'), [err, setErr] = useState('');
   const [plan, setPlan] = useState<Plan | null>(null), [done, setDone] = useState<{ result: ClaimResult; seq: number | null } | null>(null);
   const busy = step === 'reading' || step === 'testing', at = STEPS.findIndex(s => s[0] === step);
+  // Text shared into the installed app from another app. It is only put in the box: nothing is read or run until Plan is pressed.
+  useEffect(() => { (async () => {
+    const q = new URLSearchParams(location.search); let shared = q.get('text') ?? '';
+    if (q.get('shared') === '1' && 'caches' in window) { try { const c = await caches.open('apex-share'), r = await c.match('/__shared'); if (r) { shared = await r.text(); await c.delete('/__shared'); } } catch { /* nothing was shared */ } }
+    if (!q.has('text') && !q.has('shared')) return;
+    history.replaceState(null, '', location.pathname);
+    if (shared.trim()) setText(shared.slice(0, maxChars));
+  })(); }, [maxChars]);
 
   const post = async (body: object) => { const r = await fetch('/api/claims', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'The server refused the request.'); return j; };
   const change = (t: string) => { setText(t); if (plan || done) { setPlan(null); setDone(null); setStep('idle'); } };

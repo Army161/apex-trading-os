@@ -20,6 +20,9 @@ These must always stay true. `python3 tools/drift_check.py` checks them.
 - The count of tries is read from the ledger. With no ledger connected it is shown as unknown, never as zero. A ledger that cannot be read is shown as halted.
 - A claim check from the dashboard goes through `claimrun.ts`: the plan step writes nothing and returns no result, and the run step re-checks the extraction against the source, takes the run lock and records through the ledger. The source text is never stored.
 - A screen is added to `routes.json`, and `npm run check:ui` opens every screen in that list.
+- The installed app (`app/manifest.ts`, `public/sw.js`, `public/offline.html`): the service worker answers and stores GET requests only. A write is never stored and never queued. No `/api/` answer and no You screen is stored. A stored screen is shown only when the server cannot be reached, for 24 hours at most, with the offline notice, and every control in it is off.
+- A manifest shortcut is a link to a screen. Opening one never halts or changes anything. The share target only fills the box on New claim check.
+- The app never asks to be installed by itself, and it sends no web push. Alerts stay on Telegram.
 - Every `/api/v1` call goes through `api/serve.ts`. A route exists only if it is in the contract and has a handler; a test fails when the two lists differ, and another when any answer does not fit its schema.
 - v1 can read, start a claim check and pull the halt. It cannot release a halt, approve, change a limit or make a key, and the handlers in `packages/api` reach the outside only through what they are handed.
 - `/api/mcp` answers nothing without a known API key, not even the list of tools. It reaches Apex only by calling `serve` with the caller's key, so scopes, limits, the halt and the budget apply to an MCP tool call exactly as to an API call. It is stateless and answers POST only.

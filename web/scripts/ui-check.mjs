@@ -51,7 +51,45 @@ for (const theme of ['dark', 'light']) for (const [w, h, tag] of [[1360, 900, 'd
   else { await p.locator('#ax-q').fill('setup'); await p.keyboard.press('Enter'); await p.waitForURL('**/you/setup', { timeout: 5000 }).catch(() => say('typing a screen name and Enter did not go there')); }
   await ctx.close();
 }
+// The installed app (docs/design/07 s6): what a browser needs before it offers to install, a saved screen with no connection,
+// a screen that was never saved, and text shared in from another app. A service worker needs https or localhost.
+let installed = 'not checked (the address is not https or localhost)';
+if (/^https:|^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(URL)) {
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 } }); const p = await ctx.newPage(); const say = m => problems.push(`installed app: ${m}`);
+  await p.goto(URL + '/autopilot/book', { waitUntil: 'networkidle' });
+  const man = await p.evaluate(async () => { const l = document.querySelector('link[rel="manifest"]'); if (!l) return null; const m = await (await fetch(l.href)).json(); return { m, icons: await Promise.all(m.icons.map(async i => { const r = await fetch(i.src); return r.ok && r.headers.get('content-type') === 'image/png'; })) }; });
+  if (!man) say('the page links no manifest');
+  else { const { m, icons } = man;
+    if (!m.name || !m.start_url || m.display !== 'standalone') say('the manifest lacks a name, a start address or standalone display');
+    for (const size of ['192x192', '512x512']) if (!m.icons.some(i => i.sizes === size && i.purpose === 'any')) say(`no ${size} icon`);
+    if (!m.icons.some(i => i.purpose === 'maskable')) say('no maskable icon'); if (icons.includes(false)) say('an icon does not load as a PNG');
+    if (m.share_target?.method !== 'POST') say('no share target'); }
+  const controlled = await p.evaluate(() => Promise.race([navigator.serviceWorker.ready.then(() => navigator.serviceWorker.controller ? true : new Promise(r => navigator.serviceWorker.addEventListener('controllerchange', () => r(true), { once: true }))), new Promise(r => setTimeout(() => r(false), 8000))]));
+  if (!controlled) say('the service worker did not take charge of the page');
+  else {
+    await p.goto(URL + '/autopilot/book', { waitUntil: 'networkidle' });                     // opened once under the worker, so it is saved
+    if (await p.getByTestId('offline').count()) say('the offline notice shows while online');
+    await ctx.setOffline(true);
+    await p.reload({ waitUntil: 'domcontentloaded' }).catch(e => say(`a saved screen did not open offline: ${e.message.split('\n')[0]}`)); await p.waitForTimeout(800);
+    if ((await p.locator('h1').first().innerText().catch(() => '')) !== 'Paper book') say('offline, the saved screen is not the one that was opened');
+    if (!(await p.getByTestId('offline').isVisible().catch(() => false))) say('offline, the screen does not say so');
+    if (!(await p.getByTestId('halt').isDisabled().catch(() => false))) say('offline, Halt is not off');
+    if (!(await p.getByTestId('mode-badge').isVisible().catch(() => false))) say('offline, the mode badge is gone');
+    await p.goto(URL + '/autopilot/risk', { waitUntil: 'domcontentloaded' }).catch(e => say(`a screen never saved did not get the offline page: ${e.message.split('\n')[0]}`));
+    if ((await p.locator('h1').first().innerText().catch(() => '')) !== 'You are offline') say('a screen never saved does not show the offline page');
+    await ctx.setOffline(false);
+    await p.goto(URL + '/claims', { waitUntil: 'networkidle' });
+    if (await p.getByTestId('offline').count()) say('the offline notice stays after the connection is back');
+    const shared = 'Buy when the 50 day average crosses above the 200 day average. '.repeat(60);
+    await p.evaluate(text => { const f = document.createElement('form'); f.method = 'post'; f.action = '/api/share'; for (const [k, v] of [['title', 'A shared video'], ['text', text], ['url', 'https://example.com/v']]) { const i = document.createElement('input'); i.type = 'hidden'; i.name = k; i.value = v; f.append(i); } document.body.append(f); f.submit(); }, shared);
+    await p.waitForURL('**/claims', { timeout: 8000 }).catch(() => say(`sharing did not land on New claim check (${p.url()})`)); await p.waitForTimeout(800);
+    const got = await p.locator('main textarea').first().inputValue().catch(() => '');
+    if (!got.startsWith('A shared video') || !got.includes(shared.trim())) say(`shared text did not arrive whole in the box (${got.length} characters)`);
+    installed = `checked: manifest, a saved screen offline, the offline page, and ${got.length} characters shared in`;
+  }
+  await ctx.close();
+}
 await b.close();
 const uniq = [...new Set(problems)];
-console.log(uniq.length ? `${uniq.length} problems:\n${uniq.join('\n')}` : `all ${SCREENS.length} screens${details.size ? ` and ${details.size} kinds of detail screen` : ''} rendered clean in both themes on desktop and phone (${pages} page loads)${SHOTS ? '; screenshots in ui-check/' : ''}`);
+console.log(uniq.length ? `${uniq.length} problems:\n${uniq.join('\n')}` : `all ${SCREENS.length} screens${details.size ? ` and ${details.size} kinds of detail screen` : ''} rendered clean in both themes on desktop and phone (${pages} page loads). Installed app ${installed}${SHOTS ? '; screenshots in ui-check/' : ''}`);
 process.exit(uniq.length ? 1 : 0);

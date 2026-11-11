@@ -4,7 +4,7 @@
 // the server with the page, then it is refreshed every 30 seconds.
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Banner, utc } from '@apex/ui';
 import { ALL_SCREENS, BOTTOM, SECTIONS, screenOf, sectionOf } from '@/lib/nav';
 import { DATA_MARK, DATA_WORDS, triesText, type ShellStatus } from '@/lib/status';
@@ -18,6 +18,10 @@ const applyTheme = (t: Theme) => { const el = document.documentElement; if (t ==
 /** Runs before the page paints, so a saved theme does not flash the other one first. */
 export const THEME_SCRIPT = `try{var t=localStorage.getItem('apex-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}`;
 
+/** True when the server cannot be reached. Screens are then the last copy saved on this device, and every action is off. */
+const Offline = createContext(false);
+export const useOffline = () => useContext(Offline);
+
 export default function Shell({ initial, children }: { initial: ShellStatus; children: ReactNode }) {
   const path = usePathname() || '/', router = useRouter();
   const section = sectionOf(path), screen = screenOf(path);
@@ -27,8 +31,20 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
   const [aiOpen, setAiOpen] = useState(false);
   const palette = useRef<HTMLDialogElement>(null); const [q, setQ] = useState('');
 
-  const refresh = useCallback(() => fetch('/api/status', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => j && setS(j)).catch(() => {}), []);
+  const [offline, setOffline] = useState(false);
+  // A failed status read means the server cannot be reached; any answer from it means it can.
+  const refresh = useCallback(() => fetch('/api/status', { cache: 'no-store' }).then(r => { setOffline(false); return r.ok ? r.json() : null; }).then(j => j && setS(j)).catch(() => setOffline(true)), []);
   useEffect(() => { const t = setInterval(refresh, 30000); return () => clearInterval(t); }, [refresh]);
+  useEffect(() => {
+    if (!navigator.onLine) setOffline(true);
+    const off = () => setOffline(true), on = () => { refresh(); };
+    window.addEventListener('offline', off); window.addEventListener('online', on);
+    // The installed app: saved screens with no connection, and the share target. Registered in a built app only.
+    if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+    // The Halt shortcut of the installed app opens Today with the button in focus. It is never pressed for you.
+    if (location.hash === '#halt') document.querySelector<HTMLButtonElement>('[data-testid="halt"]')?.focus();
+    return () => { window.removeEventListener('offline', off); window.removeEventListener('online', on); };
+  }, [refresh]);
   useEffect(() => setTheme(readTheme()), []);
   const nextTheme = () => { const t = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]; setTheme(t); applyTheme(t); };
 
@@ -40,7 +56,7 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
   }, [openPalette]);
 
   const halt = useCallback(async () => {
-    if (busy || s.halted) return; setBusy(true); setNote('');
+    if (busy || s.halted) return; if (offline) { setNote('Not halted: there is no connection. Use Telegram or `apex halt` in the terminal.'); return; } setBusy(true); setNote('');
     try {
       const r = await fetch('/api/halt', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ reason: `Halt pressed on ${screen?.label ?? path}` }) });
       const j = await r.json().catch(() => ({}));
@@ -50,14 +66,14 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
         : j.ledger === 'failed' ? 'Bots are told to pause, but the halt could not be written to the ledger. Run `apex halt` in the terminal as well.'
           : 'Bots are told to pause. No ledger is connected here, so also run `apex halt` where the autopilot runs.'); }
     } catch { setNote('Not halted: the server could not be reached.'); } finally { setBusy(false); }
-  }, [busy, s.halted, screen, path]);
+  }, [busy, s.halted, offline, screen, path]);
 
   const hits = useMemo(() => { const n = q.trim().toLowerCase(); return ALL_SCREENS.filter(x => !n || `${x.section} ${x.label}`.toLowerCase().includes(n)); }, [q]);
   const go = (href: string) => { closePalette(); router.push(href); };
   const live = s.mode === 'live';
 
   return (
-    <div className="ax-app" data-mode={s.mode} data-ai={aiOpen ? 'open' : undefined}>
+    <div className="ax-app" data-mode={s.mode} data-ai={aiOpen ? 'open' : undefined} data-offline={offline ? 'true' : undefined}>
       <a className="ax-skip" href="#main">Skip to the content</a>
       <header className="ax-header">
         <Link href="/" className="ax-brand" aria-label="Apex, go to Today">APEX</Link>
@@ -69,7 +85,7 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
         <span className="ax-head-actions">
           <button type="button" className="ax-btn ax-search" onClick={openPalette} aria-keyshortcuts="Control+K Meta+K">Go to <kbd>Ctrl K</kbd></button>
           <button type="button" className="ax-btn" onClick={() => setAiOpen(o => !o)} aria-expanded={aiOpen} aria-controls="ax-ai">Ask Apex</button>
-          <button type="button" className="ax-halt" onClick={halt} disabled={busy || s.halted} data-testid="halt">{s.halted ? 'Halted' : busy ? 'Halting' : 'Halt'}</button>
+          <button type="button" className="ax-halt" onClick={halt} disabled={busy || s.halted || offline} title={offline ? 'There is no connection, so Halt cannot reach Apex. Use Telegram or the terminal.' : undefined} data-testid="halt">{s.halted ? 'Halted' : busy ? 'Halting' : 'Halt'}</button>
         </span>
       </header>
 
@@ -85,6 +101,7 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
             ? 'This halt is in the ledger and stays in force until you resume it on the Risk screen, with a typed confirmation.' : h.level === 'kill' ? 'Release the kill switch on Today.' : 'Release the andon cord on Today.'}</span></span>)}
           <span className="ax-n">Nothing new is opened while Apex is halted.</span>
         </Banner>}
+        {offline && <p className="ax-offline" role="status" data-testid="offline"><strong>Offline.</strong> This is the screen as it was last loaded on this device. Figures may be out of date, and nothing can be halted, resumed or checked until the connection is back.</p>}
         {s.data === 'blocked' && <Banner kind="data_blocked">{s.dataBlocked.join(', ')}. Figures that depend on these datasets are not to be trusted, and their slots are paused.</Banner>}
         {!s.persistent && <Banner kind="not_persistent">Bot history, the journal and agent jobs are kept in memory and reset when the server restarts. Add Upstash Redis from the Vercel Marketplace (see You, Setup).</Banner>}
         <div className="ax-pagehead">
@@ -92,7 +109,8 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
           {section.screens.length > 1 && <nav className="ax-subnav" aria-label={`${section.label} screens`}>
             {section.screens.map(x => <Link key={x.href} href={x.href} aria-current={x.href === screen?.href ? 'page' : undefined}>{x.label}</Link>)}</nav>}
         </div>
-        {children}
+        {/* With no connection every control inside a screen is off; reading and links stay. */}
+        <Offline.Provider value={offline}><fieldset className="ax-screen" disabled={offline}>{children}</fieldset></Offline.Provider>
       </main>
 
       <nav className="ax-bottom" aria-label="Sections">
@@ -108,7 +126,7 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
         <ul>{hits.map(x => <li key={x.href}><button type="button" onClick={() => go(x.href)}><span className="ax-n">{x.section}</span> {x.label}</button></li>)}
           {!hits.length && <li className="ax-n">No screen matches. Clear the box to see them all.</li>}</ul>
         <div className="ax-palette-actions">
-          <button type="button" className="ax-halt" onClick={() => { closePalette(); halt(); }} disabled={busy || s.halted}>{s.halted ? 'Halted' : 'Halt'}</button>
+          <button type="button" className="ax-halt" onClick={() => { closePalette(); halt(); }} disabled={busy || s.halted || offline}>{s.halted ? 'Halted' : 'Halt'}</button>
           <button type="button" className="ax-btn" onClick={nextTheme}>Theme: {theme}</button>
           <button type="button" className="ax-btn" onClick={closePalette}>Close</button>
         </div>

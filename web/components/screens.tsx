@@ -222,6 +222,13 @@ export function Setup({ s }: { s: any }) {
       <tr><td>FRED_API_KEY (optional, free: macro panel on Assistants)</td><td>{ok(s?.fredSet)}</td></tr>
       <tr><td>APEX_AI_DAILY_BUDGET (optional, USD a day, default 5)</td><td><span className="badge">{s?.aiBudget ?? 5}</span></td></tr></tbody></table>
       {s?.authEnabled && <Login />}</div>
+    <div className="card" id="install"><h3>Install the app</h3><p>Apex can sit on your home screen or in your dock like any app. It is this same site, so there is nothing to download from a store, and it never asks you to install by itself.</p>
+      <table className="wrap"><tbody>
+        <tr><td>iPhone or iPad (Safari)</td><td>Tap Share, then "Add to Home Screen".</td></tr>
+        <tr><td>Android (Chrome)</td><td>Tap the three dots, then "Add to Home screen" or "Install app".</td></tr>
+        <tr><td>Windows, Mac or Linux (Chrome or Edge)</td><td>Click the install icon at the right end of the address bar, or the three dots, then "Install Apex".</td></tr>
+        <tr><td>Mac (Safari)</td><td>File menu, then "Add to Dock".</td></tr></tbody></table>
+      <p className="mute">Installed, it keeps the screens you opened in the last 24 hours readable with no connection, marked as offline. With no connection nothing can be halted, resumed or checked. Sharing text to Apex from another phone app opens a new claim check with the text filled in. Alerts still come through Telegram.</p></div>
     <div className="card"><h3>Connect a bot</h3><p>Every bot reads two env vars on your machine and reports here automatically:</p>
       <pre className="mono" style={{ whiteSpace: 'pre-wrap' }}>{`APEX_DASHBOARD_URL=${origin}\nAPEX_INGEST_TOKEN=<same value as in Vercel>`}</pre>
       <p className="mute">Exchange, wallet and broker keys stay in each bot's local .env. They are never sent here and Apex never asks for them in chat.</p></div>
