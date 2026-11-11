@@ -1,7 +1,7 @@
 'use client';
+// The screens that existed before the app shell, moved out of the one-file App so each can sit on its own route
+// (docs/design/07 s10). Their content is unchanged here; they are restyled with the shared components one at a time.
 import { useVoice, VoiceButtons } from './voice';
-import TraderRules from './Rules';
-import { StateStrip, MemoryCard, Agents } from './Factory';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { STRATEGIES, confluence } from '@/lib/engine/strategies';
@@ -9,50 +9,21 @@ import { backtest, monteCarlo, Bar } from '@/lib/engine/core';
 import { SOURCES } from '@/lib/sources';
 
 const Chart = dynamic(() => import('./Chart'), { ssr: false });
-import Strategies from './Strategies';
-import Assistants from './Assistants';
-const TABS = ['Command', 'Strategies', 'Strategy Lab', 'Signals', 'Journal', 'Council', 'Agents', 'Assistants', 'Apex AI', 'Library', 'Setup'] as const;
-type Tab = typeof TABS[number];
 const pct = (x?: number, d = 1) => (x == null || !Number.isFinite(x) ? '–' : `${(x * 100).toFixed(d)}%`);
 const num = (x?: number, d = 2) => (x == null || !Number.isFinite(x) ? '–' : x.toLocaleString(undefined, { maximumFractionDigits: d }));
 const ago = (t?: number) => { if (!t) return 'never'; const s = (Date.now() - t) / 1000; return s < 90 ? `${Math.round(s)}s ago` : s < 5400 ? `${Math.round(s / 60)}m ago` : `${Math.round(s / 3600)}h ago`; };
 const SYMS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'DOGEUSDT', 'AVAXUSDT', 'LINKUSDT'];
 const post = (u: string, b: unknown) => fetch(u, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) }).then(r => r.json());
 
-export default function App() {
-  const [tab, setTab] = useState<Tab>('Command');
+/** The dashboard's own state (bots, trades, events, which settings are present), refreshed every 15 seconds. */
+export function useBots() {
   const [state, setState] = useState<any>(null);
   const load = useCallback(() => fetch('/api/bots', { cache: 'no-store' }).then(r => r.json()).then(setState).catch(() => {}), []);
   useEffect(() => { load(); const t = setInterval(load, 15000); return () => clearInterval(t); }, [load]);
-  useEffect(() => { try { const t = localStorage.getItem('apex-tab') as Tab; if (t && TABS.includes(t)) setTab(t); } catch {} }, []);
-  const go = (t: Tab) => { setTab(t); try { localStorage.setItem('apex-tab', t); } catch {} };
-  return (
-    <>
-      <div className="top">
-        <div className="brand">APEX <b>TRADING OS</b></div>
-        <nav>{TABS.map(t => <button key={t} className={t === tab ? 'on' : ''} onClick={() => go(t)}>{t}</button>)}</nav>
-        <div style={{ marginLeft: 'auto' }} className="row"><span className="badge">PAPER FIRST</span>{state?.killed && <span className="badge off">KILL SWITCH ON</span>}</div>
-      </div>
-      <div className="wrap">
-        {state && !state.persistent && <div className="banner warn">Storage is in-memory, so bot history resets when the server restarts. Add Upstash Redis from the Vercel Marketplace to keep it (see Setup).</div>}
-        {state && !state.ingestTokenSet && <div className="banner warn">No APEX_INGEST_TOKEN is set, so anyone with the URL can post bot data. Set one in Vercel env vars (see Setup).</div>}
-        {tab === 'Command' && <><StateStrip /><Command s={state} reload={load} /></>}
-        {tab === 'Strategies' && <Strategies aiEnabled={state?.aiEnabled} />}
-        {tab === 'Strategy Lab' && <Lab />}
-        {tab === 'Signals' && <Signals />}
-        {tab === 'Journal' && <><TraderRules /><MemoryCard /><Journal risk={state?.risk} /></>}
-        {tab === 'Agents' && <Agents />}
-        {tab === 'Council' && <Council />}
-        {tab === 'Assistants' && <Assistants aiEnabled={state?.aiEnabled} />}
-        {tab === 'Apex AI' && <Ai enabled={state?.aiEnabled} />}
-        {tab === 'Library' && <Library />}
-        {tab === 'Setup' && <Setup s={state} />}
-      </div>
-    </>
-  );
+  return { state, load };
 }
 
-function Command({ s, reload }: { s: any; reload: () => void }) {
+export function Command({ s, reload }: { s: any; reload: () => void }) {
   if (!s) return <div className="card">Loading…</div>;
   const live = s.bots.filter((b: any) => b.lastSeen && Date.now() - b.lastSeen < 15 * 60e3);
   const eq = s.bots.reduce((a: number, b: any) => a + (Number(b.status?.equity) || 0), 0);
@@ -100,7 +71,7 @@ function useCandles(sym: string, tf: string, limit = 1500) {
   return { d, err };
 }
 
-function Lab() {
+export function Lab() {
   const [sym, setSym] = useState('BTCUSDT'); const [tf, setTf] = useState('1d'); const [sid, setSid] = useState('turtle_55_20'); const [risk, setRisk] = useState(1);
   const { d, err } = useCandles(sym, tf);
   const run = useMemo(() => { if (!d) return null; const s = STRATEGIES.find(x => x.id === sid)!; const r = backtest(d.bars, s.build(d.bars), { risk: risk / 100 }); return { ...r, mc: monteCarlo(r.trades, risk / 100) }; }, [d, sid, risk]);
@@ -133,7 +104,7 @@ function Lab() {
   </>);
 }
 
-function Signals() {
+export function Signals() {
   const [tf, setTf] = useState('1d'); const [res, setRes] = useState<any[] | null>(null);
   useEffect(() => { setRes(null); fetch(`/api/signals?symbols=${SYMS.join(',')}&tf=${tf}`).then(r => r.json()).then(j => setRes(j.results ?? [])); }, [tf]);
   return (<>
@@ -152,7 +123,7 @@ function Signals() {
 }
 
 const EMOTIONS = ['calm', 'confident', 'fomo', 'fear', 'greed', 'revenge', 'bored', 'tired', 'impatient'];
-function Journal({ risk }: { risk?: any }) {
+export function Journal({ risk }: { risk?: any }) {
   const [entries, setEntries] = useState<any[]>([]);
   const blank = { symbol: '', setup: 'turtle_55_20', side: 'long', entry: '', stop: '', target: '', exit: '', emotions: [] as string[], followedPlan: true, notes: '' };
   const [f, setF] = useState<any>(blank);
@@ -190,7 +161,7 @@ function Journal({ risk }: { risk?: any }) {
   </>);
 }
 
-function Council() {
+export function Council() {
   const [p, setP] = useState<any[]>([]);
   const load = () => fetch('/api/proposals').then(r => r.json()).then(j => setP(j.proposals));
   useEffect(() => { load(); }, []);
@@ -208,7 +179,7 @@ function Council() {
   </>);
 }
 
-function Ai({ enabled }: { enabled?: boolean }) {
+export function Ai({ enabled }: { enabled?: boolean }) {
   const [msgs, setMsgs] = useState<{ role: string; content: string; tools?: string[] }[]>([]); const [q, setQ] = useState(''); const [busy, setBusy] = useState(false);
   const v = useVoice();
   const ask = async (text: string) => {
@@ -225,7 +196,7 @@ function Ai({ enabled }: { enabled?: boolean }) {
   </div>);
 }
 
-function Library() {
+export function Library() {
   const [q, setQ] = useState('');
   const rows = SOURCES.filter(s => JSON.stringify(s).toLowerCase().includes(q.toLowerCase()));
   return (<div className="card"><div className="row" style={{ justifyContent: 'space-between' }}><h3 style={{ margin: 0 }}>Source library: every transcript and guide, and what it became</h3><input placeholder="Search" value={q} onChange={e => setQ(e.target.value)} /></div>
@@ -233,7 +204,8 @@ function Library() {
     <div className="tbl"><table><thead><tr><th>#</th><th>Source</th><th>Feeds</th><th>File</th></tr></thead><tbody>{rows.map(s => <tr key={s.id}><td className="mono">{s.id}</td><td>{s.title}</td><td style={{ whiteSpace: 'normal' }}>{s.feeds}</td><td className="mono mute">{s.file}</td></tr>)}</tbody></table></div></div>);
 }
 
-function Setup({ s }: { s: any }) {
+export function Setup({ s }: { s: any }) {
+  const [origin, setOrigin] = useState(''); useEffect(() => setOrigin(window.location.origin), []);   // set after mount, so the server and the browser render the same first page
   const ok = (b?: boolean) => <span className={`badge ${b ? 'live' : 'off'}`}>{b ? 'set' : 'missing'}</span>;
   return (<div className="grid g2">
     <SystemMap />
@@ -250,13 +222,13 @@ function Setup({ s }: { s: any }) {
       <tr><td>APEX_AI_DAILY_BUDGET (optional, USD a day, default 5)</td><td><span className="badge">{s?.aiBudget ?? 5}</span></td></tr></tbody></table>
       {s?.authEnabled && <Login />}</div>
     <div className="card"><h3>Connect a bot</h3><p>Every bot reads two env vars on your machine and reports here automatically:</p>
-      <pre className="mono" style={{ whiteSpace: 'pre-wrap' }}>{`APEX_DASHBOARD_URL=${typeof window !== 'undefined' ? window.location.origin : ''}\nAPEX_INGEST_TOKEN=<same value as in Vercel>`}</pre>
+      <pre className="mono" style={{ whiteSpace: 'pre-wrap' }}>{`APEX_DASHBOARD_URL=${origin}\nAPEX_INGEST_TOKEN=<same value as in Vercel>`}</pre>
       <p className="mute">Exchange, wallet and broker keys stay in each bot's local .env. They are never sent here and Apex never asks for them in chat.</p></div>
     <div className="card"><h3>Telegram alerts and commands</h3><ol>
       <li>In Telegram, message @BotFather, send /newbot, and copy the token it gives you.</li>
       <li>Send your new bot any message, then open <span className="mono">api.telegram.org/bot&lt;token&gt;/getUpdates</span> and copy <span className="mono">chat.id</span>.</li>
       <li>In Vercel env vars set TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID and a random TELEGRAM_WEBHOOK_SECRET, then redeploy.</li>
-      <li>Register the webhook once: <span className="mono" style={{ wordBreak: 'break-all' }}>{`curl "https://api.telegram.org/bot<token>/setWebhook?url=${typeof window !== 'undefined' ? window.location.origin : ''}/api/telegram&secret_token=<secret>"`}</span></li></ol>
+      <li>Register the webhook once: <span className="mono" style={{ wordBreak: 'break-all' }}>{`curl "https://api.telegram.org/bot<token>/setWebhook?url=${origin}/api/telegram&secret_token=<secret>"`}</span></li></ol>
       <p>Then you get a message for every bot trade, risk event and new strategy signal, and the bot answers /positions, /orders, /pnl, /strategies and /bots. It only answers your chat id.</p>
       <p className="mute">Strategy signal checks run from /api/cron/strategies (set CRON_SECRET). Vercel Hobby runs it once a day; for 15m or 1h strategies point a free pinger like cron-job.org at it with the header <span className="mono">Authorization: Bearer &lt;CRON_SECRET&gt;</span>.</p>
       <p className="mute">Why there are no key forms on this page: broker, wallet, AI and Telegram keys live in Vercel or your machine's .env, never in the app's database, so a leaked dashboard login can't leak a key.</p></div>

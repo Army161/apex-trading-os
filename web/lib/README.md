@@ -2,6 +2,8 @@
 
 The dashboard's server code: the strategy engine (`engine/`), the agent policy gateway (`policy.ts`), the model gateway (`gateway.ts`) and router (`router.ts`), memory, usage and the store.
 
+The app shell reads the autopilot ledger through `ledger.ts` (Postgres, or the file ledger in local development). `status.ts` turns it into what the header shows, `queries.ts` holds the query functions the screens and the API share, and `nav.ts` with `routes.json` is the one list of screens.
+
 ## Invariants
 These must always stay true. `python3 tools/drift_check.py` checks them.
 - `policy.ts` refuses order, withdraw, transfer and pay for every agent, through the `no-money-tools` hard rule that no config can remove.
@@ -10,3 +12,6 @@ These must always stay true. `python3 tools/drift_check.py` checks them.
 - Secrets are redacted before anything is logged or stored (`redact()` in `policy.ts`, `looksSecret` in `memory.ts`).
 - A strategy only counts as having an edge if it passes `engine/validate.ts`: 50 or more trades, beats 95% of random traders, makes money on locked test data, and survives fees.
 - Going live with a strategy needs the second-opinion review (`review.ts`) and Jeremy's own switch.
+- Every screen shows the mode badge and Halt. The shell can send one thing, a halt. It has no resume, approve or go-live control.
+- The count of tries is read from the ledger. With no ledger connected it is shown as unknown, never as zero. A ledger that cannot be read is shown as halted.
+- A screen is added to `routes.json`, and `npm run check:ui` opens every screen in that list.

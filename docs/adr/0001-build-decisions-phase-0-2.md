@@ -31,6 +31,10 @@ Date: 2026-11-11. Status: in force. These are the places where the build had to 
 | 25 | `.env.example` stays a red path, so an agent proposes a new variable in a pull request instead of editing the file | It is in the approved red-path list. The hook's message for other `.env` files says to list the variable there and tell Jeremy |
 | 26 | The light-theme live colour is `#ad4e0a`, not the design's `#b4520b` | The design value is 4.49:1 on the chip surface, just under the 4.5:1 rule the same document sets. The contrast test checks every text colour on every surface in both themes |
 | 27 | `packages/ui` holds display components only; controls with state (theme switch, filters, dialogs, the claim intake form) come with the app shell and screens | They need the client runtime and the routes they act on, which are P4.2 and P4.3. Everything in the package renders on the server and is tested as static markup |
+| 28 | The header's Halt pulls the dashboard's andon cord and also writes a `halt` entry to the ledger | The bots read the cord and the autopilot run reads the ledger, so one press has to reach both. With no ledger connected the header says so and names `apex halt`. Halt needs a signed-in session |
+| 29 | Data status in the header has four states: ok, stale, blocked, not checked | A dataset that is only too old to open new paper orders is normal between refreshes and is not a failed health check, so it is shown as stale (warn), not blocked (bad) |
+| 30 | The Autopilot and Claim check sections open on a page that says which screens are not built yet | A real route with a plain sentence is better than a missing link. The Autopilot page already shows the funnel from the ledger |
+| 31 | Playwright is a pinned dev dependency of `web`, and CI runs `check:ui` against a built app with a fresh paper ledger | The design asks for the browser check on every pull request that touches `web` or `packages/ui`. Market data hosts are ignored in that job, because they refuse some CI networks |
 
 ## Open question for Jeremy
 

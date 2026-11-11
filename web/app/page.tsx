@@ -1,2 +1,2 @@
-import App from '@/components/App';
-export default function Page() { return <App />; }
+import { TodayPage } from '@/components/pages';
+export default function Page() { return <TodayPage />; }

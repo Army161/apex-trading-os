@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "tsx lib/engine/selftest.ts",
+    "test": "tsx lib/engine/selftest.ts && tsx --test test/*.test.ts",
     "check:ui": "node scripts/ui-check.mjs"
   },
   "dependencies": {
@@ -18,12 +18,15 @@
     "react-dom": "^19.1.1",
     "@apex/engine": "*",
     "@apex/kernel": "*",
-    "@apex/claims": "*"
+    "@apex/claims": "*",
+    "@apex/store": "*",
+    "@apex/ui": "*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "playwright": "1.63.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }

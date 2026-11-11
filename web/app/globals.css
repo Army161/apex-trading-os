@@ -1,13 +1,7 @@
-:root{--bg:#f6f7f9;--panel:#ffffff;--ink:#0f1720;--mute:#5b6675;--line:#e3e7ec;--acc:#0b7a5c;--acc2:#2456d6;--bad:#c03535;--warn:#a86a00;--chip:#eef2f5}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a0d12;--panel:#11161d;--ink:#e6edf3;--mute:#8b98a8;--line:#1f2731;--acc:#2fd59b;--acc2:#6ea8ff;--bad:#ff6b6b;--warn:#f0b54a;--chip:#17202a}}
-:root[data-theme="dark"]{--bg:#0a0d12;--panel:#11161d;--ink:#e6edf3;--mute:#8b98a8;--line:#1f2731;--acc:#2fd59b;--acc2:#6ea8ff;--bad:#ff6b6b;--warn:#f0b54a;--chip:#17202a}
-*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+/* Styles for the screens that predate the design system. Colours come from @apex/ui/tokens.css; --acc2 is the old name for --info. */
+:root{--acc2:var(--info)}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--font-ui)}
 a{color:var(--acc2)}code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
-.top{display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5;flex-wrap:wrap}
-.brand{font-weight:800;letter-spacing:.08em}.brand b{color:var(--acc)}
-nav{display:flex;gap:4px;flex-wrap:wrap}nav button{background:none;border:0;color:var(--mute);padding:7px 11px;border-radius:8px;cursor:pointer;font:inherit}
-nav button.on{background:var(--chip);color:var(--ink);font-weight:600}
-.wrap{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
 .grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
 .card h3{margin:0 0 10px;font-size:14px}.k{color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.v{font-size:24px;font-weight:700;margin-top:4px}
@@ -15,7 +9,7 @@ nav button.on{background:var(--chip);color:var(--ink);font-weight:600}
 .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;background:var(--chip);color:var(--mute)}
 .badge.live{background:color-mix(in srgb,var(--acc) 18%,transparent);color:var(--acc)}.badge.off{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
 .btn{background:var(--chip);border:1px solid var(--line);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;font:inherit}
-.btn.pri{background:var(--acc);color:#04140e;border-color:transparent;font-weight:600}.btn.danger{background:var(--bad);color:#fff;border-color:transparent;font-weight:700}
+.btn.pri{background:var(--acc);color:var(--on-acc);border-color:transparent;font-weight:600}.btn.danger{background:var(--bad);color:var(--on-acc);border-color:transparent;font-weight:700}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 input,select,textarea{background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 9px;font:inherit;max-width:100%}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -25,7 +19,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 .bar{height:8px;border-radius:99px;background:var(--chip);overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
 .chat{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto}.msg{padding:10px 12px;border-radius:10px;background:var(--chip);white-space:pre-wrap}.msg.u{background:color-mix(in srgb,var(--acc2) 15%,transparent);align-self:flex-end;max-width:80%}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--mute)}.dot.on{background:var(--acc)}.dot.err{background:var(--bad)}
-@media (max-width:640px){.top{padding:10px 16px}.v{font-size:20px}.wrap{padding:14px 16px 50px}}
+@media (max-width:640px){.v{font-size:20px}}
 .wrap td{white-space:normal}
 .g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
 .kanban{display:grid;gap:10px;grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:900px){.kanban{grid-template-columns:1fr}}

@@ -35,7 +35,7 @@ Every requirement becomes something Claude has to try. For example:
 Apex already runs these checks:
 - `cd engine && pytest`: engine tests.
 - `cd web && npm test`: the self-test.
-- `npm run check:ui`: every tab in a real browser, desktop and phone.
+- `npm run check:ui`: every screen in a real browser, both themes, desktop and phone.
 
 **Ask Claude:** "Write the test plan first. Run every test before you tell me it's done, and show me the results."
 
