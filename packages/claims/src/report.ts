@@ -7,7 +7,7 @@ import type { Rule } from './extract';
 export const BANNED = /\b(scam\w*|fake\w*|proven|fraud\w*)\b/i;
 export const VERDICT_NAME: Record<Verdict, string> = { holds_up: 'Holds up on past data', near_miss: 'Near miss', no_edge: 'No edge found', untestable: 'Could not be tested' };
 export const NOTICE = 'Past data only. Nothing here is advice, and a pass is a reason to paper trade, not a reason to trade.';
-const FLAG_NAME: Record<string, string> = { injection: 'Instructions aimed at the checker', fake_json: 'Ready-made result in the text', hidden_text: 'Hidden text', secret_redacted: 'Key or password removed', guaranteed_returns: 'Certain-result language',
+export const FLAG_NAME: Record<string, string> = { injection: 'Instructions aimed at the checker', fake_json: 'Ready-made result in the text', hidden_text: 'Hidden text', secret_redacted: 'Key or password removed', guaranteed_returns: 'Certain-result language',
   no_losses: 'Perfect-record language', paid_group: 'Paid group or course', affiliate_link: 'Affiliate link', urgency: 'Time pressure', screenshot_only: 'Results shown only as screenshots', cherry_picked_period: 'Short or hand-picked period',
   number_not_in_source: 'Figure not found in the source', trimmed: 'Source trimmed', pine_lookahead: 'Pine: reads future bars', pine_every_tick: 'Pine: calculates on every tick', pine_repaint: 'Pine: may repaint', pine_zero_commission: 'Pine: zero commission',
   pine_full_equity: 'Pine: 100% of equity per trade', pine_pyramiding: 'Pine: pyramiding' };

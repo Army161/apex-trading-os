@@ -18,7 +18,9 @@
     "react-dom": "^19.1.1",
     "@apex/engine": "*",
     "@apex/kernel": "*",
+    "@apex/autopilot": "*",
     "@apex/claims": "*",
+    "@apex/data": "*",
     "@apex/store": "*",
     "@apex/ui": "*"
   },

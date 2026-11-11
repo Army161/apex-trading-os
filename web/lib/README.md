@@ -16,4 +16,5 @@ These must always stay true. `python3 tools/drift_check.py` checks them.
 - A ledger halt is released only from the Risk screen, through `app/api/resume/`: signed in, same origin, a reason, and the phrase typed out. That route is a red path and can release a paper halt and nothing else.
 - An Autopilot screen draws only what `queries.ts` returns from the ledger. The board is never sorted by return. Report text is parsed into data by `markdown.ts` and never set as HTML.
 - The count of tries is read from the ledger. With no ledger connected it is shown as unknown, never as zero. A ledger that cannot be read is shown as halted.
+- A claim check from the dashboard goes through `claimrun.ts`: the plan step writes nothing and returns no result, and the run step re-checks the extraction against the source, takes the run lock and records through the ledger. The source text is never stored.
 - A screen is added to `routes.json`, and `npm run check:ui` opens every screen in that list.

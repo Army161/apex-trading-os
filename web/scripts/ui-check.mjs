@@ -14,7 +14,7 @@ const SCREENS = req('../lib/routes.json').sections.flatMap(s => s.screens.map(x 
 // The check runs signed out, so admin-only reads answer 401. The browser logs each one; that is the expected signed-out state.
 const IGNORE = [/favicon/, /status of 401 \(Unauthorized\)/, ...(process.env.UI_OFFLINE ? [/\/api\/(candles|signals|macro|crowd)/, /50[23] \((Bad Gateway|Service Unavailable)\)/] : [])];
 const SHOTS = process.env.UI_SHOTS !== '0';
-const DETAILS = [['/autopilot', '/autopilot/pairs/', 'detail-pair'], ['/autopilot/slots', '/autopilot/slots/', 'detail-slot'], ['/autopilot/reports', '/autopilot/reports/', 'detail-report'], ['/autopilot/ledger', '/autopilot/ledger/', 'detail-ledger-entry']];
+const DETAILS = [['/autopilot', '/autopilot/pairs/', 'detail-pair'], ['/autopilot/slots', '/autopilot/slots/', 'detail-slot'], ['/autopilot/reports', '/autopilot/reports/', 'detail-report'], ['/autopilot/ledger', '/autopilot/ledger/', 'detail-ledger-entry'], ['/claims', '/claims/', 'detail-claim']];
 const details = new Set();
 fs.mkdirSync('ui-check', { recursive: true });
 const b = await chromium.launch(); const problems = []; let pages = 0;

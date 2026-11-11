@@ -210,7 +210,7 @@ export function summarise(e: LedgerEntry): string {
     case 'book_snapshot': return `equity ${typeof p.equity === 'number' ? p.equity.toFixed(2) : '?'}`;
     case 'graduation_check': return `${p.slotKey}: ${p.state}`;
     case 'drift_reading': return `${p.slotKey}: ${typeof p.s === 'number' ? p.s.toFixed(2) : '?'}`;
-    case 'claim_check': return `${p.verdict ?? p.status ?? ''}`;
+    case 'claim_check': return `${p.id}: ${String(p.verdict ?? 'no verdict').replace(/_/g, ' ')}`;
     case 'gate_version': case 'cost_model': return String(p.version ?? '').slice(0, 12);
     default: return '';
   }
@@ -239,4 +239,22 @@ export function today(v: LedgerView, entries: LedgerEntry[], requested: Limits, 
   if (rs[0]?.errors) needsYou.push({ text: `The last run had ${rs[0].errors} ${rs[0].errors === 1 ? 'error' : 'errors'}`, href: '/autopilot/reports' });
   return { funnel: funnelOf(v), book: book(v, entries, requested, now).summary, slots: slots(v).filter(s => s.status !== 'retired' && s.role === 'primary'), lastRun: rs[0] ?? null,
     nearMisses: bd.rows.filter(r => !r.slotKey && r.status !== 'passed_pending_validation' && r.checks.length > 0).sort((a, b) => b.passed - a.passed || b.sharpe - a.sharpe).slice(0, 5), needsYou };
+}
+
+// ---- claim checks ----
+export type ClaimRow = { id: string; seq: number; ts: number; verdict: string | null; sourceKind: string; chars: number; readings: number; untested: number; flags: string[]; contentHash: string };
+const claimRow = (e: LedgerEntry): ClaimRow => { const p = e.payload ?? {}; return { id: String(p.id), seq: e.seq, ts: e.ts, verdict: typeof p.verdict === 'string' ? p.verdict : null, sourceKind: String(p.sourceKind ?? ''), chars: num(p.chars),
+  readings: Array.isArray(p.readings) ? p.readings.length : 0, untested: num(p.untested), flags: Array.isArray(p.flags) ? p.flags.map(String) : [], contentHash: String(p.contentHash ?? '') }; };
+/** Every recorded check, newest first. Checking the same text again adds a row; the tries are only counted once. */
+export const claimChecks = (entries: LedgerEntry[]): ClaimRow[] => entries.filter(e => e.kind === 'claim_check').map(claimRow).reverse();
+export type ClaimReading = { ruleSet: number; strategy: string; panel: string; proxy: boolean; status: string; dsrInCheck: number | null; row: BoardRow | null; rules: unknown; hypothesis: string };
+export type ClaimDetail = { check: ClaimRow; receipt: ReceiptRow; readings: ClaimReading[]; earlier: ClaimRow[] };
+/** One check as the ledger holds it: the verdict, each reading with its seven checks, and the rules in the form they were run. The source's own words are not here, because the source is never stored. */
+export function claimDetail(v: LedgerView, entries: LedgerEntry[], id: string): ClaimDetail | null {
+  const all = entries.filter(e => e.kind === 'claim_check' && e.payload?.id === id); if (!id || !all.length) return null;
+  const e = all[all.length - 1], p = e.payload ?? {}, slotMap = primaryByTrial(v), keys: string[] = Array.isArray(p.trialKeys) ? p.trialKeys.map(String) : [];
+  const readings: ClaimReading[] = (Array.isArray(p.readings) ? p.readings : []).map((r: any, i: number) => { const t = v.trials.get(keys[i] ?? '');
+    return { ruleSet: num(r.ruleSet), strategy: String(r.strategy ?? ''), panel: String(r.panel ?? ''), proxy: !!r.proxy, status: String(r.status ?? ''), dsrInCheck: typeof r.dsrInCheck === 'number' ? r.dsrInCheck : null,
+      row: t?.result ? rowOf(v, t, slotMap) : null, rules: t?.prereg?.rules ?? null, hypothesis: String(t?.prereg?.hypothesis ?? '') }; });
+  return { check: claimRow(e), receipt: receiptOf(e), readings, earlier: all.slice(0, -1).map(claimRow).reverse() };
 }
