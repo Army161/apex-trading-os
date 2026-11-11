@@ -75,7 +75,8 @@ export function effectiveLimits(requested: Limits, prev: LimitsSnapshot | null, 
 }
 
 const PAUSED = ['paused_drift', 'paused_data', 'retired'];
-const floorTo = (x: number, step: number) => (step > 0 ? Math.floor(x / step + 1e-9) * step : x);
+/** Round down to the lot step, and strip binary noise so 0.659576 is not stored as 0.6595759999999999. Never rounds up. */
+const floorTo = (x: number, step: number) => { if (!(step > 0) || !Number.isFinite(x)) return 0; const dec = Math.max(0, Math.ceil(-Math.log10(step))), q = +(Math.floor(x / step + 1e-9) * step).toFixed(dec); return q > x + step * 1e-6 ? +(q - step).toFixed(dec) : q; };
 
 export function checkIntent(i: Intent, book: BookView, limits: Limits, ctx: GuardCtx): GuardResult {
   const L = clampLimits(limits), rules: RuleResult[] = [];

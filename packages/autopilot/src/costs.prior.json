@@ -1,0 +1,14 @@
+{
+  "note": "Priors, deliberately not below what the 10 Nov 2026 study charged. feeBps is commission and regulatory fees per side, halfSpreadBps is half the quoted spread, slipBps is slippage beyond the spread. All are assumptions until quotes and paper fills are measured.",
+  "rows": [
+    { "venue": "paper", "assetClass": "etf", "bucket": "mega", "feeBps": 2, "halfSpreadBps": 0.5, "slipBps": 1, "n": 0, "source": "prior", "why": "SPY, QQQ, IWM. The study used 2 bp fee plus 1 bp slip per side; 0.5 bp added for the spread" },
+    { "venue": "paper", "assetClass": "etf", "bucket": "liquid", "feeBps": 5, "halfSpreadBps": 1, "slipBps": 2, "n": 0, "source": "prior", "why": "GLD, USO and other liquid ETFs. Study: 5 bp fee plus 2.5 bp slip" },
+    { "venue": "paper", "assetClass": "etf", "bucket": "thin", "feeBps": 5, "halfSpreadBps": 5, "slipBps": 5, "n": 0, "source": "prior", "why": "Thin ETFs: wide spreads assumed" },
+    { "venue": "paper", "assetClass": "stock", "bucket": "mega", "feeBps": 2, "halfSpreadBps": 1, "slipBps": 1, "n": 0, "source": "prior", "why": "Largest stocks" },
+    { "venue": "paper", "assetClass": "stock", "bucket": "liquid", "feeBps": 5, "halfSpreadBps": 2, "slipBps": 3, "n": 0, "source": "prior", "why": "Liquid stocks" },
+    { "venue": "paper", "assetClass": "stock", "bucket": "thin", "feeBps": 5, "halfSpreadBps": 10, "slipBps": 10, "n": 0, "source": "prior", "why": "Thin stocks" },
+    { "venue": "paper", "assetClass": "fx", "bucket": "liquid", "feeBps": 1, "halfSpreadBps": 0.5, "slipBps": 0.5, "n": 0, "source": "prior", "why": "Major pairs. Study: 1 bp fee plus 0.5 bp slip" },
+    { "venue": "paper", "assetClass": "crypto", "bucket": "liquid", "feeBps": 10, "halfSpreadBps": 2.5, "slipBps": 5, "n": 0, "source": "prior", "why": "BTC, ETH spot taker. Study: 10 bp fee plus 5 bp slip" },
+    { "venue": "paper", "assetClass": "commodity", "bucket": "liquid", "feeBps": 5, "halfSpreadBps": 1, "slipBps": 2, "n": 0, "source": "prior", "why": "Commodity ETFs, as liquid ETFs" }
+  ]
+}

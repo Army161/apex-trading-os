@@ -9,7 +9,7 @@ export type SlotState = {
   slotKey: string; trialKey: string; strategy: string; dataset: string; symbol: string; tf: string; assetClass: AssetClass;
   lockedAt: number; lockSeq: number; inputHash: string; gateVersion: string; role: 'primary' | 'shadow'; shadowOf: string | null; status: string;
   baseline: Baseline; weight: number; riskFraction: number; cusum: number; driftPauses: number; lastStopT: number | null; lastGradMonth: string | null;
-  lastGrad: any | null; lastDrift: any | null;
+  lastGrad: any | null; lastDrift: any | null; fingerprint: string; costBucket: string; lock: any;
 };
 export type PositionState = OpenPosition & { intent: string; stop0: number; target: number | null; entryT: number; entryFee: number };
 export type ClosedTrade = { slotKey: string; symbol: string; side: Side; entryT: number; exitT: number; entry: number; exit: number; qty: number; pnl: number; r: number; reason: string };
@@ -45,7 +45,7 @@ export function applyEntry(v: LedgerView, e: { kind: LedgerKind; payload: any; s
     case 'slot_locked':
       v.slots.set(p.slotKey, { slotKey: p.slotKey, trialKey: p.trialKey, strategy: p.strategy, dataset: p.dataset, symbol: p.symbol, tf: p.tf, assetClass: p.assetClass, lockedAt: p.lockedAt, lockSeq: e.seq,
         inputHash: p.inputHash, gateVersion: p.gateVersion, role: p.role, shadowOf: p.shadowOf ?? null, status: 'paper', baseline: p.baseline, weight: 0, riskFraction: 0, cusum: 0, driftPauses: 0,
-        lastStopT: null, lastGradMonth: null, lastGrad: null, lastDrift: null });
+        lastStopT: null, lastGradMonth: null, lastGrad: null, lastDrift: null, fingerprint: p.inputs?.strategy?.fingerprint ?? '', costBucket: p.costBucket ?? 'liquid', lock: p });
       break;
     case 'slot_status': {
       const s = v.slots.get(p.slotKey); if (!s) break;
@@ -75,7 +75,7 @@ export function applyEntry(v: LedgerView, e: { kind: LedgerKind; payload: any; s
     }
     case 'book_snapshot': v.lastSnapshot = p; v.cursors = { ...p.cursors }; v.peak = Math.max(v.peak, p.peak ?? 0, p.equity ?? 0); break;
     case 'drift_reading': { const s = v.slots.get(p.slotKey); if (s) { s.cusum = p.s; s.lastDrift = p; } break; }
-    case 'graduation_check': { const s = v.slots.get(p.slotKey); if (s) { s.lastGradMonth = p.month ?? null; s.lastGrad = p; } break; }
+    case 'graduation_check': { const s = v.slots.get(p.slotKey); if (s) { s.lastGradMonth = p.month ?? null; s.lastGrad = { ...p, seq: e.seq }; } break; }
     case 'halt': v.halts.push({ level: p.level, by: p.by, reason: p.reason, ts: e.ts }); if (p.level === 'book-drawdown') v.drawdownPaused = true; break;
     case 'resume': v.halts = v.halts.filter(h => h.level !== p.level); if (p.level === 'book-drawdown') { v.drawdownPaused = false; v.peak = v.cash; } break;
     default: break;
