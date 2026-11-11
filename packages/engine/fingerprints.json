@@ -8,8 +8,13 @@
   "buy_hold": "1a28af9cbe7ec9792552a59bfe534ab8c69a5723eba342a20dd7f0c1406f7f44",
   "confluence": "766d696dda5e44d643464809a37018aba81c82b6eb20039444ab3883b685dece",
   "dave_prev_range": "1a6b71c08e00883f5507cddc4f10732ef6e9124dbcf4f96a2577588ef2140231",
+  "dave_prev_range__close_break": "8190e81763ed9bf2c5e1f7c3da8a82e21e0ff1beb62c25d0a82bf643d2e0adbf",
+  "dave_prev_range__macd_impulse": "58cc80a4286697563055b4b79d70cc1506f174d8b6c9c175f104a81b3b6801b2",
+  "dave_prev_range__measured_move": "be2e94d7609b7d05ddfeb1cc583580ea8175d13ec6f4bd4c28c6476421ca0c82",
+  "dave_prev_range__weak_stop": "8bb63be6ff3966f237492260355ff40db415d303c98822bc29e2fe8d3a815d9a",
   "dave_swing_count": "6f06e25741709e2e79a70bea0408f18f890b9f36faeda68caffd30ea98c72eb7",
   "demand_second_leg": "bcea11b4a7f469842399a0e395472ec4d3a3098cc4ac3dd31be2115066edbf17",
+  "divergence_pivot": "07318f44c05e87b5b27b33a51efce99b4d8706f7ce3f7f70d5e35d24937e98ab",
   "ema50_bands": "1a75ed22d109f64c8dc6c6e6568fb2f980f6d63887c299d7aeef66bc6a10f56d",
   "failure_test_2b": "ac516877477198b63be01e9899d802d37e6a8f1a24ff9b46a9b6bf5f4c35d884",
   "garch_vol_premium": "e34cd46c789cbff8ba63f42b7ce92fe10b25af0ef7da06b8b5ea709044310b00",
@@ -23,6 +28,8 @@
   "liq_reversal": "c5da7aa92a57a57d506721fb3a49d1d904d81446ddb171929c0cdba6ea70b208",
   "liq_reversal_ema": "9adfba39bc5a951d4af2df8d5233ee9e20d77bc78121b5ae36a4b643bfaf28e5",
   "liq_trend_sweep": "5fa568a58478b39c43b3681cfd39dc3b555f09aa0472697ce4c297def44e9480",
+  "momentum_candle_breakout": "420394707845586b02817f147ca8c4b09c23a7ffb3b3918caf8c6fef1a0c71a5",
+  "opening_range_breakout": "cfaf42094ce1306bd903b34e810d4f864d6b88fd4a34685dd0006fc5a1ddeab2",
   "peak_dueling_momentum": "754f490d0fad837f313170b71feed649f16f8b680b87841f4a8f3f465513d1ac",
   "peak_extreme_fade": "3ff6658b22c596da383809c8ae6e7557bc9711134d918c52eca1d3959311ac44",
   "peak_low_vol_reversal": "ee8e184659c63d3667502775c8c98722b4a41a6bef9128043f36ed007d3ee99d",
@@ -39,6 +46,8 @@
   "turtle_55_20": "eb2f9239d1bc539f33f106e343b69608cb539a1464e3cbfc1fe430732415df12",
   "urban_deal_flow": "494cfdd9b976b32dcaca31ba38d4014e386dd71804ceba5e31b70182f171bc95",
   "urban_sr_memory": "6e98e0267fa3954a17e6d45952cf5e4a9d8efa56e380c33bb78310ef9aeb07e1",
+  "vwap_flat_fade": "1e1d860af7d1f6ae3b44ddfbec34e6cb490034bad23cd2decd658587ca5bfcc6",
+  "vwap_trend_pullback": "8244f990d18d3e9659b9f7bc07fff2bb459e06929f3c7a0887e6406722cc7d4b",
   "wyckoff_spring": "c6dff07381f7eecb8a47bfb768088887a36df62578916463f4b30e4a0ede217f"
  }
 }

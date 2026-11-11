@@ -303,3 +303,30 @@ This is the first run of the new pipeline (`npm run apex -- run --full --seed pl
 - The ledger for this run was made in a build container. The ledger of record starts with the first nightly run in GitHub Actions, which repeats this run from an empty ledger.
 
 Still not passing, as before: trails (chat/81), GARCH (chat/82), daily stop and midday filter (chat/86), the Peak systems (chat/88), and every daily strategy on 2 years of data (too few trades). The IWM AR(1) lead is not in this registry yet.
+
+## Addendum, 11 November 2026: research queue, tests 1 to 5 (P3.2)
+
+The first five tests in the plan's queue are now registered strategies. They ran through the same seven checks on SPY, QQQ and IWM (30m and 1h, bars from 2024-11-11 to 2026-11-10). That is 27 more tries, so the count is 293. The rules were written before the run and were not changed after it.
+
+| Test | Strategy | Pairs | Result |
+|---|---|---|---|
+| 1 | `dave_prev_range__measured_move` | 3 (1h) | Rejected on all three. SPY +1.5%, IWM +5.2%, QQQ -8.2% |
+| 1 | `dave_prev_range__close_break` | 3 (1h) | SPY +11.7% (Sharpe 1.20, 44 trades) and IWM +12.8% (Sharpe 1.33, 33 trades) fail only on the trade count. QQQ -6.6%, rejected |
+| 1 | `dave_prev_range__macd_impulse` | 3 (1h) | Rejected on all three. SPY +4.4%, IWM +5.0%, QQQ -5.1% |
+| 1 | `dave_prev_range__weak_stop` | 3 (1h) | Rejected on all three. No better than random entries |
+| 2 | `opening_range_breakout` | 3 (30m) | Rejected on all three. -23% to -50% after costs, on about 470 trades each |
+| 3 | `vwap_trend_pullback` | 3 (30m) | Rejected on all three. -26% to -46% |
+| 3 | `vwap_flat_fade` | 3 (30m) | Rejected on all three. -3% to -6%, 31 to 47 trades |
+| 4 | `momentum_candle_breakout` | 3 (30m) | Rejected on all three. -8% to -38% |
+| 5 | `divergence_pivot` | 3 (1h) | **SPY passes all seven checks.** QQQ -18.7% and IWM -17.5%, rejected |
+
+**The one new pass is `divergence_pivot` on SPY 1h:** 76 trades, +11.5% against +25.5% for holding SPY, Sharpe 1.03 against 0.75, max drawdown -4.9%, win rate 45%, profit factor 1.39, t-stat 1.45, deflated Sharpe after 293 trials 6.9% (the forward gate asks for 95%).
+
+**How to read it.**
+
+- The same rule loses about 18% on QQQ and on IWM. A real edge in index divergence would not be this different across three index funds, so this pass is most likely luck. It still goes to the validator and then to paper, because that is the rule for anything that passes, and paper is where luck gets found out.
+- The three intraday families (opening range, VWAP, momentum candle) lose after costs on every market. They trade about once a day, and costs alone take most of what they lose.
+- The close-break variant is the only change to `dave_prev_range` that looks no worse than the original. It has too few trades to judge and stays at "needs more trades".
+- Nothing here changes the status of anything: both passes are "checking", and nothing is proven.
+
+**Limits.** This run was made in the build container on the committed files. In the ledger of record the nightly run registers 25 of these 27 pairs in the first week and the last 2 in the next, because the weekly trial budget is 25. Every strategy in the registry, old and new, now has a look-ahead test (`packages/engine/test/lookahead.test.ts`): cut the history at a bar, run the rule again, and the answer on that bar must not change.

@@ -10,12 +10,17 @@
 //     Target: back to the high it retraced from.
 // Exits compared: fixed target, trail under bullish candle lows, trail under swing lows, and the 21 EMA close-below trail.
 // Filters compared: skip the first hour of the New York open, and higher-timeframe alignment (4x and 16x the bar size).
-import { Bar, Sig, atr, ema } from './core';
+import { Bar, Sig, atr, ema, macd, rollMax } from './core';
 import { resample } from './trend';
 import { nyHM } from './ict';
 
 export type Exit = 'target' | 'candle' | 'swing' | 'ema21';
-export type DaveOpts = { exit?: Exit; skipNyOpen?: boolean; align?: boolean; minSwings?: number; depth?: number; rr?: number };
+export type DaveOpts = { exit?: Exit; skipNyOpen?: boolean; align?: boolean; minSwings?: number; depth?: number; rr?: number;
+  // Research-queue test 1 (docs/study-and-plan.md, Phase 3). Each is off by default, so dave_prev_range itself is unchanged.
+  measuredMove?: boolean;   // target = the pullback low plus the height of the range, instead of the high it retraced from
+  closeBreak?: boolean;     // the break must close 0.25 ATR beyond the swing, and pullback depth is measured on candle bodies, not wicks
+  macdImpulse?: boolean;    // the break only counts if the MACD 3-10 line is at its 20-bar extreme on that bar (a real impulse)
+  weakStop?: boolean };     // stop under the pullback low (the weak level) instead of under the range low (the strong level)
 
 const N = NaN;
 const empty = (n: number): Sig => ({ le: Array(n).fill(false), se: Array(n).fill(false), lx: Array(n).fill(false), sx: Array(n).fill(false), stop: Array(n).fill(N), target: Array(n).fill(N) });
@@ -98,20 +103,23 @@ export function prevRangeCore(o: DaveOpts = {}) {
   const depth = o.depth ?? 0.5;
   return (b: Bar[]): Sig => {
     const s = empty(b.length), a = atr(b, 14);
-    let ph = N, pl = N, rangeLo = N, rangeHi = N, armed = false, lastDownHigh = N;
+    const m = o.macdImpulse ? macd(b.map(x => x.c), 3, 10, 16).macd : null, mHi = m ? rollMax(m, 20) : null;
+    let ph = N, pl = N, rangeLo = N, rangeHi = N, armed = false, lastDownHigh = N, pbLo = N;
     for (let i = 4; i < b.length; i++) {
       const k = i - 2;
       if (b[k].h > b[k - 1].h && b[k].h > b[k - 2].h && b[k].h >= b[k + 1].h && b[k].h >= b[k + 2].h) ph = b[k].h;
       if (b[k].l < b[k - 1].l && b[k].l < b[k - 2].l && b[k].l <= b[k + 1].l && b[k].l <= b[k + 2].l) pl = b[k].l;
       if (b[i - 1].c < b[i - 1].o) lastDownHigh = b[i - 1].h;
-      if (!isNaN(ph) && !isNaN(pl) && pl < ph && b[i].c > ph && !armed) { armed = true; rangeLo = pl; rangeHi = b[i].h; ph = N; continue; }  // break of structure
+      const broke = b[i].c > ph + (o.closeBreak ? 0.25 * a[i] : 0) && (!m || m[i] >= mHi![i]);
+      if (!isNaN(ph) && !isNaN(pl) && pl < ph && broke && !armed) { armed = true; rangeLo = pl; rangeHi = b[i].h; pbLo = N; ph = N; continue; }  // break of structure
       if (!armed) continue;
-      rangeHi = Math.max(rangeHi, b[i].h);
+      if (b[i].h > rangeHi) { rangeHi = b[i].h; pbLo = N; }
+      pbLo = isNaN(pbLo) ? b[i].l : Math.min(pbLo, b[i].l);                                                // lowest low since the range high
       if (b[i].c < rangeLo) { armed = false; continue; }                                                  // the range failed
-      const deep = (rangeHi - b[i].l) / (rangeHi - rangeLo);
+      const deep = (rangeHi - (o.closeBreak ? Math.min(b[i].o, b[i].c) : b[i].l)) / (rangeHi - rangeLo);
       if (deep >= depth && trigger(b, i, lastDownHigh) && b[i].c < rangeHi - 0.5 * a[i]) {
-        const stop = Math.min(b[i].l, rangeLo) - 0.1 * a[i];
-        s.le[i] = true; s.stop[i] = stop; s.target[i] = rangeHi; armed = false;
+        const stop = (o.weakStop ? b[i].l : Math.min(b[i].l, rangeLo)) - 0.1 * a[i];
+        s.le[i] = true; s.stop[i] = stop; s.target[i] = o.measuredMove ? Math.max(rangeHi, pbLo + (rangeHi - rangeLo)) : rangeHi; armed = false;
       }
     }
     trailExits(b, s, o.exit ?? 'target');

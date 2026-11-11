@@ -4,7 +4,7 @@ The autopilot core. Design: `docs/design/` (start with `00-README.md`, then `04-
 
 | Package | What it is | Imports |
 |---|---|---|
-| `engine` | Strategies, indicators, `backtest()`, the six-check validator, deflated Sharpe, fingerprints | nothing in this repo |
+| `engine` | Strategies (including the research-queue tests in `queue.ts`), indicators, `backtest()`, the six-check validator, deflated Sharpe, fingerprints, the look-ahead test | nothing in this repo |
 | `kernel` | Canonical JSON and hashing, the hash-chained ledger, gate `standard-bar-v1`, the risk guard, the four live locks, config, the ledger view | `engine` |
 | `data` | Dataset registry, source adapters, the terms gate, the data firewall | `engine`, `kernel` |
 | `store` | Ledger drivers: JSON-lines file and Postgres | `kernel` |

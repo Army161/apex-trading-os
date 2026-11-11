@@ -159,18 +159,24 @@ export function runAutopilot(inp: RunInput): RunOutput {
   function runFactory() {
     const pairs: { d: LoadedDataset; s: StrategyEntry; key: string; inputs: TrialInputs; ih: string; t?: TrialState }[] = [];
     for (const d of inp.datasets) for (const s of inp.registry) {
-      if (!d.spec.panels.includes('stress-board') && s.def.tf !== d.spec.tf) continue;
+      // A research-queue test pairs only with the panels it names, on its own timeframe. Everything else pairs as before
+      // (the whole stress board, other panels by timeframe) and never with a panel that exists only for the queue.
+      const q = s.def.queue;
+      if (q ? !(s.def.tf === d.spec.tf && q.panels.some(x => d.spec.panels.includes(x))) : !d.spec.panels.includes('stress-board') && (s.def.tf !== d.spec.tf || d.spec.panels.every(x => x.startsWith('queue-')))) continue;
       const key = trialKey({ strategyId: s.def.id, fingerprint: s.fingerprint, panel: d.spec.id, tf: d.spec.tf, gateVersion: gv });
       const inputs: TrialInputs = { strategy: { id: s.def.id, fingerprint: s.fingerprint }, dataset: [{ id: d.spec.id, version: d.version }], gateVersion: gv, costModelVersion: cm.version, engineFingerprint: inp.engineFingerprint, seed: g.monkey.seed };
       pairs.push({ d, s, key, inputs, ih: inputHash(inputs), t: view.trials.get(key) });
     }
+    // Queue tests go first, in the plan's order (the order they are registered in), so the weekly budget is spent on them in that order.
+    const order = new Map(inp.registry.map((s, i) => [s, i])), queued = pairs.filter(p => p.s.def.queue).sort((a, b) => order.get(a.s)! - order.get(b.s)!);
+    pairs.splice(0, pairs.length, ...queued, ...pairs.filter(p => !p.s.def.queue));
     pairsTotal = pairs.length;
     // The N behind the deflated-Sharpe readout is every trial ever plus every new pair in this registry, so the readout does not
     // depend on the order pairs happen to be evaluated in. It is a readout only: it is not part of the result hash.
     const nReadout = view.trials.size + pairs.filter(p => !p.t).length;
     pairs.sort((a, b) => (a.t ? a.t.lastSeq : -1) - (b.t ? b.t.lastSeq : -1));                // never evaluated first, then oldest first (stable)
     const budget = inp.mode === 'full' ? Infinity : inp.budget ?? 10, weekAgo = inp.now - 7 * DAY;
-    let newThisWeek = [...view.preregs.values()].filter(p => p.source === 'factory' && p.ts > weekAgo).length;
+    let newThisWeek = [...view.preregs.values()].filter(p => (p.source === 'factory' || p.source.startsWith('queue:')) && p.ts > weekAgo).length;
     for (const p of pairs) {
       if (evaluated >= budget) break;
       if (p.t && p.t.result.inputHash === p.ih) continue;                                     // already judged on exactly these inputs
@@ -179,10 +185,11 @@ export function runAutopilot(inp: RunInput): RunOutput {
         if (!view.skipped.has(sk)) emit('skipped_data', { dataset: p.d.spec.id, version: p.d.version, strategy: p.s.def.id, reason: h ? h.checks.filter(c => c.status === 'blocked').map(c => `${c.id}: ${c.detail}`).join('; ') : 'no health verdict' });
         continue; }
       if (!view.preregs.has(p.key)) {
-        if (!inp.seedSource && newThisWeek >= inp.trialsPerWeek) { waitingBudget++; continue; }
-        emit('prereg', { trialKey: p.key, hypothesis: `${p.s.def.name} beats random entries, costs and buy and hold on ${p.d.spec.symbol} ${p.d.spec.tf}`, source: inp.seedSource ?? 'factory',
+        const q = p.s.def.queue;                                                              // queue tests always wait for the weekly budget, even in a seeded run
+        if ((q || !inp.seedSource) && newThisWeek >= inp.trialsPerWeek) { waitingBudget++; continue; }
+        emit('prereg', { trialKey: p.key, hypothesis: `${p.s.def.name} beats random entries, costs and buy and hold on ${p.d.spec.symbol} ${p.d.spec.tf}`, source: q ? `queue:${q.id}` : inp.seedSource ?? 'factory',
           strategy: { id: p.s.def.id, fingerprint: p.s.fingerprint }, panel: p.d.spec.id, tf: p.d.spec.tf, gateVersion: gv, passBar: passBar(g), plannedVariants: 1 });
-        newThisWeek++; newTrials++;
+        if (q || !inp.seedSource) newThisWeek++; newTrials++;
       }
       const res = evaluate(p.d.bars, p.s.def.build, costFor(cm, p.d.spec), g, Math.max(nReadout, trialsEver(view) + (p.t ? 0 : 1))); if (res.error) errors++;
       emit('trial_result', { trialKey: p.key, gateVersion: gv, inputs: p.inputs, inputHash: p.ih, resultHash: resultHash(res), status: res.status, why: res.why, checks: res.checks, metrics: res.metrics, readouts: res.readouts,

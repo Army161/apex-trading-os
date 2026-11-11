@@ -1,5 +1,6 @@
 import { dealFlow, srMemory } from './urban';
 import { swingCount, prevRange } from './dave';
+import { openingRange, vwapPullback, vwapFade, momentumBreakout, divergencePivot } from './queue';
 import { garchIntraday } from './garch';
 import { extremeFade, duelingMomentum, stopBreakout } from './peak';
 import { Bar, Sig, atr, sma, ema, rsi, adx, rollMax, rollMin, shift, stdev, candles, swings, supertrend } from './core';
@@ -8,7 +9,10 @@ import { sarReverse, maCross, bandRevert, withEmaRegime, withAdx, regimePoints }
 import { secondLeg, sharpReversal, gwsReversal, anchorDiscount } from './demand';
 import { trendSweepRide, liquidityReversal, fxLevelReversal, liquidityPoints } from './liquidity';
 
-export type StratDef = { id: string; name: string; source: string; direction: 'long' | 'both'; tf: string; desc: string; build: (b: Bar[]) => Sig };
+/** `queue`: a research-queue test (docs/design/04 s16). It is paired only with datasets in the named panels, on its own
+ *  timeframe, and every pair is pre-registered under the weekly trial budget. Without it a strategy pairs as before. */
+export type StratDef = { id: string; name: string; source: string; direction: 'long' | 'both'; tf: string; desc: string; build: (b: Bar[]) => Sig; queue?: { id: string; panels: string[] } };
+const Q = (id: string) => ({ id, panels: ['queue-etf-intraday'] });
 
 const empty = (n: number): Sig => ({ le: Array(n).fill(false), se: Array(n).fill(false), lx: Array(n).fill(false), sx: Array(n).fill(false), stop: Array(n).fill(NaN), target: Array(n).fill(NaN) });
 const C = (b: Bar[]) => b.map(x => x.c), H = (b: Bar[]) => b.map(x => x.h), L = (b: Bar[]) => b.map(x => x.l), V = (b: Bar[]) => b.map(x => x.v);
@@ -110,6 +114,25 @@ export const STRATEGIES: StratDef[] = [
   { id: 'peak_low_vol_reversal', name: 'Low-Volume Reversal', source: 'chat/88', direction: 'both', tf: '1d', desc: 'The 35-bar extreme fade, only when volume is below its 20-bar average; out after 20 bars. Unproven.', build: extremeFade(35, 20, true) },
   { id: 'peak_dueling_momentum', name: 'Dueling Momentum', source: 'chat/88', direction: 'both', tf: '1d', desc: 'Long when the close is above the close 50 bars ago but below the close 100 bars ago (mirror for shorts); out after 20 bars. Unproven.', build: duelingMomentum() },
   { id: 'peak_stop_breakout', name: '45-Bar Stop Breakout + Time Exit', source: 'chat/88', direction: 'both', tf: '1d', desc: 'First touch of the 45-bar high goes long, 45-bar low goes short; out after 20 bars, 2 ATR stop. Unproven.', build: stopBreakout() },
+  // ---- Research queue, tests 1 to 5 (docs/study-and-plan.md, Phase 3). All unproven. Each pair is one pre-registered try. ----
+  { id: 'dave_prev_range__measured_move', name: 'Previous-Range Pullback: measured-move target', source: 'chat/78, queue test 1', direction: 'both', tf: '1h', queue: Q('P3-1'), desc: 'The previous-range pullback with one change: the target is the pullback low plus the height of the range, not the high it retraced from. Unproven.',
+    build: prevRange({ measuredMove: true }) },
+  { id: 'dave_prev_range__close_break', name: 'Previous-Range Pullback: close break', source: 'chat/78, queue test 1', direction: 'both', tf: '1h', queue: Q('P3-1'), desc: 'The previous-range pullback with one change: the break of structure must close 0.25 ATR beyond the swing, and pullback depth is measured on candle bodies, not wicks. Unproven.',
+    build: prevRange({ closeBreak: true }) },
+  { id: 'dave_prev_range__macd_impulse', name: 'Previous-Range Pullback: MACD impulse filter', source: 'chat/78 + 16, queue test 1', direction: 'both', tf: '1h', queue: Q('P3-1'), desc: 'The previous-range pullback with one change: the break only counts when the MACD 3-10 line is at its 20-bar extreme on that bar. Unproven.',
+    build: prevRange({ macdImpulse: true }) },
+  { id: 'dave_prev_range__weak_stop', name: 'Previous-Range Pullback: weak-level stop', source: 'chat/78, queue test 1', direction: 'both', tf: '1h', queue: Q('P3-1'), desc: 'The previous-range pullback with one change: the stop sits under the pullback low (the weak level) instead of under the range low (the strong level). Unproven.',
+    build: prevRange({ weakStop: true }) },
+  { id: 'opening_range_breakout', name: 'Opening-Range Breakout', source: 'chat/22, queue test 2', direction: 'both', tf: '30m', queue: Q('P3-2'), desc: 'The first regular-session bar sets the range; the first later close beyond it enters. Stop at the other side of the range, 2R, one trade a day, flat before the close. Unproven.',
+    build: openingRange() },
+  { id: 'vwap_trend_pullback', name: 'Session VWAP Trend Pullback', source: 'uploads/05, queue test 3', direction: 'both', tf: '30m', queue: Q('P3-3'), desc: 'VWAP rising with closes above it; a bar dips to within half a band of VWAP and closes back up. Stop one band beyond VWAP, 2R, one trade a day, flat before the close. Unproven.',
+    build: vwapPullback() },
+  { id: 'vwap_flat_fade', name: 'Flat-VWAP Band-2 Fade', source: 'uploads/05, queue test 3', direction: 'both', tf: '30m', queue: Q('P3-3'), desc: 'VWAP flat for four bars; a bar trades through the second band and closes back inside. Stop beyond the bar, target VWAP, one trade a day, flat before the close. Unproven.',
+    build: vwapFade() },
+  { id: 'momentum_candle_breakout', name: 'Momentum-Candle Breakout', source: 'chat/14, queue test 4', direction: 'both', tf: '30m', queue: Q('P3-4'), desc: 'A candle with a body at least twice the prior three, closing beyond the prior 20-bar extreme and in the outer quarter of its range. Stop beyond the candle, 2R, regular session only, flat before the close. Unproven.',
+    build: momentumBreakout() },
+  { id: 'divergence_pivot', name: 'MACD Divergence + Reversal Candle (confirmed pivot)', source: 'chat/16, queue test 5', direction: 'both', tf: '1h', queue: Q('P3-5'), desc: 'A pivot low below the last one while the MACD 3-10 line is higher, used only after 3 bars confirm the pivot; then a hammer or engulfing candle within 6 bars. Stop beyond the pivot, 2R. Unproven.',
+    build: divergencePivot() },
   { id: 'buy_hold', name: 'Buy & Hold (benchmark)', source: 'benchmark', direction: 'long', tf: 'any', desc: 'Buys the first bar and holds.',
     build: b => { const s = empty(b.length); s.le[0] = true; s.stop[0] = b[0].c * 1e-4; s.fullSize = true; return s; } },
 ];

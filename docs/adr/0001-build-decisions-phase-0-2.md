@@ -21,6 +21,7 @@ Date: 2026-11-11. Status: in force. These are the places where the build had to 
 | 15 | Workflow actions are pinned to major tags (`@v4`), not commit hashes | The build container could not look the hashes up. Pinning by hash is a follow-up |
 | 16 | Fingerprint fixtures are frozen copies of three committed data files | Deterministic across machines. They must never be refreshed |
 | 17 | The `protected-paths` check stays red on a red-path pull request opened under Jeremy's account, and he merges with the admin bypass | GitHub does not let an author approve their own pull request, and agents open pull requests under his account. A hard lock needs a separate agent account (`docs/branch-protection.md`) |
+| 18 | Research-queue tests are ordinary registered strategies with a `queue` tag. They pair only with the `queue-etf-intraday` panel on their own timeframe, are pre-registered as `queue:<id>`, go first in the plan's order, and always wait for the weekly trial budget (25), even in a seeded run | Keeps the queue inside the one factory path, so every queue pair is pre-registered and counted. A queue table in Postgres (design `04` section 16) waits for the database |
 
 ## Open question for Jeremy
 

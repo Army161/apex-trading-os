@@ -152,3 +152,17 @@ test('report: fixed template. First line is the paper notice, ten sections, and 
   const empty: ReportData = (await new Sim().run({ ...withData(), mode: 'full', registry: [FLIP] })).report;
   assert.ok(renderReport(empty).includes(NOTHING_PASSED)); assert.ok(renderShort(empty).includes(NOTHING_PASSED));
 });
+
+test('research queue: a queue test pairs only with its panel and timeframe, is pre-registered as queue:<id>, and waits for the weekly budget even in a seeded run', async () => {
+  const bars = PAST, q = (id: string, tf = '1d') => { const s = strat(id, coinFlip(7)); return { ...s, def: { ...s.def, tf, queue: { id: 'P3-9', panels: ['queue-test'] } } }; };
+  const board = dataset(bars, spec('BOARD', { panels: ['stress-board'] })), qd = dataset(bars, spec('QD', { panels: ['queue-test'] })), both = dataset(bars, spec('BOTH', { panels: ['stress-board', 'queue-test'] }));
+  const qh = dataset(bars, spec('QH', { panels: ['queue-test'], tf: '1h', id: 'csv:QH:1h:raw' })), ds = [board, qd, both, qh];
+  const registry = [FLIP, q('qa'), q('qb'), q('qc', '1h')];
+  const sim = new Sim({ registry, trialsPerWeek: 3, seedSource: 'plan:P1.13' }), a = await sim.run({ datasets: ds, health: ds.map(d => healthy(d)), mode: 'full' });
+  const pre = await sim.of('prereg') as any[], pairOf = (p: any) => `${p.strategy.id}@${p.panel.split(':')[1]}`;
+  assert.deepEqual(pre.filter(p => p.source === 'plan:P1.13').map(pairOf).sort(), ['flip@BOARD', 'flip@BOTH'], 'a plain strategy never pairs with a queue-only panel');
+  assert.deepEqual(pre.filter(p => p.source === 'queue:P3-9').map(pairOf), ['qa@QD', 'qa@BOTH', 'qb@QD'], 'queue pairs in registry order, stopped by the weekly budget of 3');
+  assert.equal(a.report.funnel.waitingBudget, 2, 'qb@BOTH and qc@QH wait; nothing pairs qa or qb with the 1h set, or qc with a daily one');
+  sim.now += 8 * 24 * 3600e3; const b = await sim.run({ datasets: ds, health: ds.map(d => healthy(d)), mode: 'full' });
+  assert.deepEqual((await sim.of('prereg') as any[]).slice(pre.length).map(pairOf), ['qb@BOTH', 'qc@QH']); assert.equal(b.report.funnel.waitingBudget, 0);
+});

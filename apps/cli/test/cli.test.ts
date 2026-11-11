@@ -65,7 +65,7 @@ test('data pull: without a key nothing is fetched; with one, new bars are append
   const fake = async (url: string, init?: any) => { seen.push({ url, auth: init?.headers?.Authorization }); const spy = url.includes('/ticker/SPY/');
     return { ok: true, status: 200, json: async () => ({ results: spy ? [1, 2, 3, 4].map(k => ({ t: 1794270600000 + k * 18e5, o: 752.5, h: 753, l: 752, c: 752.8, v: 1000 })) : [] }) }; };
   const r = await pullData(ctx, fake as any, async () => {});
-  assert.deepEqual(r.problems, []); assert.equal(r.pulled.length, 6, 'six base files behind the seven datasets'); assert.match(r.pulled.find(x => x.startsWith('SPY'))!, /4 new bars/);
+  assert.deepEqual(r.problems, []); assert.equal(r.pulled.length, 8, 'eight base files behind the twelve datasets'); assert.match(r.pulled.find(x => x.startsWith('SPY'))!, /4 new bars/);
   assert.ok(seen.every(s => s.auth === 'Bearer test-key' && !s.url.includes('test-key')), 'the key travels in a header, never in the URL');
   assert.ok(seen.some(s => s.url.includes(encodeURIComponent('C:EURUSD'))) && seen.some(s => s.url.includes(encodeURIComponent('X:BTCUSD'))));
   const after = loadData(ctx).datasets.find(d => d.spec.id === 'csv:SPY:1h:split')!;
