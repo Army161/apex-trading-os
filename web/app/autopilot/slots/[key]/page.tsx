@@ -5,13 +5,15 @@ import { loadLedger } from '@/lib/ledger';
 import { slotDetail } from '@/lib/queries';
 import { Card, Hash, IntentsTable, NoLedger, Ref, Side, SlotsTable, TradesTable, pairHref, param, receiptHref } from '@/components/autopilot/parts';
 import LocalTime from '@/components/LocalTime';
+import LiveApproval from '@/components/autopilot/LiveApproval';
+import { CHECKLIST, MAX_EXPIRY_DAYS, nextStage } from '@/app/api/admin/live/approval';
 export const metadata = { title: 'Slot' };
 export const dynamic = 'force-dynamic';
 
 export default async function Page({ params }: { params: Promise<{ key: string }> }) {
   const l = await loadLedger(); if (!l.ok) return <NoLedger state={l} />;
   const d = slotDetail(l.view, l.entries, param((await params).key), l.now); if (!d) notFound();
-  const s = d.slot, c = d.clock, is = d.inSample;
+  const s = d.slot, c = d.clock, is = d.inSample, stage = nextStage(s.status);
   const earliest = c.earliestMonth !== null ? `forward month ${c.earliestMonth}` : null;
   return <div className="grid">
     <Card>
@@ -23,7 +25,9 @@ export default async function Page({ params }: { params: Promise<{ key: string }
         <GraduationClock g={{ months: c.months, trades: c.trades, dsr: c.dsr, earliest, needMonths: c.needMonths, needTrades: c.needTrades, needDsr: c.needDsr }} />
         <p className="ax-n">{c.state ? <>Last monthly check ({c.checkedMonth}): <strong>{c.state.replace(/_/g, ' ')}</strong>.{c.fails.length ? ` Still short: ${c.fails.join('; ')}.` : ''}{c.note ? ` Clock: ${c.note}.` : ''}</> : 'No monthly check has run yet.'} The deflated figure counts {count(c.m)} {c.m === 1 ? 'slot' : 'slots'} ever locked.</p>
       </Card>
-      <Card><div className="ax-scroll"><LockPanel locks={d.locks} /></div><p className="ax-n">{FIXED.live}</p></Card>
+      <Card><div className="ax-scroll"><LockPanel locks={d.locks} /></div><p className="ax-n">{FIXED.live}</p>
+        {/* The approval step shows only when locks 1 and 2 are open and lock 3 is not. The server works that out again before it records anything. */}
+        {stage && d.locks[0].open && d.locks[1].open && !d.locks[2].open ? <LiveApproval slotKey={s.slotKey} stage={stage.id} sizePct={stage.size * 100} maxDays={MAX_EXPIRY_DAYS} checklist={CHECKLIST} /> : null}</Card>
     </div>
     <div className="grid g2">
       <Card title="Forward record (after the lock)">

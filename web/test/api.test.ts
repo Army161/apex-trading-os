@@ -209,7 +209,7 @@ const walk = (dir: string): string[] => readdirSync(dir).flatMap(n => { const p 
 test('inventory: every HTTP route is accounted for, and none outside the dashboard\'s own list can move money or open a lock', () => {
   const api = join(web, 'app/api'), files = walk(api).map(f => ({ name: '/' + relative(api, f).replace(/\/route\.ts$/, ''), src: readFileSync(f, 'utf8') }));
   // Session-only dashboard routes whose names hold a guarded word. Each needs the signed-in session; none is reachable with an API key.
-  const SESSION_ONLY = ['/resume', '/admin/keys', '/admin/keys/[id]', '/killswitch', '/decisions', '/proposals'];
+  const SESSION_ONLY = ['/resume', '/admin/keys', '/admin/keys/[id]', '/admin/live/[key]/approve', '/killswitch', '/decisions', '/proposals'];
   const guarded = /order|withdraw|transfer|pay|approve|resume|release|live|signoff|key|decision|proposal|kill/i;
   for (const f of files) if (guarded.test(f.name)) { assert.ok(SESSION_ONLY.includes(f.name), `${f.name} has a guarded word in its name and is not on the session-only list`); assert.match(f.src, /isAdmin\(\)/, `${f.name} checks the session`); }
   // Every route that changes something says how the caller is checked.

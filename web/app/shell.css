@@ -116,3 +116,4 @@ a.ax-btn{display:inline-flex;align-items:center;text-decoration:none}
 .ax-facts{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:8px 0 0;font:13px/1.45 var(--font-ui)}.ax-facts dt{color:var(--mute)}.ax-facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .ax-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}.ax-actions p{flex-basis:100%;margin:0}
 .ax-table th .ax-sub{display:block;min-width:22ch;font-weight:400;white-space:normal;max-width:44ch}
+.ax-confirm label.ax-tick{display:flex;gap:8px;align-items:flex-start;font:13px/1.45 var(--font-ui);color:var(--ink)}.ax-confirm label.ax-tick input{width:auto;min-height:0;margin-top:3px;flex:none}

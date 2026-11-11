@@ -27,6 +27,7 @@ export const REQUIRED: Partial<Record<LedgerKind, string[]>> = {
   book_snapshot: ['at', 'equity', 'cash', 'peak', 'cursors'],
   drift_reading: ['slotKey', 'n', 's'],
   graduation_check: ['slotKey', 'state', 'm', 'n'],
+  live_approval: ['slotKey', 'stage', 'sizeCap', 'expiresAt', 'by', 'checklist'],
   halt: ['level', 'by', 'reason'],
   resume: ['level', 'by'],
   anchor: ['seq', 'hash'],

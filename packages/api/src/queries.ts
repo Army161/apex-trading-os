@@ -106,8 +106,11 @@ export function slotDetail(v: LedgerView, entries: LedgerEntry[], slotKey: strin
   const s = v.slots.get(slotKey); if (!s) return null;
   const tr = v.trials.get(s.trialKey), fb = forwardBars(entries), g = s.lastGrad, closed = v.closed.filter(c => c.slotKey === slotKey) as Trade[], pos = v.positions.get(slotKey) ?? null;
   const gradSeq = g?.state === 'strict_pass' ? g.seq : null, agree = tr?.validator.filter(x => x.purpose === 'graduation' && x.slotKey === slotKey && x.agrees).pop()?.seq ?? null;
-  // The dashboard never holds an approval or the machine key, so locks 3 and 4 can only ever read as closed here.
-  const locks = liveAllowed(slotKey, { slotStatus: s.status, graduationPassedSeq: gradSeq, validatorAgreeSeq: agree, reviewClean: false, approval: null, machine: null }, now).locks;
+  // Lock 2 also needs the review chain, and nothing records its result in the ledger yet, so it reads as closed and lock 3 cannot open.
+  // Lock 3 is the latest approval the ledger holds for this slot. Lock 4 is never known here: only the executor on Jeremy's machine has the key.
+  const ap = [...entries].reverse().find(e => e.kind === 'live_approval' && e.payload?.slotKey === slotKey);
+  const approval = ap ? { seq: ap.seq, slotKey, stage: String(ap.payload.stage), sizeCap: num(ap.payload.sizeCap), expiresAt: num(ap.payload.expiresAt), hash: ap.hash } : null;
+  const locks = liveAllowed(slotKey, { slotStatus: s.status, graduationPassedSeq: gradSeq, validatorAgreeSeq: agree, reviewClean: false, approval, machine: null }, now).locks;
   const lockEntry = entries.find(e => e.seq === s.lockSeq) ?? null, slotMap = primaryByTrial(v);
   return { slot: slotRow(v, s),
     clock: { months: num(g?.months), trades: g ? num(g.trades) : closed.length, dsr: g && num(g.trades) > 0 && typeof g.dsrM === 'number' ? g.dsrM : null, m: g ? num(g.m, slotsEver(v)) : slotsEver(v), state: g?.state ?? null, fails: Array.isArray(g?.fails) ? g.fails.map(String) : [],
