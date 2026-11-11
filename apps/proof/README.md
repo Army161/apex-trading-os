@@ -21,10 +21,17 @@ It needs no setting to run. `.env.example` lists the ones later work packages wi
 5. **Every sentence a public page shows is in `lib/copy.ts`.** A test holds all of it to the wording rules: no promise of returns, none of the words Apex never uses about a source, and the not-advice line on every page.
 6. **Never in this product:** live trading, a broker connection, anyone's exchange or broker keys, signals, copy trading, rankings of named vendors.
 
+## The database
+
+`db/migrations/0001_tenancy.sql` is written for a Supabase project and has not been applied to one: there is no project yet. It is a red path. `test/isolation.test.ts` applies it to a throwaway Postgres database (`APEX_TEST_DATABASE_URL` names the server) behind `db/test/supabase_shim.sql`, and checks for every table that one account cannot read or write another's rows.
+
+7. **Row-level security is on and forced on every table,** and a signed-in person can write only two things: start a check and rename it. Everything else is written by the workers. A new table needs the same treatment, and the isolation test fails without it.
+8. **The per-account ledger and the count of tries are append-only for every role.**
+
 ## Not built yet
 
-Sign-in and the per-account database (P5.2), the claim check flow (P5.3), billing in Stripe test mode (P5.4), the rest of the screens (P5.5), share links (P5.6). The market data licence is not chosen: see `DATA_LICENCE.md`.
+Sign-in with Supabase Auth (the second half of P5.2: it needs the Supabase project), the claim check flow (P5.3), billing in Stripe test mode (P5.4), the rest of the screens (P5.5), share links (P5.6). The market data licence is not chosen: see `DATA_LICENCE.md`.
 
 ## Only Jeremy can do these
 
-A second Vercel project for this folder, its own Supabase project, its own model key, a Stripe account (test mode first), a commercial data plan, a name and a domain, and a lawyer's review of the wording before anyone outside uses it.
+A second Vercel project for this folder, its own Supabase project (then apply `db/migrations` to it and put its URL and keys in the Vercel project), its own model key, a Stripe account (test mode first), a commercial data plan, a name and a domain, and a lawyer's review of the wording before anyone outside uses it.

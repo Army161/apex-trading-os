@@ -24,3 +24,4 @@
 /.github/ @Army161
 /.env.example @Army161
 /db/migrations/ @Army161
+/apps/proof/db/migrations/ @Army161

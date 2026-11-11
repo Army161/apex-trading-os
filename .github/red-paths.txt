@@ -24,3 +24,4 @@ plugin/hooks/**
 .github/**
 .env.example
 db/migrations/**
+apps/proof/db/migrations/**
