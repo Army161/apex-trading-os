@@ -22,7 +22,8 @@
     "@apex/claims": "*",
     "@apex/data": "*",
     "@apex/store": "*",
-    "@apex/ui": "*"
+    "@apex/ui": "*",
+    "@apex/sdk": "*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

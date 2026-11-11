@@ -1,12 +1,21 @@
 {
   "name": "apex-trading-os",
   "private": true,
-  "workspaces": ["packages/*", "apps/*", "web"],
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "web"
+  ],
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck -w web",
     "test": "npm run test:packages && npm run test -w web",
     "test:packages": "tsx --test packages/*/test/*.test.ts apps/*/test/*.test.ts",
-    "apex": "tsx apps/cli/src/main.ts"
+    "apex": "tsx apps/cli/src/main.ts",
+    "openapi": "tsx packages/sdk/src/gen.ts"
   },
-  "devDependencies": { "@types/node": "^22.10.0", "tsx": "^4.19.2", "typescript": "^5.7.2" }
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
 }

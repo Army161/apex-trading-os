@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 const LIMITS: Record<string, [string, 'pct' | 'count']> = { riskPct: ['Risk per trade', 'pct'], maxOpen: ['Open positions at once', 'count'], maxPerSymbol: ['Positions per symbol', 'count'], dailyLossPct: ['Daily loss stop', 'pct'], weeklyLossPct: ['Weekly loss stop', 'pct'],
   maxDrawdownPct: ['Drawdown stop', 'pct'], maxWeightPct: ['Largest slot weight', 'pct'], maxClassPct: ['Largest share in one asset class', 'pct'], maxCorrRiskPct: ['Risk in correlated positions', 'pct'], cooldownBars: ['Bars to wait after a stop', 'count'] };
-const show = (k: string, x: number) => (LIMITS[k]?.[1] === 'count' ? String(x) : share(x, x < 0.1 ? 1 : 0));
+const show = (k: string, x: number) => (!Number.isFinite(x) ? 'none' : LIMITS[k]?.[1] === 'count' ? String(x) : share(x, x < 0.1 ? 1 : 0));
 
 export default async function Page() {
   const l = await loadLedger(); if (!l.ok) return <NoLedger state={l} />;

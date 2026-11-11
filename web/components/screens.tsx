@@ -4,6 +4,7 @@
 import { useVoice, VoiceButtons } from './voice';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import ApiKeys from './ApiKeys';
 import { STRATEGIES, confluence } from '@/lib/engine/strategies';
 import { backtest, monteCarlo, Bar } from '@/lib/engine/core';
 import { SOURCES } from '@/lib/sources';
@@ -233,6 +234,7 @@ export function Setup({ s }: { s: any }) {
       <p className="mute">Strategy signal checks run from /api/cron/strategies (set CRON_SECRET). Vercel Hobby runs it once a day; for 15m or 1h strategies point a free pinger like cron-job.org at it with the header <span className="mono">Authorization: Bearer &lt;CRON_SECRET&gt;</span>.</p>
       <p className="mute">Why there are no key forms on this page: broker, wallet, AI and Telegram keys live in Vercel or your machine's .env, never in the app's database, so a leaked dashboard login can't leak a key.</p></div>
     <Spend />
+    <ApiKeys />
     <div className="card"><h3>Safety rails built in</h3><ul>
       <li>Every bot starts in paper, dry-run or watch mode. Going live needs a second explicit switch on your machine.</li>
       <li>1% risk per trade, minimum 1.5–2R, entry/stop/target required before any order.</li>

@@ -25,3 +25,11 @@ export async function list<T>(k: string, n = 100): Promise<T[]> {
   if (!persistent) return (mem.get(k) ?? []).slice(0, n);
   const a: string[] = await redis(['LRANGE', `apex:${k}`, 0, n - 1]); return a.map(x => JSON.parse(x));
 }
+/** Count one more under `k` and return the count. The count starts again `ttlSec` after its first hit. Used for the API's rate limits. */
+export async function incr(k: string, ttlSec: number): Promise<{ n: number; resetSec: number }> {
+  if (!persistent) { const now = Date.now(), c = mem.get(`#${k}`) as { n: number; until: number } | undefined, live = c && c.until > now ? c : { n: 0, until: now + ttlSec * 1000 };
+    live.n++; mem.set(`#${k}`, live); return { n: live.n, resetSec: Math.max(1, Math.ceil((live.until - now) / 1000)) }; }
+  const n = Number(await redis(['INCR', `apex:${k}`])); if (n === 1) await redis(['EXPIRE', `apex:${k}`, ttlSec]);
+  const ttl = Number(await redis(['TTL', `apex:${k}`])); if (ttl < 0) await redis(['EXPIRE', `apex:${k}`, ttlSec]);   // a count left without an expiry would lock the key out for good
+  return { n, resetSec: ttl > 0 ? ttl : ttlSec };
+}

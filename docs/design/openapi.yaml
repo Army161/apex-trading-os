@@ -1,0 +1,3072 @@
+# Written by `npm run openapi` from packages/sdk/src/contract.ts. Do not edit by hand: change the contract and run it again.
+openapi: "3.1.0"
+info:
+  title: "Apex API"
+  version: "1.0.0"
+  description: "Read the Apex ledger and queue a claim check. No route creates, changes or cancels an order, approves anything, resumes anything or changes a limit. Every performance figure is a Metric with its sample size and basis."
+servers:
+  - url: "/api/v1"
+paths:
+  "/status":
+    get:
+      operationId: status
+      summary: "Mode, halts, counts of tries and slots, data status and the last run."
+      security:
+        - apiKey:
+            - "read:status"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/funnel":
+    get:
+      operationId: funnel
+      summary: "How many pairs are at each stage."
+      security:
+        - apiKey:
+            - "read:board"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Funnel"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/board":
+    get:
+      operationId: board
+      summary: "Every evaluated pair. Sorted by status, then checks passed, then Sharpe. Never by return."
+      security:
+        - apiKey:
+            - "read:board"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          description: "One status."
+          schema:
+            type: string
+        - name: market
+          in: query
+          required: false
+          description: "One symbol."
+          schema:
+            type: string
+        - name: tf
+          in: query
+          required: false
+          description: "One timeframe."
+          schema:
+            type: string
+        - name: q
+          in: query
+          required: false
+          description: "Text in the strategy, symbol or timeframe."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/EvaluationPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/pairs/{trialKey}":
+    get:
+      operationId: pair
+      summary: "One evaluation in full. The key may be the whole trial key or its first eight or more characters."
+      security:
+        - apiKey:
+            - "read:board"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: trialKey
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/EvaluationDetail"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "404":
+          "$ref": "#/components/responses/NotFound"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/slots":
+    get:
+      operationId: slots
+      summary: "Every slot ever locked."
+      security:
+        - apiKey:
+            - "read:slots"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SlotPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/slots/{key}":
+    get:
+      operationId: slot
+      summary: "One slot with its graduation clock, drift state and the four locks."
+      security:
+        - apiKey:
+            - "read:slots"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SlotDetail"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "404":
+          "$ref": "#/components/responses/NotFound"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/slots/{key}/trades":
+    get:
+      operationId: slotTrades
+      summary: "Forward paper trades for a slot, newest first."
+      security:
+        - apiKey:
+            - "read:slots"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TradePage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "404":
+          "$ref": "#/components/responses/NotFound"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/slots/{key}/events":
+    get:
+      operationId: slotEvents
+      summary: "Status changes for a slot, with the reason for each."
+      security:
+        - apiKey:
+            - "read:slots"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SlotEventPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "404":
+          "$ref": "#/components/responses/NotFound"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/slots/{key}/drift":
+    get:
+      operationId: slotDrift
+      summary: "Drift readings for a slot, newest first."
+      security:
+        - apiKey:
+            - "read:slots"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DriftReadingPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "404":
+          "$ref": "#/components/responses/NotFound"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/locks/{slotKey}":
+    get:
+      operationId: locks
+      summary: "The four live locks as the lock function reports them. Locks three and four never read open here."
+      security:
+        - apiKey:
+            - "read:slots"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: slotKey
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Locks"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "404":
+          "$ref": "#/components/responses/NotFound"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/book":
+    get:
+      operationId: book
+      summary: "The paper book: equity, day, week, drawdown and how much of each loss limit is used."
+      security:
+        - apiKey:
+            - "read:book"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Book"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/book/positions":
+    get:
+      operationId: positions
+      summary: "Open paper positions."
+      security:
+        - apiKey:
+            - "read:book"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/PositionPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/book/fills":
+    get:
+      operationId: fills
+      summary: "Paper fills, newest first."
+      security:
+        - apiKey:
+            - "read:book"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/FillPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/book/intents":
+    get:
+      operationId: intents
+      summary: "Orders the strategies asked for and what the risk guard said, newest first."
+      security:
+        - apiKey:
+            - "read:book"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+        - name: ok
+          in: query
+          required: false
+          description: "`true` for allowed, `false` for blocked."
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IntentPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/risk":
+    get:
+      operationId: risk
+      summary: "Limits with their ceilings, halts, exposure and drift."
+      security:
+        - apiKey:
+            - "read:book"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Risk"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/queue":
+    get:
+      operationId: queue
+      summary: "The weekly budget of tries and what was registered against it."
+      security:
+        - apiKey:
+            - "read:board"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Queue"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/data/health":
+    get:
+      operationId: dataHealth
+      summary: "One row a dataset: status, range and warnings."
+      security:
+        - apiKey:
+            - "read:data"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DataHealthPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/costs":
+    get:
+      operationId: costs
+      summary: "The cost model in force."
+      security:
+        - apiKey:
+            - "read:data"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Costs"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/reports":
+    get:
+      operationId: reports
+      summary: "Runs, newest first."
+      security:
+        - apiKey:
+            - "read:reports"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ReportRowPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/reports/{id}":
+    get:
+      operationId: report
+      summary: "One run with its report text. `format=md` returns the Markdown alone."
+      security:
+        - apiKey:
+            - "read:reports"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: format
+          in: query
+          required: false
+          description: "`md` for Markdown."
+          schema:
+            type: string
+            enum:
+              - json
+              - md
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Report"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "404":
+          "$ref": "#/components/responses/NotFound"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/ledger":
+    get:
+      operationId: ledger
+      summary: "Ledger entries, newest first."
+      security:
+        - apiKey:
+            - "read:ledger"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+        - name: kind
+          in: query
+          required: false
+          description: "One entry kind."
+          schema:
+            type: string
+        - name: slot
+          in: query
+          required: false
+          description: "One slot key."
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          description: "Only entries at or after this time."
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          description: "Only entries at or before this time."
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/LedgerRowPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/ledger/head":
+    get:
+      operationId: ledgerHead
+      summary: "The head sequence number and hash, and the last anchor."
+      security:
+        - apiKey:
+            - "read:ledger"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/LedgerHead"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/ledger/verify":
+    get:
+      operationId: ledgerVerify
+      summary: "Recompute the hash chain over a range. At most 5,000 entries a call."
+      security:
+        - apiKey:
+            - "read:ledger"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: from
+          in: query
+          required: false
+          description: "First sequence number. Default 1."
+          schema:
+            type: integer
+        - name: to
+          in: query
+          required: false
+          description: "Last sequence number. Default: 4,999 after `from`, or the head."
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/LedgerVerify"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/ledger/{seq}":
+    get:
+      operationId: ledgerEntry
+      summary: "One entry with its payload."
+      security:
+        - apiKey:
+            - "read:ledger"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: seq
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/LedgerEntry"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "404":
+          "$ref": "#/components/responses/NotFound"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/claim-checks":
+    get:
+      operationId: claimChecks
+      summary: "Claim checks, newest first."
+      security:
+        - apiKey:
+            - "queue:claims"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: "Rows a page."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: cursor
+          in: query
+          required: false
+          description: "The `next` value of the page before."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClaimCheckRowPage"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+    post:
+      operationId: claimCheckStart
+      summary: "Run a claim check. It uses tries from the weekly budget. Refused while anything is halted."
+      security:
+        - apiKey:
+            - "queue:claims"
+      x-apex-rate: "10 every 3600 seconds for each key"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ClaimCheckBody"
+      responses:
+        "202":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClaimCheckAccepted"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "409":
+          "$ref": "#/components/responses/Conflict"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/claim-checks/{id}":
+    get:
+      operationId: claimCheck
+      summary: "One claim check as the ledger holds it. The source text is never stored, so it is not here."
+      security:
+        - apiKey:
+            - "queue:claims"
+      x-apex-rate: "120 every 60 seconds for each key"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClaimCheck"
+        "304":
+          "$ref": "#/components/responses/NotModified"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "404":
+          "$ref": "#/components/responses/NotFound"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+  "/halt":
+    post:
+      operationId: halt
+      summary: "Pull the andon cord. Safe to repeat. There is no route that releases it."
+      security:
+        - apiKey:
+            - halt
+      x-apex-rate: "5 every 3600 seconds for each key"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/HaltBody"
+      responses:
+        "200":
+          description: OK
+          headers:
+            x-apex-mode:
+              "$ref": "#/components/headers/x-apex-mode"
+            x-apex-trials:
+              "$ref": "#/components/headers/x-apex-trials"
+            ETag:
+              "$ref": "#/components/headers/ETag"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HaltResult"
+        "401":
+          "$ref": "#/components/responses/Unauthorized"
+        "403":
+          "$ref": "#/components/responses/ForbiddenScope"
+        "409":
+          "$ref": "#/components/responses/Conflict"
+        "422":
+          "$ref": "#/components/responses/Invalid"
+        "429":
+          "$ref": "#/components/responses/RateLimited"
+        "503":
+          "$ref": "#/components/responses/Unavailable"
+components:
+  securitySchemes:
+    apiKey:
+      type: http
+      scheme: bearer
+      description: "A key made in the dashboard under You, Setup: `apx_<id>_<secret>`. Scopes: read:status, read:board, read:slots, read:book, read:ledger, read:reports, read:data, read:agents, queue:claims, queue:research, halt. There is no scope for approve, resume, limits or live."
+  headers:
+    x-apex-mode:
+      description: "`paper`, or `live` only when the ledger holds a slot in a live stage."
+      schema:
+        type: string
+    x-apex-trials:
+      description: "Tries counted so far. Absent when no ledger is connected."
+      schema:
+        type: integer
+    ETag:
+      description: "Send it back in `If-None-Match` to get `304`."
+      schema:
+        type: string
+  responses:
+    NotModified:
+      description: "Not changed since the `ETag` you sent."
+    Unauthorized:
+      description: "No key, an unknown key or a revoked key."
+      content:
+        "application/problem+json":
+          schema:
+            "$ref": "#/components/schemas/Problem"
+    ForbiddenScope:
+      description: "The key does not hold the scope this route needs."
+      content:
+        "application/problem+json":
+          schema:
+            "$ref": "#/components/schemas/Problem"
+    NotFound:
+      description: "Nothing with that id."
+      content:
+        "application/problem+json":
+          schema:
+            "$ref": "#/components/schemas/Problem"
+    Conflict:
+      description: "Halted, out of budget or a run is in progress."
+      content:
+        "application/problem+json":
+          schema:
+            "$ref": "#/components/schemas/Problem"
+    Invalid:
+      description: "The body or a query value is not valid."
+      content:
+        "application/problem+json":
+          schema:
+            "$ref": "#/components/schemas/Problem"
+    RateLimited:
+      description: "Too many calls. `Retry-After` says when to try again."
+      content:
+        "application/problem+json":
+          schema:
+            "$ref": "#/components/schemas/Problem"
+    Unavailable:
+      description: "No ledger is connected, or it could not be read."
+      content:
+        "application/problem+json":
+          schema:
+            "$ref": "#/components/schemas/Problem"
+  schemas:
+    Metric:
+      type: object
+      properties:
+        value:
+          type: number
+        unit:
+          type: string
+          enum:
+            - pct
+            - usd
+            - ratio
+            - count
+            - prob
+        "n":
+          type: integer
+        basis:
+          type: string
+          enum:
+            - in_sample
+            - forward
+            - book
+        net:
+          type: boolean
+        receipt:
+          type: integer
+      required:
+        - value
+        - unit
+        - "n"
+        - basis
+        - net
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        code:
+          type: string
+          enum:
+            - unauthorized
+            - forbidden_scope
+            - not_found
+            - validation
+            - rate_limited
+            - halted
+            - budget
+            - busy
+            - unavailable
+      required:
+        - type
+        - title
+        - status
+        - code
+    Receipt:
+      type: object
+      properties:
+        seq:
+          type: integer
+        kind:
+          type: string
+        ts:
+          type: string
+          format: date-time
+        actor:
+          type: string
+        payloadHash:
+          type: string
+        prevHash:
+          type: string
+        hash:
+          type: string
+      required:
+        - seq
+        - kind
+        - ts
+        - actor
+        - payloadHash
+        - prevHash
+        - hash
+    Check:
+      type: object
+      properties:
+        "n":
+          type: integer
+        name:
+          type: string
+        pass:
+          type: boolean
+        why:
+          type: string
+        value:
+          anyOf:
+            - type: number
+            - type: "null"
+      required:
+        - "n"
+        - name
+        - pass
+        - why
+        - value
+    Evaluation:
+      type: object
+      properties:
+        trialKey:
+          type: string
+        strategy:
+          type: string
+        symbol:
+          type: string
+        tf:
+          type: string
+        panel:
+          type: string
+        status:
+          type: string
+        slotKey:
+          anyOf:
+            - type: string
+            - type: "null"
+        checksPassed:
+          type: integer
+        checks:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Check"
+        why:
+          type: string
+        source:
+          type: string
+        validated:
+          type: boolean
+        error:
+          anyOf:
+            - type: string
+            - type: "null"
+        nTrials:
+          anyOf:
+            - type: integer
+            - type: "null"
+        metrics:
+          type: object
+          properties:
+            ret:
+              "$ref": "#/components/schemas/Metric"
+            sharpe:
+              "$ref": "#/components/schemas/Metric"
+            maxDrawdown:
+              "$ref": "#/components/schemas/Metric"
+            dsr:
+              anyOf:
+                - "$ref": "#/components/schemas/Metric"
+                - type: "null"
+          required:
+            - ret
+            - sharpe
+            - maxDrawdown
+            - dsr
+        receipt:
+          type: integer
+      required:
+        - trialKey
+        - strategy
+        - symbol
+        - tf
+        - panel
+        - status
+        - slotKey
+        - checksPassed
+        - checks
+        - why
+        - source
+        - validated
+        - error
+        - nTrials
+        - metrics
+        - receipt
+    ValidatorRun:
+      type: object
+      properties:
+        seq:
+          type: integer
+        purpose:
+          type: string
+        level:
+          type: string
+        agrees:
+          type: boolean
+        exact:
+          type: boolean
+        source:
+          type: string
+        diffs:
+          type: array
+          items:
+            type: string
+      required:
+        - seq
+        - purpose
+        - level
+        - agrees
+        - exact
+        - source
+        - diffs
+    EvaluationDetail:
+      allOf:
+        - "$ref": "#/components/schemas/Evaluation"
+        - type: object
+          properties:
+            hypothesis:
+              type: string
+            passBar:
+              type: string
+            preregSeq:
+              anyOf:
+                - type: integer
+                - type: "null"
+            validator:
+              type: array
+              items:
+                "$ref": "#/components/schemas/ValidatorRun"
+            receiptEntry:
+              anyOf:
+                - "$ref": "#/components/schemas/Receipt"
+                - type: "null"
+            benchmark:
+              anyOf:
+                - type: object
+                  properties:
+                    bars:
+                      type: integer
+                    ret:
+                      "$ref": "#/components/schemas/Metric"
+                    sharpe:
+                      "$ref": "#/components/schemas/Metric"
+                    maxDrawdown:
+                      "$ref": "#/components/schemas/Metric"
+                  required:
+                    - bars
+                    - ret
+                    - sharpe
+                    - maxDrawdown
+                - type: "null"
+            tStat:
+              anyOf:
+                - type: number
+                - type: "null"
+            inputs:
+              anyOf:
+                - type: object
+                  properties:
+                    strategyFingerprint:
+                      type: string
+                    datasets:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          version:
+                            type: string
+                        required:
+                          - id
+                          - version
+                    gateVersion:
+                      type: string
+                    costModelVersion:
+                      type: string
+                    engineFingerprint:
+                      type: string
+                    seed:
+                      anyOf:
+                        - type: number
+                        - type: "null"
+                  required:
+                    - strategyFingerprint
+                    - datasets
+                    - gateVersion
+                    - costModelVersion
+                    - engineFingerprint
+                    - seed
+                - type: "null"
+            data:
+              anyOf:
+                - type: object
+                  properties:
+                    first:
+                      type: string
+                      format: date-time
+                    last:
+                      type: string
+                      format: date-time
+                    rows:
+                      type: integer
+                  required:
+                    - first
+                    - last
+                    - rows
+                - type: "null"
+          required:
+            - hypothesis
+            - passBar
+            - preregSeq
+            - validator
+            - receiptEntry
+            - benchmark
+            - tStat
+            - inputs
+            - data
+    Slot:
+      type: object
+      properties:
+        slotKey:
+          type: string
+        trialKey:
+          type: string
+        strategy:
+          type: string
+        symbol:
+          type: string
+        tf:
+          type: string
+        status:
+          type: string
+        role:
+          type: string
+        shadowOf:
+          anyOf:
+            - type: string
+            - type: "null"
+        weight:
+          type: number
+        riskFraction:
+          type: number
+        lockedAt:
+          type: string
+          format: date-time
+        lockSeq:
+          type: integer
+        forwardTrades:
+          type: integer
+        drift:
+          type: object
+          properties:
+            cusum:
+              type: number
+            pauses:
+              type: integer
+          required:
+            - cusum
+            - pauses
+        graduation:
+          type: object
+          properties:
+            state:
+              anyOf:
+                - type: string
+                - type: "null"
+            month:
+              anyOf:
+                - type: string
+                - type: "null"
+          required:
+            - state
+            - month
+      required:
+        - slotKey
+        - trialKey
+        - strategy
+        - symbol
+        - tf
+        - status
+        - role
+        - shadowOf
+        - weight
+        - riskFraction
+        - lockedAt
+        - lockSeq
+        - forwardTrades
+        - drift
+        - graduation
+    Lock:
+      type: object
+      properties:
+        id:
+          type: string
+          enum:
+            - evidence
+            - validated
+            - approved
+            - machine
+        open:
+          type: boolean
+        why:
+          type: string
+      required:
+        - id
+        - open
+        - why
+    Locks:
+      type: object
+      properties:
+        slotKey:
+          type: string
+        allowed:
+          type: boolean
+        locks:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Lock"
+      required:
+        - slotKey
+        - allowed
+        - locks
+    Position:
+      type: object
+      properties:
+        slotKey:
+          type: string
+        symbol:
+          type: string
+        side:
+          type: string
+          enum:
+            - long
+            - short
+        qty:
+          type: number
+        entry:
+          type: number
+        stop:
+          type: number
+        riskUsd:
+          type: number
+        riskPct:
+          type: number
+        since:
+          type: string
+          format: date-time
+      required:
+        - slotKey
+        - symbol
+        - side
+        - qty
+        - entry
+        - stop
+        - riskUsd
+        - riskPct
+        - since
+    SlotDetail:
+      allOf:
+        - "$ref": "#/components/schemas/Slot"
+        - type: object
+          properties:
+            fingerprint:
+              type: string
+            lock:
+              anyOf:
+                - "$ref": "#/components/schemas/Receipt"
+                - type: "null"
+            locks:
+              type: array
+              items:
+                "$ref": "#/components/schemas/Lock"
+            clock:
+              type: object
+              properties:
+                months:
+                  type: number
+                trades:
+                  type: integer
+                dsr:
+                  anyOf:
+                    - "$ref": "#/components/schemas/Metric"
+                    - type: "null"
+                slotsEverLocked:
+                  type: integer
+                state:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                fails:
+                  type: array
+                  items:
+                    type: string
+                note:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                earliestMonth:
+                  anyOf:
+                    - type: number
+                    - type: "null"
+                needMonths:
+                  type: number
+                needTrades:
+                  type: number
+                needDsr:
+                  type: number
+                checkedMonth:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+              required:
+                - months
+                - trades
+                - dsr
+                - slotsEverLocked
+                - state
+                - fails
+                - note
+                - earliestMonth
+                - needMonths
+                - needTrades
+                - needDsr
+                - checkedMonth
+            forward:
+              type: object
+              properties:
+                trades:
+                  type: integer
+                wins:
+                  type: integer
+                pnl:
+                  "$ref": "#/components/schemas/Metric"
+                avgR:
+                  anyOf:
+                    - "$ref": "#/components/schemas/Metric"
+                    - type: "null"
+              required:
+                - trades
+                - wins
+                - pnl
+                - avgR
+            position:
+              anyOf:
+                - "$ref": "#/components/schemas/Position"
+                - type: "null"
+            inSample:
+              anyOf:
+                - "$ref": "#/components/schemas/Evaluation"
+                - type: "null"
+            shadows:
+              type: array
+              items:
+                type: string
+          required:
+            - fingerprint
+            - lock
+            - locks
+            - clock
+            - forward
+            - position
+            - inSample
+            - shadows
+    Trade:
+      type: object
+      properties:
+        slotKey:
+          type: string
+        symbol:
+          type: string
+        side:
+          type: string
+          enum:
+            - long
+            - short
+        entryAt:
+          type: string
+          format: date-time
+        exitAt:
+          type: string
+          format: date-time
+        entry:
+          type: number
+        exit:
+          type: number
+        qty:
+          type: number
+        pnl:
+          type: number
+        r:
+          type: number
+        reason:
+          type: string
+      required:
+        - slotKey
+        - symbol
+        - side
+        - entryAt
+        - exitAt
+        - entry
+        - exit
+        - qty
+        - pnl
+        - r
+        - reason
+    SlotEvent:
+      type: object
+      properties:
+        seq:
+          type: integer
+        ts:
+          type: string
+          format: date-time
+        from:
+          type: string
+        to:
+          type: string
+        why:
+          type: string
+      required:
+        - seq
+        - ts
+        - from
+        - to
+        - why
+    DriftReading:
+      type: object
+      properties:
+        seq:
+          type: integer
+        ts:
+          type: string
+          format: date-time
+        "n":
+          type: integer
+        s:
+          type: number
+        alarms:
+          type: array
+          items:
+            type: string
+        threshold:
+          type: number
+      required:
+        - seq
+        - ts
+        - "n"
+        - s
+        - alarms
+        - threshold
+    Book:
+      type: object
+      properties:
+        capital:
+          type: number
+        equity:
+          "$ref": "#/components/schemas/Metric"
+        change:
+          "$ref": "#/components/schemas/Metric"
+        drawdown:
+          "$ref": "#/components/schemas/Metric"
+        day:
+          "$ref": "#/components/schemas/Metric"
+        week:
+          "$ref": "#/components/schemas/Metric"
+        peak:
+          type: number
+        cash:
+          type: number
+        openPositions:
+          type: integer
+        closedTrades:
+          type: integer
+        limits:
+          type: object
+          properties:
+            dailyLossPct:
+              type: number
+            weeklyLossPct:
+              type: number
+            maxDrawdownPct:
+              type: number
+          required:
+            - dailyLossPct
+            - weeklyLossPct
+            - maxDrawdownPct
+        lossUsed:
+          type: object
+          properties:
+            day:
+              type: number
+            week:
+              type: number
+            fromPeak:
+              type: number
+          required:
+            - day
+            - week
+            - fromPeak
+        drawdownPaused:
+          type: boolean
+        since:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+        lastMark:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+        costs:
+          anyOf:
+            - type: object
+              properties:
+                version:
+                  type: string
+                measured:
+                  type: integer
+                assumed:
+                  type: integer
+              required:
+                - version
+                - measured
+                - assumed
+            - type: "null"
+      required:
+        - capital
+        - equity
+        - change
+        - drawdown
+        - day
+        - week
+        - peak
+        - cash
+        - openPositions
+        - closedTrades
+        - limits
+        - lossUsed
+        - drawdownPaused
+        - since
+        - lastMark
+        - costs
+    Fill:
+      type: object
+      properties:
+        seq:
+          type: integer
+        ts:
+          type: string
+          format: date-time
+        intent:
+          type: string
+        slotKey:
+          type: string
+        kind:
+          type: string
+        at:
+          type: string
+          format: date-time
+        price:
+          type: number
+        qty:
+          type: number
+      required:
+        - seq
+        - ts
+        - intent
+        - slotKey
+        - kind
+        - at
+        - price
+        - qty
+    Intent:
+      type: object
+      properties:
+        seq:
+          type: integer
+        ts:
+          type: string
+          format: date-time
+        ok:
+          type: boolean
+        id:
+          type: string
+        slotKey:
+          type: string
+        symbol:
+          type: string
+        side:
+          type: string
+          enum:
+            - long
+            - short
+        barAt:
+          type: string
+          format: date-time
+        qty:
+          anyOf:
+            - type: number
+            - type: "null"
+        riskUsd:
+          anyOf:
+            - type: number
+            - type: "null"
+        rules:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              detail:
+                type: string
+            required:
+              - id
+              - detail
+        note:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - seq
+        - ts
+        - ok
+        - id
+        - slotKey
+        - symbol
+        - side
+        - barAt
+        - qty
+        - riskUsd
+        - rules
+        - note
+    Risk:
+      type: object
+      properties:
+        limits:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              inForce:
+                type: number
+              requested:
+                type: number
+              default:
+                type: number
+              ceiling:
+                anyOf:
+                  - type: number
+                  - type: "null"
+              pending:
+                anyOf:
+                  - type: object
+                    properties:
+                      value:
+                        type: number
+                      since:
+                        type: string
+                        format: date-time
+                      effective:
+                        type: string
+                        format: date-time
+                    required:
+                      - value
+                      - since
+                      - effective
+                  - type: "null"
+            required:
+              - key
+              - inForce
+              - requested
+              - default
+              - ceiling
+              - pending
+        halts:
+          type: array
+          items:
+            type: object
+            properties:
+              level:
+                type: string
+              by:
+                type: string
+              reason:
+                type: string
+              ts:
+                type: string
+                format: date-time
+            required:
+              - level
+              - by
+              - reason
+              - ts
+        drawdownPaused:
+          type: boolean
+        openRiskPct:
+          type: number
+        exposure:
+          type: array
+          items:
+            type: object
+            properties:
+              assetClass:
+                type: string
+              riskUsd:
+                type: number
+              riskPct:
+                type: number
+              positions:
+                type: integer
+            required:
+              - assetClass
+              - riskUsd
+              - riskPct
+              - positions
+        drift:
+          type: array
+          items:
+            type: object
+            properties:
+              slotKey:
+                type: string
+              status:
+                type: string
+              cusum:
+                type: number
+              threshold:
+                type: number
+              pauses:
+                type: integer
+            required:
+              - slotKey
+              - status
+              - cusum
+              - threshold
+              - pauses
+      required:
+        - limits
+        - halts
+        - drawdownPaused
+        - openRiskPct
+        - exposure
+        - drift
+    Queue:
+      type: object
+      properties:
+        used:
+          type: integer
+        budget:
+          type: integer
+        waiting:
+          type: integer
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              source:
+                type: string
+              label:
+                type: string
+              pairs:
+                type: integer
+              done:
+                type: integer
+              passed:
+                type: integer
+              nearMiss:
+                type: integer
+              first:
+                type: string
+                format: date-time
+            required:
+              - source
+              - label
+              - pairs
+              - done
+              - passed
+              - nearMiss
+              - first
+      required:
+        - used
+        - budget
+        - waiting
+        - items
+    DataHealth:
+      type: object
+      properties:
+        dataset:
+          type: string
+        status:
+          type: string
+        tradable:
+          type: boolean
+        rows:
+          type: integer
+        first:
+          type: string
+          format: date-time
+        last:
+          type: string
+          format: date-time
+        source:
+          type: string
+        second:
+          anyOf:
+            - type: string
+            - type: "null"
+        version:
+          type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        receipt:
+          anyOf:
+            - type: integer
+            - type: "null"
+      required:
+        - dataset
+        - status
+        - tradable
+        - rows
+        - first
+        - last
+        - source
+        - second
+        - version
+        - warnings
+        - receipt
+    Costs:
+      anyOf:
+        - type: object
+          properties:
+            version:
+              type: string
+            receipt:
+              type: integer
+            rows:
+              type: array
+              items:
+                type: object
+          required:
+            - version
+            - receipt
+            - rows
+        - type: "null"
+    ReportRow:
+      type: object
+      properties:
+        id:
+          type: string
+        receipt:
+          type: integer
+        ts:
+          type: string
+          format: date-time
+        mode:
+          type: string
+        evaluated:
+          type: integer
+        newTrials:
+          type: integer
+        intents:
+          type: integer
+        blocked:
+          type: integer
+        fills:
+          type: integer
+        errors:
+          type: integer
+        waitingBudget:
+          type: integer
+        problems:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - receipt
+        - ts
+        - mode
+        - evaluated
+        - newTrials
+        - intents
+        - blocked
+        - fills
+        - errors
+        - waitingBudget
+        - problems
+    Report:
+      allOf:
+        - "$ref": "#/components/schemas/ReportRow"
+        - type: object
+          properties:
+            markdown:
+              anyOf:
+                - type: string
+                - type: "null"
+          required:
+            - markdown
+    LedgerRow:
+      allOf:
+        - "$ref": "#/components/schemas/Receipt"
+        - type: object
+          properties:
+            summary:
+              type: string
+            slotKey:
+              anyOf:
+                - type: string
+                - type: "null"
+          required:
+            - summary
+            - slotKey
+    LedgerEntry:
+      allOf:
+        - "$ref": "#/components/schemas/Receipt"
+        - type: object
+          properties:
+            summary:
+              type: string
+            payload: {}
+            prev:
+              anyOf:
+                - type: integer
+                - type: "null"
+            next:
+              anyOf:
+                - type: integer
+                - type: "null"
+          required:
+            - summary
+            - payload
+            - prev
+            - next
+    LedgerHead:
+      type: object
+      properties:
+        seq:
+          type: integer
+        hash:
+          anyOf:
+            - type: string
+            - type: "null"
+        anchor:
+          anyOf:
+            - type: object
+              properties:
+                seq:
+                  type: integer
+                hash:
+                  type: string
+                at:
+                  type: string
+                  format: date-time
+              required:
+                - seq
+                - hash
+                - at
+            - type: "null"
+      required:
+        - seq
+        - hash
+        - anchor
+    LedgerVerify:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        from:
+          type: integer
+        to:
+          type: integer
+        checked:
+          type: integer
+        badSeq:
+          anyOf:
+            - type: integer
+            - type: "null"
+        why:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - ok
+        - from
+        - to
+        - checked
+        - badSeq
+        - why
+    ClaimCheckRow:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - done
+        verdict:
+          anyOf:
+            - type: string
+            - type: "null"
+        ts:
+          type: string
+          format: date-time
+        sourceKind:
+          type: string
+        chars:
+          type: integer
+        readings:
+          type: integer
+        untested:
+          type: integer
+        flags:
+          type: array
+          items:
+            type: string
+        contentHash:
+          type: string
+        receipt:
+          type: integer
+      required:
+        - id
+        - status
+        - verdict
+        - ts
+        - sourceKind
+        - chars
+        - readings
+        - untested
+        - flags
+        - contentHash
+        - receipt
+    ClaimCheck:
+      allOf:
+        - "$ref": "#/components/schemas/ClaimCheckRow"
+        - type: object
+          properties:
+            receiptEntry:
+              "$ref": "#/components/schemas/Receipt"
+            trialsUsed:
+              type: integer
+            interpretations:
+              type: array
+              items:
+                type: object
+                properties:
+                  ruleSet:
+                    type: integer
+                  strategy:
+                    type: string
+                  panel:
+                    type: string
+                  proxy:
+                    type: boolean
+                  status:
+                    type: string
+                  dsrInCheck:
+                    anyOf:
+                      - "$ref": "#/components/schemas/Metric"
+                      - type: "null"
+                  hypothesis:
+                    type: string
+                  rules: {}
+                  evaluation:
+                    anyOf:
+                      - "$ref": "#/components/schemas/Evaluation"
+                      - type: "null"
+                required:
+                  - ruleSet
+                  - strategy
+                  - panel
+                  - proxy
+                  - status
+                  - dsrInCheck
+                  - hypothesis
+                  - rules
+                  - evaluation
+          required:
+            - receiptEntry
+            - trialsUsed
+            - interpretations
+    ClaimCheckAccepted:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - done
+        verdict:
+          anyOf:
+            - type: string
+            - type: "null"
+        headline:
+          type: string
+        trialsUsed:
+          type: integer
+        receipt:
+          anyOf:
+            - type: integer
+            - type: "null"
+        repeated:
+          type: boolean
+      required:
+        - id
+        - status
+        - verdict
+        - headline
+        - trialsUsed
+        - receipt
+        - repeated
+    Funnel:
+      type: object
+      properties:
+        tried:
+          type: integer
+        waiting:
+          type: integer
+        passed:
+          type: integer
+        validated:
+          type: integer
+        paper:
+          type: integer
+        eligible:
+          type: integer
+        live:
+          type: integer
+        rejected:
+          type: integer
+        nearMiss:
+          type: integer
+        needsData:
+          type: integer
+      required:
+        - tried
+        - waiting
+        - passed
+        - validated
+        - paper
+        - eligible
+        - live
+        - rejected
+        - nearMiss
+        - needsData
+    Status:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+            - paper
+            - live
+        halted:
+          type: boolean
+        halts:
+          type: array
+          items:
+            type: object
+            properties:
+              level:
+                type: string
+              by:
+                type: string
+              reason:
+                type: string
+              ts:
+                anyOf:
+                  - type: string
+                    format: date-time
+                  - type: "null"
+              from:
+                type: string
+                enum:
+                  - ledger
+                  - dashboard
+            required:
+              - level
+              - by
+              - reason
+              - ts
+              - from
+        ledger:
+          type: string
+          enum:
+            - postgres
+            - file
+            - none
+            - error
+        entries:
+          type: integer
+        trials:
+          anyOf:
+            - type: integer
+            - type: "null"
+        slots:
+          anyOf:
+            - type: integer
+            - type: "null"
+        data:
+          type: string
+          enum:
+            - ok
+            - stale
+            - blocked
+            - unknown
+        dataBlocked:
+          type: array
+          items:
+            type: string
+        dataStale:
+          type: array
+          items:
+            type: string
+        lastRun:
+          anyOf:
+            - type: object
+              properties:
+                id:
+                  type: string
+                mode:
+                  type: string
+                ts:
+                  type: string
+                  format: date-time
+              required:
+                - id
+                - mode
+                - ts
+            - type: "null"
+        aiEnabled:
+          type: boolean
+        at:
+          type: string
+          format: date-time
+      required:
+        - mode
+        - halted
+        - halts
+        - ledger
+        - entries
+        - trials
+        - slots
+        - data
+        - dataBlocked
+        - dataStale
+        - lastRun
+        - aiEnabled
+        - at
+    HaltResult:
+      type: object
+      properties:
+        halted:
+          type: boolean
+          enum:
+            - true
+        already:
+          type: boolean
+        ledger:
+          type: string
+          enum:
+            - recorded
+            - already
+            - no_ledger
+            - failed
+      required:
+        - halted
+        - already
+        - ledger
+    ClaimCheckBody:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+            - transcript
+            - article
+            - post
+            - pine
+            - rules
+        text:
+          type: string
+        extraction:
+          type: object
+        idempotencyKey:
+          type: string
+          maxLength: 100
+      required:
+        - text
+    HaltBody:
+      type: object
+      properties:
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 300
+      required:
+        - reason
+    EvaluationPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Evaluation"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    SlotPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Slot"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    TradePage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Trade"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    SlotEventPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/SlotEvent"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    DriftReadingPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/DriftReading"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    PositionPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Position"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    FillPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Fill"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    IntentPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Intent"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    DataHealthPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/DataHealth"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    ReportRowPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ReportRow"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    LedgerRowPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LedgerRow"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+    ClaimCheckRowPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ClaimCheckRow"
+        next:
+          anyOf:
+            - type: string
+            - type: "null"
+      required:
+        - items
+        - next
+x-apex-problem-codes:
+  unauthorized: 401
+  forbidden_scope: 403
+  not_found: 404
+  validation: 422
+  rate_limited: 429
+  halted: 409
+  budget: 409
+  busy: 409
+  unavailable: 503

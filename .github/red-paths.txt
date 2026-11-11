@@ -11,6 +11,8 @@ web/lib/andon.ts
 web/app/api/killswitch/**
 web/app/api/resume/**
 web/app/api/live/**
+web/app/api/admin/**
+web/lib/api/keys.ts
 apps/executor/**
 bots/**/broker*.py
 bots/**/executor*
