@@ -9,6 +9,7 @@ web/lib/policy.ts
 web/lib/auth.ts
 web/lib/andon.ts
 web/app/api/killswitch/**
+web/app/api/resume/**
 web/app/api/live/**
 apps/executor/**
 bots/**/broker*.py

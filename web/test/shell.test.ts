@@ -24,7 +24,7 @@ test('routes: a path maps to its section and its screen', () => {
   assert.equal(sectionOf('/').id, 'today'); assert.equal(sectionOf('/research/lab').id, 'research'); assert.equal(sectionOf('/you/setup/').id, 'you');
   assert.equal(sectionOf('/researchers').id, 'today', 'a prefix that is not a path segment does not match');
   assert.equal(screenOf('/research')?.label, 'Strategies'); assert.equal(screenOf('/research/lab')?.label, 'Lab'); assert.equal(screenOf('/you/setup')?.label, 'Setup');
-  assert.equal(screenOf('/autopilot/slots/abc')?.href, '/autopilot', 'a deeper path falls back to the nearest screen above it');
+  assert.equal(screenOf('/autopilot/slots/abc')?.href, '/autopilot/slots', 'a deeper path falls back to the nearest screen above it'); assert.equal(screenOf('/autopilot/pairs/abc')?.href, '/autopilot');
 });
 
 test('status: no ledger means the count of tries is unknown, not zero', () => {
@@ -85,7 +85,7 @@ test('funnel: tried, passed, in paper, eligible and live are counted from the le
   const lock = (seq: number, slotKey: string, role = 'primary') => E(seq, 'slot_locked', { slotKey, trialKey: slotKey, strategy: 'x', dataset: 'd', symbol: 'SPY', tf: '1h', assetClass: 'equity', lockedAt: 1, inputHash: 'h', gateVersion: 'g', role, baseline: {} });
   const f = funnel([E(1, 'prereg', { trialKey: 'w', gateVersion: 'g' }), tr(2, 'a', 'rejected', [true, false]), tr(3, 'b', 'watch', [true, true, false]), tr(4, 'c', 'needs_data', [false]),
     tr(5, 'p', 'passed_pending_validation', [true, true]), lock(6, 'p'), lock(7, 'shadow', 'shadow'), lock(8, 'e'), E(9, 'slot_status', { slotKey: 'e', from: 'paper', to: 'live_eligible' })], 10000);
-  assert.deepEqual(f, { tried: 4, waiting: 0, passed: 1, paper: 1, eligible: 1, live: 0, rejected: 1, nearMiss: 1, needsData: 1 });
+  assert.deepEqual(f, { tried: 4, waiting: 1, passed: 1, validated: 0, paper: 1, eligible: 1, live: 0, rejected: 1, nearMiss: 1, needsData: 1 });
 });
 
 test('shell: Halt and the mode badge are in the header markup, and the shell offers no resume, approve or go-live control', () => {

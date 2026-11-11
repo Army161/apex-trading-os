@@ -9,6 +9,7 @@ import { Banner, utc } from '@apex/ui';
 import { ALL_SCREENS, BOTTOM, SECTIONS, screenOf, sectionOf } from '@/lib/nav';
 import { DATA_MARK, DATA_WORDS, triesText, type ShellStatus } from '@/lib/status';
 import { Ai } from '../screens';
+import LocalTime from '../LocalTime';
 
 type Theme = 'system' | 'light' | 'dark';
 const THEMES: Theme[] = ['system', 'light', 'dark'];
@@ -16,13 +17,6 @@ const readTheme = (): Theme => { try { const t = localStorage.getItem('apex-them
 const applyTheme = (t: Theme) => { const el = document.documentElement; if (t === 'system') delete el.dataset.theme; else el.dataset.theme = t; try { localStorage.setItem('apex-theme', t); } catch { /* private window */ } };
 /** Runs before the page paints, so a saved theme does not flash the other one first. */
 export const THEME_SCRIPT = `try{var t=localStorage.getItem('apex-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}`;
-
-/** A time in the reader's own zone, with UTC on hover. The server renders UTC; the browser swaps it after it mounts. */
-function LocalTime({ t }: { t: number }) {
-  const [local, setLocal] = useState<string | null>(null);
-  useEffect(() => setLocal(new Date(t).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })), [t]);
-  return <time dateTime={new Date(t).toISOString()} title={utc(t)}>{local ?? utc(t)}</time>;
-}
 
 export default function Shell({ initial, children }: { initial: ShellStatus; children: ReactNode }) {
   const path = usePathname() || '/', router = useRouter();

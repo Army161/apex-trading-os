@@ -4,7 +4,14 @@
       { "href": "/", "label": "Today" }
     ] },
     { "id": "autopilot", "label": "Autopilot", "short": "Auto", "icon": "▤", "href": "/autopilot", "screens": [
-      { "href": "/autopilot", "label": "Funnel and board" }
+      { "href": "/autopilot", "label": "Funnel and board" },
+      { "href": "/autopilot/slots", "label": "Slots" },
+      { "href": "/autopilot/book", "label": "Paper book" },
+      { "href": "/autopilot/risk", "label": "Risk" },
+      { "href": "/autopilot/queue", "label": "Research queue" },
+      { "href": "/autopilot/data", "label": "Data health" },
+      { "href": "/autopilot/reports", "label": "Reports" },
+      { "href": "/autopilot/ledger", "label": "Ledger" }
     ] },
     { "id": "claims", "label": "Claim check", "short": "Claim", "icon": "⚖", "href": "/claims", "screens": [
       { "href": "/claims", "label": "Claim check" }

@@ -13,5 +13,7 @@ These must always stay true. `python3 tools/drift_check.py` checks them.
 - A strategy only counts as having an edge if it passes `engine/validate.ts`: 50 or more trades, beats 95% of random traders, makes money on locked test data, and survives fees.
 - Going live with a strategy needs the second-opinion review (`review.ts`) and Jeremy's own switch.
 - Every screen shows the mode badge and Halt. The shell can send one thing, a halt. It has no resume, approve or go-live control.
+- A ledger halt is released only from the Risk screen, through `app/api/resume/`: signed in, same origin, a reason, and the phrase typed out. That route is a red path and can release a paper halt and nothing else.
+- An Autopilot screen draws only what `queries.ts` returns from the ledger. The board is never sorted by return. Report text is parsed into data by `markdown.ts` and never set as HTML.
 - The count of tries is read from the ledger. With no ledger connected it is shown as unknown, never as zero. A ledger that cannot be read is shown as halted.
 - A screen is added to `routes.json`, and `npm run check:ui` opens every screen in that list.
