@@ -43,14 +43,14 @@ jobs:
     name: ui (every screen, both themes, phone and desktop)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      APEX_STATE_DIR: '${{ runner.temp }}/apex-state'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - run: npx -w web playwright install --with-deps chromium
+      # The runner context cannot be read in a job-level env block, so the state folder is set here for the steps below.
+      - run: echo "APEX_STATE_DIR=$RUNNER_TEMP/apex-state" >> "$GITHUB_ENV"
       - name: a paper ledger for the screens to read
         run: npm run -s apex -- run --full > /dev/null
       - run: npm run build -w web
