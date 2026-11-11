@@ -7,13 +7,13 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { STRATEGIES } from '@apex/engine/strategies';
-import { GATE_V1, Ledger, STAGES, buildView, gateVersion, loadConfig, passBar, verifyChain } from '@apex/kernel';
+import { GATE_V1, STAGES, buildView, gateVersion, loadConfig, passBar, verifyChain } from '@apex/kernel';
 import { PRIOR_COSTS } from '@apex/autopilot';
 import { EXTRACT_FAILED, extractionRequest, intake, validateExtraction, type Extracted } from '@apex/claims';
 import type { ClaimCheckBody, DataHealth, DriftReading, Evaluation, Fill, HaltResult, Intent, LedgerRow, LedgerVerify, Locks, Position, ReportRow, Slot, SlotEvent, Trade } from '@apex/sdk';
 import { claimCheck, execute, makeSignoff, terminalConfirm, fingerprints, loadData, makeCtx, openStore, pullData, sendTelegram, type Ctx } from './runtime';
 import { SourceError, all, localSource, remoteSource, type Source } from './source';
-import * as R from './render';
+import * as R from '@apex/sdk/text';
 import { completion } from './completion';
 import { runTui } from './tui';
 
@@ -42,6 +42,7 @@ export const COMMANDS: Record<string, Command> = {
   live: { about: 'The four locks, read-only', subs: ['status'] },
   doctor: { about: 'Config, ledger chain, data, fingerprints', local: true },
   tui: { about: 'Full-screen view', flags: ['once'] },
+  mcp: { about: 'Serve the MCP tools over stdio, for Claude Code and Claude Desktop', writes: 'a halt entry or a claim check, only when a client calls those two tools' },
   completion: { about: 'Print a shell completion script', subs: ['bash', 'zsh', 'fish'] },
   help: { about: 'This text' },
 };
@@ -71,6 +72,7 @@ const HELP = `apex: paper-first trading research. Nothing here places a live ord
   apex live status [slot]              The four locks, read-only
   apex doctor                          Config, ledger chain, data, fingerprints
   apex tui                             Full-screen view. Read-only except for Halt
+  apex mcp                             Serve the MCP tools over stdio (for Claude Code and Claude Desktop). Read, claim check and halt only
   apex completion bash|zsh|fish        Print a completion script
 
 Where the answer comes from:
@@ -99,13 +101,10 @@ const usd = (x: number) => `$${x.toFixed(2)}`, whenMs = (t: number) => (t ? new 
 const damaged = (e: unknown): LedgerVerify | null => { const m = /ledger file is damaged at seq (\d+): (.*)$/.exec((e as Error)?.message ?? ''); return m ? { ok: false, from: 1, to: Number(m[1]), checked: Number(m[1]), badSeq: Number(m[1]), why: m[2] } : null; };
 
 /** Pull the cord where the answers come from. Shared by `apex halt` and the H key in the full-screen view. */
-async function pullCord(s: Source, ctx: Ctx, reason: string): Promise<{ data: HaltResult; text: string }> {
+async function pullCord(s: Source, reason: string): Promise<{ data: HaltResult; text: string }> {
   if (s.mode === 'fixtures') throw new Usage('The fixture ledger is read-only, so nothing was halted.');
-  if (s.mode === 'remote') { const r = await s.call('halt', { body: { reason: reason.slice(0, 300) } });
-    return { data: r, text: `${r.already ? 'The andon cord was already pulled' : 'Andon cord pulled'} on the dashboard (ledger: ${r.ledger.replace('_', ' ')}). No new entries will be opened until it is resumed on the dashboard.` }; }
-  const o = await openStore(ctx);
-  try { const e = await new Ledger(o.store, ctx.now).append('halt', 'cli', { level: 'andon', by: 'cli', reason: reason.slice(0, 500) });
-    return { data: { halted: true, already: false, ledger: 'recorded' }, text: `Andon cord pulled (ledger seq ${e.seq}). No new entries will be opened until it is resumed on the dashboard.` }; } finally { await o.close(); }
+  const r = await s.call('halt', { body: { reason: reason.slice(0, 300) } });
+  return { data: r, text: `${r.already ? 'The andon cord was already pulled' : 'Andon cord pulled'} ${s.mode === 'remote' ? 'on the dashboard' : 'in this ledger'} (ledger: ${r.ledger.replace('_', ' ')}). No new entries will be opened until it is resumed on the dashboard.` };
 }
 
 export async function main(argv: string[], ctx: Ctx = makeCtx(resolve(process.env.APEX_ROOT || process.cwd())), print: (s: string) => void = s => console.log(s)): Promise<number> {
@@ -278,7 +277,7 @@ async function dispatch(a: Args, ctx: Ctx, print: (s: string) => void): Promise<
     }
 
     case 'halt': { const reason = a._.slice(1).join(' ').trim(); if (!reason) { print('Say why: apex halt "<reason>"'); return 2; }
-      const r = await pullCord(src(), ctx, reason); print(json ? JSON.stringify(r.data, null, 1) : r.text); return 0; }
+      const r = await pullCord(src(), reason); print(json ? JSON.stringify(r.data, null, 1) : r.text); return 0; }
 
     case 'live': { if (sub !== 'status') throw new Usage('Usage: apex live status [slot]. Nothing in the terminal opens a lock.');
       const s = src(), keys = arg ? [arg] : (await all<Slot>(s, 'slots')).map(x => x.slotKey), locks: Locks[] = []; for (const k of keys) locks.push(await s.call('locks', { params: { slotKey: k } }));
@@ -298,7 +297,9 @@ async function dispatch(a: Args, ctx: Ctx, print: (s: string) => void): Promise<
       // A broken chain or a changed strategy is a failed verification (4). A bad setting or blocked data is an error (1).
       return !checks[1].ok || !checks[2].ok ? 4 : checks[0].ok && checks[3].ok ? 0 : 1; } }
 
-    case 'tui': { const s = src(); return runTui(s, { now: ctx.now, once: !!a.flags.once, cols: a.flags.cols ? num('cols', 100, 40, 400) : undefined, rows: a.flags.rows ? num('rows', 30, 12, 200) : undefined, print, halt: async reason => (await pullCord(s, ctx, reason)).text }); }
+    case 'tui': { const s = src(); return runTui(s, { now: ctx.now, once: !!a.flags.once, cols: a.flags.cols ? num('cols', 100, 40, 400) : undefined, rows: a.flags.rows ? num('rows', 30, 12, 200) : undefined, print, halt: async reason => (await pullCord(s, reason)).text }); }
+
+    case 'mcp': { const s = a.flags.fixtures || wantRemote ? src() : localSource(ctx, { actor: 'mcp' }); return (await import('./mcp')).serveStdio(s, ctx); }
 
     case 'completion': { const text = completion(sub ?? '', COMMANDS, GLOBAL_FLAGS); if (!text) throw new Usage('Usage: apex completion bash | zsh | fish'); print(text); return 0; }
 

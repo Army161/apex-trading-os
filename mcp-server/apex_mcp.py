@@ -1,7 +1,8 @@
 """Apex MCP server: lets Claude Desktop, Claude Code or any MCP client call the Apex engine as tools.
 (Idea from the FinceptTerminal audit, archive/chat/26: plug the terminal into agents through MCP. Written from scratch; no Fincept code.)
 
-Read-only by design: backtests, scans, confluence and dashboard status. There is no tool that places, changes or cancels orders.
+Read-only by design: the strategy list, scans, confluence and dashboard status. There is no tool that places, changes or cancels orders,
+and none that runs a backtest: see the note below and packages/mcp, the server that replaces this one.
 
   pip install "mcp>=2" pandas numpy
   python mcp-server/apex_mcp.py            # stdio, for claude_desktop_config.json / `claude mcp add`
@@ -18,12 +19,12 @@ sys.path.insert(0, os.path.join(HERE, "..", "engine"))
 
 from mcp.server.mcpserver import MCPServer  # noqa: E402
 
-from apex_engine import data, backtest as bt, research  # noqa: E402
+from apex_engine import data  # noqa: E402
 from apex_engine.strategies import REGISTRY, get  # noqa: E402
 from apex_engine.strategies.confluence import explain  # noqa: E402
 
-server = MCPServer("apex", instructions="Apex trading engine. Backtests and signals on public exchange candles. Results are history, not "
-                                       "promises; every bot runs paper first. Sources: binance, coinbase, kraken (crypto), alpaca (stocks, needs keys).")
+server = MCPServer("apex", instructions="Apex trading engine: the strategy list and signals on public exchange candles. A signal is not a tested "
+                                       "result; every bot runs paper first. Sources: binance, coinbase, kraken (crypto), alpaca (stocks, needs keys).")
 SOURCES = {"binance", "coinbase", "kraken", "alpaca", "massive", "synthetic"}
 
 
@@ -44,23 +45,9 @@ def list_strategies() -> str:
                 "description": c.description, "defaults": c.defaults} for k, c in sorted(REGISTRY.items())])
 
 
-@server.tool(description="Backtest one strategy on live candles. Fills at next open, fees and slippage included, stop checked before target. "
-                         "Returns metrics, Monte Carlo range and the last 20 trades.", structured_output=False)
-def backtest(strategy: str, symbol: str = "BTCUSDT", tf: str = "1d", source: str = "binance", risk_pct: float = 0.01) -> str:
-    if strategy not in REGISTRY:
-        return _j({"error": f"unknown strategy; choose from {sorted(REGISTRY)}"})
-    df = _df(source, symbol, tf)
-    r = bt.run(df, get(strategy), symbol=symbol, timeframe=tf, risk_pct=min(max(risk_pct, 0.001), 0.05))
-    return _j({"symbol": symbol, "tf": tf, "bars": len(df), "metrics": r.metrics, "monte_carlo": bt.monte_carlo(r.trades, risk_pct=risk_pct),
-               "last_trades": [t.__dict__ for t in r.trades[-20:]]})
-
-
-@server.tool(description="Run every strategy on one market and rank them by out-of-sample (walk-forward) results, never by in-sample return.",
-             structured_output=False)
-def leaderboard(symbol: str = "BTCUSDT", tf: str = "1d", source: str = "binance", walk_forward: bool = True) -> str:
-    lb = research.leaderboard(_df(source, symbol, tf), symbol, tf, walk=walk_forward)
-    keep = ("strategy", "name", "total_return", "max_drawdown", "trades", "win_rate", "profit_factor", "buy_hold_return", "oos", "error")
-    return _j({"best": lb["best"], "rows": [{k: r.get(k) for k in keep if k in r} for r in lb["rows"]]})
+# There is no `backtest` or `leaderboard` tool here any more. Each ran a test with free parameters that nothing counted, and
+# an uncounted try is how a lucky result gets mistaken for an edge. To test an idea, use `queue_claim_check` on the new server
+# (packages/mcp): it writes the rules down first, runs the same gate as everything else and counts the try.
 
 
 @server.tool(description="Which strategies signal on the last closed candle, plus the 0-100 confluence score, for up to 10 symbols.",

@@ -12,6 +12,7 @@ npm run apex -- validate               # independent re-run of anything waiting
 npm run apex -- halt "why"             # pull the andon cord
 npm run apex -- tui                    # full-screen view; read-only except for Halt
 npm run apex -- status --fixtures      # the same commands on a small made-up ledger, for a look around
+npx tsx apps/cli/src/main.ts mcp       # the MCP server over stdio, for Claude Code and Claude Desktop
 ```
 
 ## Where the answer comes from
@@ -29,17 +30,19 @@ Shell completion: `eval "$(apex completion bash)"`, `eval "$(apex completion zsh
 ## Files
 
 - `src/main.ts`: the commands and `COMMANDS`, the registry of every command and what it writes.
-- `src/source.ts`: the three places an answer comes from. `src/render.ts`: the text for each shape. `src/tui.ts`: the full-screen view. `src/completion.ts`: the completion scripts.
+- `src/source.ts`: the three places an answer comes from. The text for each shape is `packages/sdk/src/text.ts`, shared with the MCP server. `src/tui.ts`: the full-screen view. `src/completion.ts`: the completion scripts.
+- `src/mcp.ts`: `apex mcp`, the stdio side of `packages/mcp`. Start it with `tsx` directly, not `npm run`, because standard output must carry only the protocol.
 - `src/runtime.ts`: the store, the data files, the run, Telegram and the sign-off. The nightly job uses it.
 - `test/snapshots/`: the text and JSON of every read command on the fixtures. After a wording change that is meant, run the tests once with `UPDATE_SNAPSHOTS=1` and commit the diff.
 
 ## Invariants
 
-- The only commands that write are `run`, `validate`, `claim`, `halt`, `signoff`, `data pull` and `strategies fingerprint --write`. The first four write ledger entries only (or, in remote mode, ask the dashboard to). A test holds this list against `COMMANDS`.
+- The only commands that write are `run`, `validate`, `claim`, `halt`, `mcp` (the halt and claim tools), `signoff`, `data pull` and `strategies fingerprint --write`. The first four write ledger entries only (or, in remote mode, ask the dashboard to). A test holds this list against `COMMANDS`.
 - There is no order command, no resume command and no command that opens a live lock. `live status` is read-only. `queue` only lists.
 - A command exists only if it is in `COMMANDS` and in the switch; a test fails when the two differ, and when a command or flag is named like something that trades, resumes, approves or takes a secret.
-- Read commands print the API's shapes through `render.ts`. A table that shows performance carries n, basis and net, and the commands that touch the paper book open with `PAPER` and the count of tries.
+- Read commands print the API's shapes through `@apex/sdk/text`. A table that shows performance carries n, basis and net, and the commands that touch the paper book open with `PAPER` and the count of tries.
 - The API key is read from the environment only, by the client in `source.ts`. No flag takes a key, no output or error includes one, and remote mode refuses a plain `http` address unless it is localhost.
+- `apex mcp` prints nothing to standard output but the protocol. Through it a client can read, pull the halt (recorded as `by: mcp`) and, in remote mode only, start a claim check. It offers no other write.
 - The full-screen view only reads. Its one write is the halt, which needs a typed reason and then the word `HALT`. No single key changes anything.
 - `--seed` and `--seed-if-empty` accept only an approved plan item (`plan:<id>`). They exempt a batch from the weekly trial budget and record why in each pre-registration.
 - One run at a time: a run takes the lock first and releases it at the end.

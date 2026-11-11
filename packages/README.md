@@ -11,8 +11,9 @@ The autopilot core. Design: `docs/design/` (start with `00-README.md`, then `04-
 | `autopilot` | The run: paper broker, incubator, graduation, drift, weights, cost model, report | `engine`, `kernel`, `data` |
 | `claims` | The claim checker: intake (size limit, key redaction, injection and sales flags), the extraction shape and its checks against the source, mapping to a template or a rule spec, the gate run, the four verdicts and the report wording | `engine`, `kernel`, `data`, `autopilot` |
 | `ui` | The design system: colour tokens for light and dark (`tokens.ts` generates `tokens.css`), the status vocabulary, number formats and fixed phrases, and the display components (`Metric`, checks table, funnel, graduation clock, receipts, banners, claim compare) | `react` only |
-| `sdk` | The v1 API contract (every route, scope and shape), the OpenAPI document built from it, a response checker, and the typed client with `paginate`, `waitForClaimCheck` and `verifyReceipt` | nothing in this repo |
+| `sdk` | The v1 API contract (every route, scope and shape), the OpenAPI document built from it, a response checker, the typed client with `paginate`, `waitForClaimCheck` and `verifyReceipt`, and the words for each shape (`text.ts`), which the terminal and the MCP server both print | nothing in this repo |
 | `api` | What each v1 route returns: the ledger queries (`queries.ts`), the status line (`status.ts`) and one handler a route (`handlers.ts`). The dashboard serves them and the terminal calls them directly, so both print the same figure | `kernel`, `sdk` |
+| `mcp` | The MCP server: thirteen tools over the v1 contract (eleven read, `queue_claim_check`, `apex_halt`), two resources and three prompts. `apex mcp` serves it over stdio and `web/app/api/mcp` over HTTP | `sdk`, and the MCP SDK |
 
 `apps/cli` is the `apex` command and the code the nightly job runs. It is the only place here that touches disk, clock, network or environment.
 
@@ -33,6 +34,7 @@ The autopilot core. Design: `docs/design/` (start with `00-README.md`, then `04-
 - No package here calls a model. The claim checker is handed its extraction; the app makes that call through `web/lib/gateway.ts`.
 - No GPL or AGPL code is copied in. Secrets are never written to the ledger, a log or a report.
 - The v1 API contract in `sdk/src/contract.ts` has no route or scope that trades, approves, resumes, changes a limit or goes live. Its only writes are a claim check and a halt. `docs/design/openapi.yaml` is written from it by `npm run openapi` and never by hand.
+- `mcp` reaches Apex only through the `Api` it is handed, and every tool calls routes of the v1 contract. It has no tool that approves, resumes, retires, changes a limit, opens a lock, runs a test with free parameters or reads a key or the environment. A tool writes exactly when its route does, which is two of them. Text it returns is wrapped as data, so words from a source or a halt reason are never read as instructions.
 - `api` reads only what it is handed: entries, a view, config, a clock value and a few functions. It imports no store, no file system, no network and no environment, and a test in `web/test/api.test.ts` holds that.
 
 ## Checks

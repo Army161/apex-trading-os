@@ -1,5 +1,5 @@
-// A small JSON Schema check for the parts the contract uses: type, enum, required, properties, items, anyOf, allOf, $ref and
-// the string and number bounds. The contract tests run every route's real answer through it, and a client may do the same.
+// A small JSON Schema check for the parts the contract uses: type, enum, required, properties, items, anyOf, allOf, $ref, the
+// string and number bounds and pattern. The contract tests run every route's real answer through it, and a client may do the same.
 import { SCHEMAS, type Schema } from './contract';
 
 const RFC3339 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
@@ -16,7 +16,8 @@ export function validate(schema: Schema | string, v: unknown, path = '$', schema
   if (typeof s.type === 'string' && !typeOk(s.type, v)) return [...out, `${path}: expected ${s.type}, got ${v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v}`];
   if (Array.isArray(s.enum) && !s.enum.includes(v)) out.push(`${path}: ${JSON.stringify(v)} is not one of ${s.enum.join(', ')}`);
   if (typeof v === 'string') { if (s.format === 'date-time' && !RFC3339.test(v)) out.push(`${path}: not an RFC 3339 UTC time`);
-    if (typeof s.minLength === 'number' && v.length < s.minLength) out.push(`${path}: shorter than ${s.minLength}`); if (typeof s.maxLength === 'number' && v.length > s.maxLength) out.push(`${path}: longer than ${s.maxLength}`); }
+    if (typeof s.minLength === 'number' && v.length < s.minLength) out.push(`${path}: shorter than ${s.minLength}`); if (typeof s.maxLength === 'number' && v.length > s.maxLength) out.push(`${path}: longer than ${s.maxLength}`);
+    if (typeof s.pattern === 'string' && !new RegExp(s.pattern).test(v)) out.push(`${path}: does not match ${s.pattern}`); }
   if (typeof v === 'number') { if (typeof s.minimum === 'number' && v < s.minimum) out.push(`${path}: below ${s.minimum}`); if (typeof s.maximum === 'number' && v > s.maximum) out.push(`${path}: above ${s.maximum}`); }
   if (Array.isArray(v) && s.items) v.forEach((x, i) => out.push(...validate(s.items as Schema, x, `${path}[${i}]`, schemas)));
   if (v && typeof v === 'object' && !Array.isArray(v)) { const o = v as Record<string, unknown>;

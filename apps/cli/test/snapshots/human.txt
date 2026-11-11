@@ -392,7 +392,7 @@ $ apex completion bash --fixtures
 # apex completion for bash. Load it with: eval "$(apex completion bash)"
 _apex() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
-  if [ "$COMP_CWORD" -eq 1 ]; then COMPREPLY=( $(compgen -W "status run validate board pair slots slot book risk queue costs report data ledger strategies claim halt signoff live doctor tui completion help" -- "$cur") ); return; fi
+  if [ "$COMP_CWORD" -eq 1 ]; then COMPREPLY=( $(compgen -W "status run validate board pair slots slot book risk queue costs report data ledger strategies claim halt signoff live doctor tui mcp completion help" -- "$cur") ); return; fi
   case "${COMP_WORDS[1]}" in
     status) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
     run) COMPREPLY=( $(compgen -W "--full --budget --dry-run --seed --seed-if-empty --send --json --remote --local --fixtures" -- "$cur") ) ;;
@@ -415,6 +415,7 @@ _apex() {
     live) COMPREPLY=( $(compgen -W "status --json --remote --local --fixtures" -- "$cur") ) ;;
     doctor) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
     tui) COMPREPLY=( $(compgen -W "--once --json --remote --local --fixtures" -- "$cur") ) ;;
+    mcp) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
     completion) COMPREPLY=( $(compgen -W "bash zsh fish --json --remote --local --fixtures" -- "$cur") ) ;;
     help) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
   esac
@@ -426,7 +427,7 @@ $ apex completion zsh --fixtures
 # apex completion for zsh. Load it with: eval "$(apex completion zsh)"
 _apex() {
   local -a cmds
-  cmds=('status:Mode, halts, last run, slots, book' 'run:Run the pipeline once' 'validate:Independent re-run of anything waiting for the validator' 'board:Every evaluated pair' 'pair:One evaluation in detail' 'slots:Every slot ever locked' 'slot:One slot - clock, forward record, locks' 'book:The paper book' 'risk:Limits, halts, exposure, drift' 'queue:The weekly budget of tries' 'costs:The cost model in force' 'report:A run report' 'data:Data health, or pull new bars' 'ledger:Read and verify the ledger' 'strategies:The strategy library and its fingerprints' 'claim:Test the rules a source states' 'halt:Pull the andon cord' 'signoff:Jeremy only - allow one edit of a red path' 'live:The four locks, read-only' 'doctor:Config, ledger chain, data, fingerprints' 'tui:Full-screen view' 'completion:Print a shell completion script' 'help:This text')
+  cmds=('status:Mode, halts, last run, slots, book' 'run:Run the pipeline once' 'validate:Independent re-run of anything waiting for the validator' 'board:Every evaluated pair' 'pair:One evaluation in detail' 'slots:Every slot ever locked' 'slot:One slot - clock, forward record, locks' 'book:The paper book' 'risk:Limits, halts, exposure, drift' 'queue:The weekly budget of tries' 'costs:The cost model in force' 'report:A run report' 'data:Data health, or pull new bars' 'ledger:Read and verify the ledger' 'strategies:The strategy library and its fingerprints' 'claim:Test the rules a source states' 'halt:Pull the andon cord' 'signoff:Jeremy only - allow one edit of a red path' 'live:The four locks, read-only' 'doctor:Config, ledger chain, data, fingerprints' 'tui:Full-screen view' 'mcp:Serve the MCP tools over stdio, for Claude Code and Claude Desktop' 'completion:Print a shell completion script' 'help:This text')
   if (( CURRENT == 2 )); then _describe 'command' cmds; return; fi
   case "$words[2]" in
     status) compadd -- --json --remote --local --fixtures ;;
@@ -450,6 +451,7 @@ _apex() {
     live) compadd -- status --json --remote --local --fixtures ;;
     doctor) compadd -- --json --remote --local --fixtures ;;
     tui) compadd -- --once --json --remote --local --fixtures ;;
+    mcp) compadd -- --json --remote --local --fixtures ;;
     completion) compadd -- bash zsh fish --json --remote --local --fixtures ;;
     help) compadd -- --json --remote --local --fixtures ;;
   esac
@@ -480,6 +482,7 @@ complete -c apex -n '__fish_use_subcommand' -a 'signoff' -d 'Jeremy only: allow 
 complete -c apex -n '__fish_use_subcommand' -a 'live' -d 'The four locks, read-only'
 complete -c apex -n '__fish_use_subcommand' -a 'doctor' -d 'Config, ledger chain, data, fingerprints'
 complete -c apex -n '__fish_use_subcommand' -a 'tui' -d 'Full-screen view'
+complete -c apex -n '__fish_use_subcommand' -a 'mcp' -d 'Serve the MCP tools over stdio, for Claude Code and Claude Desktop'
 complete -c apex -n '__fish_use_subcommand' -a 'completion' -d 'Print a shell completion script'
 complete -c apex -n '__fish_use_subcommand' -a 'help' -d 'This text'
 complete -c apex -n '__fish_seen_subcommand_from status' -l 'json'
@@ -617,6 +620,10 @@ complete -c apex -n '__fish_seen_subcommand_from tui' -l 'json'
 complete -c apex -n '__fish_seen_subcommand_from tui' -l 'remote'
 complete -c apex -n '__fish_seen_subcommand_from tui' -l 'local'
 complete -c apex -n '__fish_seen_subcommand_from tui' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from mcp' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from mcp' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from mcp' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from mcp' -l 'fixtures'
 complete -c apex -n '__fish_seen_subcommand_from completion' -a 'bash'
 complete -c apex -n '__fish_seen_subcommand_from completion' -a 'zsh'
 complete -c apex -n '__fish_seen_subcommand_from completion' -a 'fish'
@@ -654,6 +661,7 @@ apex: paper-first trading research. Nothing here places a live order.
   apex live status [slot]              The four locks, read-only
   apex doctor                          Config, ledger chain, data, fingerprints
   apex tui                             Full-screen view. Read-only except for Halt
+  apex mcp                             Serve the MCP tools over stdio (for Claude Code and Claude Desktop). Read, claim check and halt only
   apex completion bash|zsh|fish        Print a completion script
 
 Where the answer comes from:

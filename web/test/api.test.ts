@@ -219,14 +219,16 @@ test('inventory: every HTTP route is accounted for, and none outside the dashboa
     '/risk': /guard\(\)/, '/builder': /guard\(\)/ };                                                    // model chats that change nothing but their own notes: held by the daily AI budget
   for (const f of files) { if (!/export (async function|const) (POST|PUT|PATCH|DELETE)\b/.test(f.src)) continue;
     if (OPEN_BY_DESIGN[f.name]) { assert.match(f.src, OPEN_BY_DESIGN[f.name], f.name); continue; }
-    assert.match(f.src, /isAdmin\(\)|ingestOk\(|CRON_SECRET|cronOk\(|serve\(req, deps\)/, `${f.name} changes something and names its check`); }
+    assert.match(f.src, /isAdmin\(\)|ingestOk\(|CRON_SECRET|cronOk\(|serve\(req, deps\)|await deps\.key\(auth\)/, `${f.name} changes something and names its check`); }
   // v1 is one catch-all file. It and everything it serves stay clear of the broker and of the session-only routes.
   assert.deepEqual(files.filter(f => f.name.startsWith('/v1')).map(f => f.name), ['/v1/[...path]']);
-  for (const p of ['app/api/v1/[...path]/route.ts', 'lib/api/serve.ts', '../packages/api/src/handlers.ts', '../packages/api/src/queries.ts', '../packages/api/src/status.ts']) { const src = readFileSync(join(web, p), 'utf8');
+  for (const p of ['app/api/v1/[...path]/route.ts', 'app/api/mcp/route.ts', 'lib/api/deps.ts', 'lib/api/serve.ts', '../packages/mcp/src/server.ts', '../packages/api/src/handlers.ts', '../packages/api/src/queries.ts', '../packages/api/src/status.ts']) { const src = readFileSync(join(web, p), 'utf8');
     assert.doesNotMatch(src, /autopilot\/(src\/)?broker|app\/api\/(admin|resume|killswitch|live)|ledgerResume|releaseCord|createKey|revokeKey|setJSON\('killswitch'/, `${p} imports nothing that trades, resumes or makes keys`); }
   // The handlers and the queries under them live in packages/api so the terminal can use the very same ones. They take what they are handed.
   for (const f of ['handlers', 'queries', 'status']) { assert.doesNotMatch(readFileSync(join(web, '../packages/api/src', `${f}.ts`), 'utf8'), /from '(\.\.\/|@\/|next\/)|node:fs|node:child_process|process\.env|\bfetch\(/, `packages/api/src/${f}.ts reaches the outside only through what it is handed`);
     assert.match(readFileSync(join(web, f === 'handlers' ? 'lib/api/handlers.ts' : `lib/${f}.ts`), 'utf8'), new RegExp(`^export \\* from '@apex/api/${f}';\\s*$`, 'm'), `web/lib ${f} is the shared one`); }
+  // The MCP route makes every tool call through `serve` with the caller's own key, and has no other way to reach Apex.
+  const mcp = readFileSync(join(web, 'app/api/mcp/route.ts'), 'utf8'); assert.match(mcp, /serve\(new Request\(url, init\), deps\)/); assert.doesNotMatch(mcp, /readLedger|ledgerHalt|pullCord|claimCheck\(|isAdmin|@\/lib\/(store|andon|ledger|auth)/, 'the MCP route touches nothing directly');
   assert.deepEqual(READ_SCOPES.filter(s => !s.startsWith('read:')), []);
 });
 

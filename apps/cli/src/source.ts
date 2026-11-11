@@ -1,13 +1,13 @@
 // Where a read command gets its answer (docs/design/08 s1). There are three places, and all three give the same shapes,
 // the ones in the v1 contract, so one renderer serves them all and `--json` prints exactly what the API would send.
-//   local:    the ledger in this checkout, through the same handlers the dashboard serves
+//   local:    the ledger in this checkout, through the same handlers the dashboard serves. Its one write is the halt
 //   remote:   the dashboard's /api/v1, through the client in packages/sdk. Read, queue a claim check, halt
 //   fixtures: a small committed ledger held in memory, for demos and tests. Nothing is written
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { ApiFail, HANDLERS, statusFrom, type Ctx as ApiCtx } from '@apex/api';
 import { ApexApiError, ApexClient, ROUTES, type Bodies, type Page, type ProblemCode, type Responses, type RouteDef, type RouteId } from '@apex/sdk';
-import { MemoryLedgerStore, buildView, loadConfig, type LedgerEntry } from '@apex/kernel';
+import { Ledger, MemoryLedgerStore, buildView, loadConfig, type LedgerEntry } from '@apex/kernel';
 import { openStore, type Ctx } from './runtime';
 
 export type CallArgs = { params?: Record<string, string>; query?: Record<string, string | number | boolean | undefined>; body?: unknown };
@@ -24,7 +24,7 @@ function reportFile(ctx: Ctx, id: string): string | null {
 export const FIXTURE_LEDGER = join(__dirname, '../fixtures/ledger.jsonl');
 
 /** The ledger in this checkout (or the committed fixture ledger). It serves reads only: the commands that write do so themselves, under the run lock. */
-export function localSource(ctx: Ctx, o: { fixtures?: boolean } = {}): Source {
+export function localSource(ctx: Ctx, o: { fixtures?: boolean; actor?: string } = {}): Source {
   const cfg = loadConfig(ctx.env, 'cli');
   const read = async (): Promise<{ entries: LedgerEntry[]; kind: 'postgres' | 'file'; now: number }> => {
     if (o.fixtures) { const entries = await new MemoryLedgerStore(readFileSync(FIXTURE_LEDGER, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l))).read(); return { entries, kind: 'file', now: (entries[entries.length - 1]?.ts ?? 0) + 3600e3 }; }
@@ -34,7 +34,11 @@ export function localSource(ctx: Ctx, o: { fixtures?: boolean } = {}): Source {
   return { mode: o.fixtures ? 'fixtures' : 'local', where: o.fixtures ? 'the committed fixture ledger' : ctx.env.DATABASE_URL ? 'DATABASE_URL' : ctx.env.APEX_LEDGER_FILE || join(ctx.stateDir, 'ledger.jsonl'),
     reportMarkdown: async id => reportFile(ctx, id),
     async call(id, a = {}) {
-      const r: RouteDef = ROUTES[id]; if (r.method !== 'GET') throw new SourceError('unavailable', `${id} is not a read.`);
+      const r: RouteDef = ROUTES[id], by = o.actor ?? 'cli';
+      // The one write a local source makes itself: the halt. It is always allowed, and it is one ledger entry.
+      if (id === 'halt') { if (o.fixtures) throw new SourceError('unavailable', 'The fixture ledger is read-only, so nothing was halted.'); const reason = String((a.body as { reason?: unknown } | undefined)?.reason ?? '').trim(); if (reason.length < 3) throw new SourceError('validation', 'A halt needs a reason.');
+        const s = await openStore(ctx); try { await new Ledger(s.store, ctx.now).append('halt', by, { level: 'andon', by, reason: reason.slice(0, 500) }); return { halted: true, already: false, ledger: 'recorded' } as Responses[typeof id]; } finally { await s.close(); } }
+      if (r.method !== 'GET') throw new SourceError('unavailable', o.fixtures ? 'The fixture ledger is read-only.' : 'A claim check from here needs the dashboard, which makes the extraction. Set APEX_API_URL and APEX_API_KEY, or use: apex claim <file> --extraction <json>.');
       try {
         const { entries, kind, now } = await read(), view = buildView(entries, cfg.paperCapital), query = new URLSearchParams();
         for (const [k, v] of Object.entries(a.query ?? {})) if (v !== undefined) query.set(k, String(v));

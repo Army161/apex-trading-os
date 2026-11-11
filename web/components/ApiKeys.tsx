@@ -22,6 +22,7 @@ export default function ApiKeys() {
   const toggle = (s: Scope) => setScopes(x => (x.includes(s) ? x.filter(y => y !== s) : SCOPES.filter(y => y === s || x.includes(y))));
   return <div className="card"><h3>API keys</h3>
     <p className="mute">For programs that read Apex: the terminal in remote mode, the MCP server and the browser extension. A key can read, and if you allow it, start a claim check or pull the halt. No key can approve, resume, change a limit or go live.</p>
+    <p className="mute">To connect a Claude app, add a custom connector with the address <span className="mono">/api/mcp</span> on this site and a key as the bearer token.</p>
     {!usable && <p role="status">Keys are switched off here: set <span className="mono">APEX_API_KEYS_PEPPER</span> (16 characters or more) in the environment first.</p>}
     {msg && <p role="alert">{msg}</p>}
     {fresh && <div role="status"><p><strong>Copy this key now.</strong> It is shown once and cannot be shown again.</p><pre className="mono" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{fresh}</pre><button className="btn" onClick={() => setFresh(null)}>I have copied it</button></div>}

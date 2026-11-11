@@ -2,6 +2,6 @@
   "name": "@apex/cli",
   "version": "0.1.0",
   "private": true,
-  "bin": { "apex": "./src/main.ts" },
-  "dependencies": { "@apex/engine": "*", "@apex/kernel": "*", "@apex/data": "*", "@apex/store": "*", "@apex/autopilot": "*", "@apex/claims": "*", "@apex/api": "*", "@apex/sdk": "*" }
+  "bin": { "apex": "./src/main.ts", "apex-mcp": "./src/mcp-bin.ts" },
+  "dependencies": { "@apex/engine": "*", "@apex/kernel": "*", "@apex/data": "*", "@apex/store": "*", "@apex/autopilot": "*", "@apex/claims": "*", "@apex/api": "*", "@apex/sdk": "*", "@apex/mcp": "*", "@modelcontextprotocol/sdk": "1.32.2" }
 }

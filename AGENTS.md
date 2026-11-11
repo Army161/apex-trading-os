@@ -16,6 +16,7 @@ These are model-agnostic (archive/chat/68). Claude Code, OpenCode, Codex, or a l
 - `web/`: the Next.js dashboard. The strategy engine now lives in `packages/engine`; `web/lib/engine/` re-exports it.
 - `packages/`: the autopilot core (engine, kernel, data, store, autopilot). Read `packages/README.md` and its Invariants first.
 - `apps/cli/`: the `apex` command (`npm run apex -- help`) and the code the nightly paper run uses.
+- `packages/mcp`: the MCP server (`apex mcp` over stdio, `/api/mcp` on the dashboard). It can read, start a claim check and pull the halt, and nothing else. `mcp-server/` is the old Python one.
 - `.github/red-paths.txt`: paths that need Jeremy's review. They never auto-merge.
 - `bots/`: Python paper bots.
 - `docs/`: how-tos and design notes. Start with `docs/how-to-direct-apex-agents.md`, `docs/agent-safety-and-office.md` and `docs/validation-results.md`.

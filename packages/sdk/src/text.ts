@@ -1,7 +1,8 @@
-// What the terminal prints (docs/design/08 s2, s4). Every function takes the API's own shapes and returns text. A figure is
-// never printed bare: a table that shows performance carries n, basis and net, as the Metric rule asks. Statuses are words,
-// so nothing depends on colour.
-import type { Book, Costs, DataHealth, DriftReading, Evaluation, EvaluationDetail, Fill, Intent, LedgerEntry, LedgerHead, LedgerRow, LedgerVerify, Locks, Metric, Position, Queue, ReportRow, Risk, Slot, SlotDetail, SlotEvent, Status, Trade } from '@apex/sdk';
+// The words for each shape in the contract (docs/design/08 s2 and s4, 10 s1.1). The terminal prints them and the MCP server
+// sends them beside the data, so a figure reads the same in both. Every function takes the API's own shapes and returns
+// text. A figure is never printed bare: a table that shows performance carries n, basis and net, as the Metric rule asks.
+// Statuses are words, so nothing depends on colour.
+import type { Book, ClaimCheck, ClaimCheckRow, Costs, DataHealth, DriftReading, Evaluation, EvaluationDetail, Fill, Funnel, Intent, LedgerEntry, LedgerHead, LedgerRow, LedgerVerify, Locks, Metric, Position, Queue, ReportRow, Risk, Slot, SlotDetail, SlotEvent, Status, Trade } from './contract';
 
 export const table = (rows: (string | number | null)[][]) => { const w = rows[0].map((_, c) => Math.max(...rows.map(r => String(r[c] ?? '').length))); return rows.map(r => r.map((x, c) => String(x ?? '').padEnd(w[c])).join('  ').trimEnd()).join('\n'); };
 const pct = (x: number, d = 1) => `${x >= 0 ? '+' : ''}${(x * 100).toFixed(d)}%`, share = (x: number, d = 1) => `${(x * 100).toFixed(d)}%`, usd = (x: number) => `${x < 0 ? '-' : ''}$${Math.abs(x).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -107,3 +108,12 @@ export const ledgerRows = (rows: LedgerRow[]) => rows.length ? rows.map(e => `${
 export const ledgerEntryText = (e: LedgerEntry) => [`#${e.seq} ${e.kind} by ${e.actor} at ${when(e.ts)}`, e.summary, `hash         ${e.hash}`, `previous     ${e.prevHash}`, `payload hash ${e.payloadHash}`, '', JSON.stringify(e.payload, null, 1)].join('\n');
 export const headText = (h: LedgerHead) => h.hash === null ? 'The ledger is empty.' : `seq ${h.seq}\nhash ${h.hash}\nlast anchor ${h.anchor ? `#${h.anchor.seq} ${short(h.anchor.hash, 16)} at ${when(h.anchor.at)}` : 'none yet'}`;
 export const verifyText = (v: LedgerVerify) => v.ok ? `chain   ok   ${v.from} .. ${v.to}   (${v.checked} entries)` : v.checked === 0 ? `chain   nothing to check in ${v.from} .. ${v.to}` : `chain   BROKEN at #${v.badSeq}: ${v.why}. Pull the cord and do not run until this is understood.`;
+
+export const funnelText = (f: Funnel) => `Pairs: ${f.tried} tried, ${f.waiting} waiting, ${f.passed} passed the checks, ${f.validated} validated, ${f.paper} in paper, ${f.eligible} eligible, ${f.live} live. ${f.rejected} rejected, ${f.nearMiss} near miss, ${f.needsData} need data.`;
+export const claimRowsText = (c: ClaimCheckRow[]) => c.length ? table([['check', 'when', 'verdict', 'source', 'readings', 'untested', 'flags', 'receipt'], ...c.map(x => [x.id, when(x.ts), (x.verdict ?? 'none').replace(/_/g, ' '), x.sourceKind, x.readings, x.untested, x.flags.join(', '), `#${x.receipt}`])]) : 'No claim check has been run yet.';
+export function claimText(c: ClaimCheck): string {
+  return [`Claim check ${c.id} · verdict: ${(c.verdict ?? 'none').replace(/_/g, ' ')} · ${c.readings} readings tested, ${c.untested} not testable · ${c.trialsUsed} tries used · receipt #${c.receipt}`,
+    `Source: ${c.sourceKind}, ${c.chars} characters. The source text is not stored.${c.flags.length ? ` Flags: ${c.flags.join(', ')}.` : ''}`, '',
+    ...(c.interpretations.length ? [table([['reading', 'strategy', 'data', 'status', 'luck-adj in this check', 'stand-in data'], ...c.interpretations.map(i => [i.ruleSet, i.strategy, i.panel, i.status, fig(i.dsrInCheck), i.proxy ? 'yes' : 'no'])])] : ['No reading could be tested.']),
+    '', 'A verdict is what the gate found on past data. It is not a judgment of the source or its author.'].join('\n');
+}

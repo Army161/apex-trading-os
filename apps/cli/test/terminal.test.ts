@@ -116,7 +116,7 @@ test('the command registry: it matches the code, names what writes, and has noth
   const src = readFileSync(join(__dirname, '../src/main.ts'), 'utf8'), body = src.slice(src.indexOf('async function dispatch'));
   const cases = body.split('\n').filter(l => /^    case /.test(l)).flatMap(l => [...l.matchAll(/case '([\w-]+)':/g)].map(x => x[1])).filter(c => c !== '--help');
   assert.deepEqual([...new Set(cases)].sort(), Object.keys(COMMANDS).sort(), 'every command in the switch is in the registry, and the other way round');
-  assert.deepEqual(Object.keys(COMMANDS).filter(c => COMMANDS[c].writes).sort(), ['claim', 'data', 'halt', 'run', 'signoff', 'strategies', 'validate'], 'the commands that can write anything at all');
+  assert.deepEqual(Object.keys(COMMANDS).filter(c => COMMANDS[c].writes).sort(), ['claim', 'data', 'halt', 'mcp', 'run', 'signoff', 'strategies', 'validate'], 'the commands that can write anything at all');
   const words = [...Object.keys(COMMANDS), ...Object.values(COMMANDS).flatMap(c => [...(c.subs ?? []), ...(c.flags ?? [])]), ...GLOBAL_FLAGS];
   for (const w of words) assert.doesNotMatch(w, /^(order|buy|sell|trade|withdraw|pay|transfer|resume|approve|sign|go-?live|key|token|secret|password)$/i, w);
   assert.doesNotMatch(src, /autopilot\/(src\/)?broker|ledgerResume|releaseCord/, 'the terminal imports nothing that trades or resumes');

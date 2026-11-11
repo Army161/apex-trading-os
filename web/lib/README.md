@@ -4,7 +4,7 @@ The dashboard's server code: the strategy engine (`engine/`), the agent policy g
 
 The app shell reads the autopilot ledger through `ledger.ts` (Postgres, or the file ledger in local development). `status.ts` turns it into what the header shows, `queries.ts` holds the query functions the screens and the API share, and `nav.ts` with `routes.json` is the one list of screens.
 
-`api/` serves `/api/v1` from the contract in `packages/sdk`: `serve.ts` is the one door (route, caller, scope, limit, body, ledger, answer), what each route returns lives in `packages/api` (`handlers.ts`, `queries.ts` and `status.ts` here are one-line re-exports of it, so the terminal uses the very same code), and `keys.ts` holds the API keys.
+`api/` serves `/api/v1` from the contract in `packages/sdk`: `serve.ts` is the one door (route, caller, scope, limit, body, ledger, answer), what each route returns lives in `packages/api` (`handlers.ts`, `queries.ts` and `status.ts` here are one-line re-exports of it, so the terminal uses the very same code), `deps.ts` wires `serve` to the real key store, ledger and the two writes, and `keys.ts` holds the API keys. `app/api/mcp` is the MCP server over HTTP: it needs an API key, and each tool call goes through the v1 client into `serve` with that key.
 
 ## Invariants
 These must always stay true. `python3 tools/drift_check.py` checks them.
@@ -22,5 +22,6 @@ These must always stay true. `python3 tools/drift_check.py` checks them.
 - A screen is added to `routes.json`, and `npm run check:ui` opens every screen in that list.
 - Every `/api/v1` call goes through `api/serve.ts`. A route exists only if it is in the contract and has a handler; a test fails when the two lists differ, and another when any answer does not fit its schema.
 - v1 can read, start a claim check and pull the halt. It cannot release a halt, approve, change a limit or make a key, and the handlers in `packages/api` reach the outside only through what they are handed.
+- `/api/mcp` answers nothing without a known API key, not even the list of tools. It reaches Apex only by calling `serve` with the caller's key, so scopes, limits, the halt and the budget apply to an MCP tool call exactly as to an API call. It is stateless and answers POST only.
 - An API key is stored as a hash with a pepper, shown once, and holds only scopes from the contract. With no pepper set, no key works in production. Keys are made and revoked only from a signed-in dashboard session (`app/api/admin/keys/`, a red path).
 - The dashboard session works on v1 reads from the dashboard itself, and on no v1 write.

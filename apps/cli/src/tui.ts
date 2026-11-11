@@ -4,7 +4,7 @@
 // seconds. The only thing it can change is the halt, and that asks for a reason and a typed confirmation first.
 import type { Book, DataHealth, Evaluation, LedgerRow, Queue, Risk, Slot, Status } from '@apex/sdk';
 import { SourceError, all, type Source } from './source';
-import * as R from './render';
+import * as R from '@apex/sdk/text';
 
 export const PANES = ['Today', 'Board', 'Slots', 'Book', 'Risk', 'Queue', 'Data', 'Ledger'] as const;
 export type TuiData = { status: Status; slots: Slot[]; book: Book | null; board: Evaluation[]; risk: Risk | null; queue: Queue | null; data: DataHealth[]; ledger: LedgerRow[]; where: string; error: string | null };

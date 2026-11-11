@@ -14,7 +14,8 @@ One repo for every bot, strategy and tool built from Jeremy's 104 transcripts an
 | `bots/maker-clip-keeper/` | Modern Maker/Sky Liquidations 2.0 (Dog/Clipper) keeper, watch-only by default |
 | `bots/alpaca/` | Nightly core QQQ/GLD rotation + RSI2 dip + 50/20 breakout system, and the 11-skill day trader desk (paper forced) |
 | `bots/research-council/` | Two Claude research desks that post proposals for approval and never execute: the debate desk (`council.py`) and the analyst team (`analyst_team.py`: web discovery, 5 parallel analysts, weighted 0-100 score, deep-value/quality/growth/inversion/macro lenses compared side by side, 3-target plan with code-enforced sizing and R:R, risk matrix, Markdown report, quick and compare modes) |
-| `mcp-server/` | Apex MCP server: Claude Desktop or Claude Code can call the engine (list strategies, backtest, walk-forward leaderboard, scan, dashboard status). Read-only, no order tools |
+| `packages/mcp` | The Apex MCP server: Claude Code and Claude Desktop start it with `apex mcp`, and Claude apps reach it at `/api/mcp` with an API key. It reads the ledger, can start a claim check and can pull the halt. No tool approves, resumes, changes a limit or trades |
+| `mcp-server/` | The old Python MCP server, kept for its signal scan. Its `backtest` and `leaderboard` tools were removed because they ran tests that nothing counted |
 | `tools/skill_scan.py` | Safety scan for any skill, plugin or MCP server before you install it: hidden instructions, secret/wallet access, data sent out, curl-into-shell, destructive or obfuscated code. Score 0-100 |
 | `bots/tradingview-bridge/` | Pine v6 scripts and TradingView MCP setup for Claude desktop |
 
