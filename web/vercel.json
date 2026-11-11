@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/dream",
       "schedule": "30 6 * * *"
+    },
+    {
+      "path": "/api/cron/officer",
+      "schedule": "15 23 * * 1-5"
     }
   ]
 }

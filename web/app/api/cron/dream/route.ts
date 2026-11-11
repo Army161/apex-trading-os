@@ -2,6 +2,7 @@
 // suggest (never apply) a rules-file edit. Vercel Cron (Bearer CRON_SECRET) or a logged-in "Run dream now".
 import { dream } from '@/lib/memory';
 import { isAdmin } from '@/lib/auth';
+import { scheduled } from '@/lib/automations';
 import { getJSON } from '@/lib/store';
 import { trades } from '@/lib/bots';
 import { getRules } from '@/lib/rules';
@@ -13,5 +14,5 @@ export async function GET(req: Request) {
   const day = Date.now() - 864e5;
   const journal = (await getJSON<any[]>('journal', [])).filter(j => (j.ts ?? 0) >= day);
   const t = (await trades(200)).filter((x: any) => x.ts >= day);
-  try { return Response.json(await dream({ journal, trades: t, rules: (await getRules())?.text })); } catch (e: any) { return Response.json({ error: e.message }, { status: 502 }); }
+  try { const rules = (await getRules())?.text; return Response.json(await scheduled('dream', () => dream({ journal, trades: t, rules }), { byPerson: !cron })); } catch (e: any) { return Response.json({ error: e.message }, { status: 502 }); }
 }

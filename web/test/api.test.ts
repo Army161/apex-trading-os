@@ -217,7 +217,8 @@ test('inventory: every HTTP route is accounted for, and none outside the dashboa
   const OPEN_BY_DESIGN: Record<string, RegExp> = { '/login': /APEX_ADMIN_PASSWORD/,                 // the sign-in itself: it checks the password
     '/telegram': /TELEGRAM_WEBHOOK_SECRET/,                                                             // Telegram calls it: it checks the webhook secret
     '/risk': /guard\(\)/, '/builder': /guard\(\)/,
-    '/share': /NextResponse\.redirect\(to, 303\)/ };                                                // the share target's landing: it writes nothing and only sends the browser to New claim check                                                    // model chats that change nothing but their own notes: held by the daily AI budget
+    '/share': /NextResponse\.redirect\(to, 303\)/,
+    '/automations': /if \(on && !\(await isAdmin\(\)\)\)/ };                                        // a job's switch: off is open like Halt (it only stops something), on checks the session                                                // the share target's landing: it writes nothing and only sends the browser to New claim check                                                    // model chats that change nothing but their own notes: held by the daily AI budget
   for (const f of files) { if (!/export (async function|const) (POST|PUT|PATCH|DELETE)\b/.test(f.src)) continue;
     if (OPEN_BY_DESIGN[f.name]) { assert.match(f.src, OPEN_BY_DESIGN[f.name], f.name); continue; }
     assert.match(f.src, /isAdmin\(\)|ingestOk\(|CRON_SECRET|cronOk\(|serve\(req, deps\)|await deps\.key\(auth\)/, `${f.name} changes something and names its check`); }

@@ -3,6 +3,8 @@
 // The answer is data. packages/claims checks every quote and number against the source before anything is tested.
 import { extract, intake, type Extracted, type Intake, type ModelRequest } from '@apex/claims';
 import { ask, textOf } from './gateway';
+import { gate } from './policy';
+import { ensureRoster } from './roster';
 
 export const CLAIMS_MODEL = process.env.APEX_CLAIMS_MODEL || 'claude-fable-5-2';
 
@@ -18,5 +20,8 @@ export async function callExtractor(req: ModelRequest): Promise<unknown> {
 /** Intake, then extraction with one retry. A refused input never reaches the model. */
 export async function extractClaims(text: unknown, kind: unknown = 'transcript'): Promise<{ ok: true; intake: Intake; extracted: Extracted } | { ok: false; error: string }> {
   const a = intake(text, kind); if (!a.ok) return a;
+  // The extractor is an agent on the roster: its card, its daily budget and an audit row before the call (docs/design/06 s1).
+  await ensureRoster(); const v = await gate({ agent: 'claim-extractor', verb: 'analyze', target: 'claim-check', trigger: 'person' });
+  if (!v.allow) return { ok: false, error: v.rule === 'over-daily-budget' ? 'The claim extractor has used its jobs for today. Try again tomorrow.' : `The claim extractor was refused by the rule "${v.rule}".` };
   return { ok: true, intake: a.intake, extracted: await extract(a.intake, callExtractor) };
 }

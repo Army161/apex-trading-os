@@ -1,0 +1,86 @@
+{
+  "note": "The roster table of docs/design/06 section 2, as data. web/test/agents.test.ts holds web/lib/roster.ts to it.",
+  "agents": [
+    {
+      "id": "scout",
+      "verbs": [
+        "read",
+        "analyze",
+        "browse",
+        "write_file"
+      ],
+      "model": "claude-sonnet-5-5",
+      "jobsPerDay": 3
+    },
+    {
+      "id": "claim-extractor",
+      "verbs": [
+        "analyze"
+      ],
+      "model": "claude-fable-5-2",
+      "jobsPerDay": 30
+    },
+    {
+      "id": "data-steward",
+      "verbs": [
+        "read",
+        "analyze",
+        "notify",
+        "write_file"
+      ],
+      "model": "claude-haiku-5-5",
+      "jobsPerDay": 24
+    },
+    {
+      "id": "validator",
+      "verbs": [
+        "read",
+        "analyze",
+        "write_file"
+      ],
+      "model": "claude-sonnet-5-5",
+      "jobsPerDay": 20
+    },
+    {
+      "id": "risk-officer",
+      "verbs": [
+        "read",
+        "analyze",
+        "notify",
+        "halt"
+      ],
+      "model": "none",
+      "jobsPerDay": 48
+    },
+    {
+      "id": "reporter",
+      "verbs": [
+        "read",
+        "analyze",
+        "notify",
+        "write_file"
+      ],
+      "model": "claude-sonnet-5-5",
+      "jobsPerDay": 4
+    },
+    {
+      "id": "code-reviewer",
+      "verbs": [
+        "read",
+        "analyze"
+      ],
+      "model": "set in the review tool",
+      "jobsPerDay": 0
+    },
+    {
+      "id": "promotion-reviewer",
+      "verbs": [
+        "read",
+        "analyze",
+        "write_file"
+      ],
+      "model": "claude-fable-5-2",
+      "jobsPerDay": 2
+    }
+  ]
+}

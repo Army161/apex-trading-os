@@ -25,7 +25,12 @@
       { "href": "/research/assistants", "label": "Assistants" }
     ] },
     { "id": "agents", "label": "Agents", "short": "Agents", "icon": "⚙", "href": "/agents", "screens": [
-      { "href": "/agents", "label": "Agents" }
+      { "href": "/agents", "label": "Roster" },
+      { "href": "/agents/inbox", "label": "Inbox" },
+      { "href": "/agents/outbox", "label": "Outbox" },
+      { "href": "/agents/activity", "label": "Activity" },
+      { "href": "/agents/automations", "label": "Automations" },
+      { "href": "/agents/team", "label": "Strategy team" }
     ] },
     { "id": "you", "label": "You", "short": "You", "icon": "☺", "href": "/you", "screens": [
       { "href": "/you", "label": "Journal and rules" },

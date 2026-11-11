@@ -5,10 +5,14 @@ import { allStrategies, latestSignal } from '@/lib/strategies';
 import { getJSON, setJSON, push } from '@/lib/store';
 import { candles } from '@/lib/market';
 import { sendTelegram } from '@/lib/telegram';
+import { scheduled } from '@/lib/automations';
 export const maxDuration = 60;
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) return new Response('forbidden', { status: 403 });
+  return Response.json(await scheduled('strategies', check));
+}
+async function check() {
   const out: any[] = []; const seen: Record<string, number> = {};
   for (const s of await allStrategies()) {
     const d = s.deployment; if (!d || d.status !== 'running') continue;
@@ -27,5 +31,5 @@ export async function GET(req: Request) {
   const all = await getJSON<Record<string, any>>('strategies', {});
   for (const [id, t] of Object.entries(seen)) if (all[id]?.deployment) all[id].deployment.lastSignalT = t;
   await setJSON('strategies', all);
-  return Response.json({ checked: out });
+  return { checked: out };
 }
