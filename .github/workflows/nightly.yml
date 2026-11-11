@@ -60,6 +60,9 @@ jobs:
           cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
       - name: the ledger chain is intact after the run
         run: npm run -s apex -- ledger verify
+      - name: anchor the ledger head
+        # Saves today's head (sequence number and hash) under state/heads. The next step commits it, so git history dates it.
+        run: npm run -s apex -- ledger anchor
       - name: save state
         if: always()
         run: |

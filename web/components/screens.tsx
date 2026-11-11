@@ -2,6 +2,7 @@
 // The screens that existed before the app shell, moved out of the one-file App so each can sit on its own route
 // (docs/design/07 s10). Their content is unchanged here; they are restyled with the shared components one at a time.
 import { useVoice, VoiceButtons } from './voice';
+import ReceiptsSwitch from './ReceiptsSwitch';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import ApiKeys from './ApiKeys';
@@ -222,6 +223,7 @@ export function Setup({ s }: { s: any }) {
       <tr><td>FRED_API_KEY (optional, free: macro panel on Assistants)</td><td>{ok(s?.fredSet)}</td></tr>
       <tr><td>APEX_AI_DAILY_BUDGET (optional, USD a day, default 5)</td><td><span className="badge">{s?.aiBudget ?? 5}</span></td></tr></tbody></table>
       {s?.authEnabled && <Login />}</div>
+    <ReceiptsSwitch />
     <div className="card" id="install"><h3>Install the app</h3><p>Apex can sit on your home screen or in your dock like any app. It is this same site, so there is nothing to download from a store, and it never asks you to install by itself.</p>
       <table className="wrap"><tbody>
         <tr><td>iPhone or iPad (Safari)</td><td>Tap Share, then "Add to Home Screen".</td></tr>

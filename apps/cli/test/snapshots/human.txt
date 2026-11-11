@@ -407,7 +407,7 @@ _apex() {
     costs) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
     report) COMPREPLY=( $(compgen -W "--list --id --date --send --json --remote --local --fixtures" -- "$cur") ) ;;
     data) COMPREPLY=( $(compgen -W "health pull --json --remote --local --fixtures" -- "$cur") ) ;;
-    ledger) COMPREPLY=( $(compgen -W "head tail show verify replay --n --kind --slot --from --json --remote --local --fixtures" -- "$cur") ) ;;
+    ledger) COMPREPLY=( $(compgen -W "head tail show verify replay anchor --n --kind --slot --from --json --remote --local --fixtures" -- "$cur") ) ;;
     strategies) COMPREPLY=( $(compgen -W "list show fingerprint --write --check --json --remote --local --fixtures" -- "$cur") ) ;;
     claim) COMPREPLY=( $(compgen -W "--extraction --kind --dry-run --request --wait --json --remote --local --fixtures" -- "$cur") ) ;;
     halt) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
@@ -443,7 +443,7 @@ _apex() {
     costs) compadd -- --json --remote --local --fixtures ;;
     report) compadd -- --list --id --date --send --json --remote --local --fixtures ;;
     data) compadd -- health pull --json --remote --local --fixtures ;;
-    ledger) compadd -- head tail show verify replay --n --kind --slot --from --json --remote --local --fixtures ;;
+    ledger) compadd -- head tail show verify replay anchor --n --kind --slot --from --json --remote --local --fixtures ;;
     strategies) compadd -- list show fingerprint --write --check --json --remote --local --fixtures ;;
     claim) compadd -- --extraction --kind --dry-run --request --wait --json --remote --local --fixtures ;;
     halt) compadd -- --json --remote --local --fixtures ;;
@@ -571,6 +571,7 @@ complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'tail'
 complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'show'
 complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'verify'
 complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'replay'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'anchor'
 complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'n'
 complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'kind'
 complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'slot'
@@ -651,7 +652,7 @@ apex: paper-first trading research. Nothing here places a live order.
   apex risk | queue | costs
   apex report [--list] [--id <run>] [--date YYYY-MM-DD] [--send telegram]
   apex data health | pull              pull needs MASSIVE_API_KEY (a data key; it cannot trade)
-  apex ledger head | tail [-n N] [--kind K] [--slot S] | show <seq> | verify [--from N] | replay
+  apex ledger head | tail [-n N] [--kind K] [--slot S] | show <seq> | verify [--from N] | replay | anchor
   apex strategies list | show <id> | fingerprint [--write | --check]
   apex claim <file | -> --extraction <json> [--kind transcript|pine|page|rules] [--dry-run]
                                        Test the rules a source states. Each reading is one try

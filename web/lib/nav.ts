@@ -7,6 +7,8 @@ export type Screen = { href: string; label: string };
 export type Section = { id: string; label: string; short: string; icon: string; href: string; screens: Screen[] };
 export const SECTIONS: Section[] = routes.sections;
 /** Phone bottom bar: these four, then "More" (07 s6). */
+/** Pages that are not in any section's list, with the heading each one shows. */
+export const UNLISTED: Record<string, string> = { '/receipts': 'Receipts' };
 export const BOTTOM = ['today', 'autopilot', 'claims', 'agents'] as const;
 export const ALL_SCREENS: (Screen & { section: string })[] = SECTIONS.flatMap(s => s.screens.map(x => ({ ...x, section: s.label })));
 

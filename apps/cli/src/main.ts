@@ -7,7 +7,8 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { STRATEGIES } from '@apex/engine/strategies';
-import { GATE_V1, STAGES, buildView, gateVersion, loadConfig, passBar, verifyChain } from '@apex/kernel';
+import { GATE_V1, Ledger, STAGES, buildView, gateVersion, loadConfig, passBar, verifyChain } from '@apex/kernel';
+import { checkHeads, planAnchor, readHeads, writeHead } from './anchor';
 import { PRIOR_COSTS } from '@apex/autopilot';
 import { EXTRACT_FAILED, extractionRequest, intake, validateExtraction, type Extracted } from '@apex/claims';
 import type { ClaimCheckBody, DataHealth, DriftReading, Evaluation, Fill, HaltResult, Intent, LedgerRow, LedgerVerify, Locks, Position, ReportRow, Slot, SlotEvent, Trade } from '@apex/sdk';
@@ -34,7 +35,7 @@ export const COMMANDS: Record<string, Command> = {
   costs: { about: 'The cost model in force' },
   report: { about: 'A run report', flags: ['list', 'id', 'date', 'send'] },
   data: { about: 'Data health, or pull new bars', subs: ['health', 'pull'], writes: 'refreshed bars in the state folder (pull only)' },
-  ledger: { about: 'Read and verify the ledger', subs: ['head', 'tail', 'show', 'verify', 'replay'], flags: ['n', 'kind', 'slot', 'from'] },
+  ledger: { about: 'Read and verify the ledger', subs: ['head', 'tail', 'show', 'verify', 'replay', 'anchor'], flags: ['n', 'kind', 'slot', 'from'] },
   strategies: { about: 'The strategy library and its fingerprints', subs: ['list', 'show', 'fingerprint'], flags: ['write', 'check'], writes: 'the fingerprint file (--write only)', local: true },
   claim: { about: 'Test the rules a source states', flags: ['extraction', 'kind', 'dry-run', 'request', 'wait'], writes: 'ledger entries' },
   halt: { about: 'Pull the andon cord', writes: 'one halt entry' },
@@ -62,7 +63,7 @@ const HELP = `apex: paper-first trading research. Nothing here places a live ord
   apex risk | queue | costs
   apex report [--list] [--id <run>] [--date YYYY-MM-DD] [--send telegram]
   apex data health | pull              pull needs MASSIVE_API_KEY (a data key; it cannot trade)
-  apex ledger head | tail [-n N] [--kind K] [--slot S] | show <seq> | verify [--from N] | replay
+  apex ledger head | tail [-n N] [--kind K] [--slot S] | show <seq> | verify [--from N] | replay | anchor
   apex strategies list | show <id> | fingerprint [--write | --check]
   apex claim <file | -> --extraction <json> [--kind transcript|pine|page|rules] [--dry-run]
                                        Test the rules a source states. Each reading is one try
@@ -214,6 +215,14 @@ async function dispatch(a: Args, ctx: Ctx, print: (s: string) => void): Promise<
     case 'ledger': {
       if (sub === 'replay') { localOnly(); return withStore(entries => { const r = verifyChain(entries); if (!r.ok) { print(R.verifyText({ ok: false, from: 1, to: entries.length, checked: entries.length, badSeq: r.badSeq ?? null, why: r.why ?? null })); return 4; }
         const v = buildView(entries, cfg.paperCapital); print(`Replayed ${entries.length} entries: ${v.trials.size} trials, ${v.slots.size} slots, ${v.closed.length} closed trades, cash ${usd(v.cash)}.`); return 0; }).catch(e => { const v = damaged(e); if (!v) throw e; print(json ? JSON.stringify(v, null, 1) : R.verifyText(v)); return 4; }); }
+      if (sub === 'anchor') { localOnly(); if (cfg.ledgerAnchor === 'off') { print('Anchoring is switched off (APEX_LEDGER_ANCHOR=off). Nothing was saved.'); return 0; }
+        const o = await openStore(ctx), release = await o.lock(); if (!release) { await o.close(); print('Another run holds the lock. Nothing was saved.'); return 3; }
+        try { const entries = await o.store.read(), chain = verifyChain(entries), heads = chain.ok ? checkHeads(entries, readHeads(ctx.stateDir)) : null;
+          if (!chain.ok || !heads!.ok) { print(`The ledger does not verify (${chain.ok ? heads!.why : `entry ${chain.badSeq}: ${chain.why}`}), so nothing was anchored.`); return 4; }
+          const plan = planAnchor(entries, ctx.now()); if ('skip' in plan) { print(plan.skip); return 0; }
+          const file = writeHead(ctx.stateDir, plan.head); await new Ledger(o.store, ctx.now).append('anchor', 'cli', { seq: plan.head.seq, hash: plan.head.hash, file });
+          print(`Anchored entry ${plan.head.seq} (${plan.head.hash.slice(0, 12)}) in ${file}.${cfg.ledgerAnchor === 'git+ots' ? ' An OpenTimestamps proof is not built yet, so none was made.' : ''} It counts once that file is committed.`); return 0;
+        } finally { await release(); await o.close(); } }
       const s = src();
       if (sub === 'head' || !sub) { const h = await s.call('ledgerHead'); await out(s, h, () => R.headText(h), false); return 0; }
       if (sub === 'tail') { const rows = (await s.call('ledger', { query: { limit: num('n', 10, 1, 200), kind: str('kind'), slot: str('slot') } })).items.reverse(); await out(s, pageOf(rows), () => R.ledgerRows(rows as LedgerRow[]), false); return 0; }
@@ -224,9 +233,11 @@ async function dispatch(a: Args, ctx: Ctx, print: (s: string) => void): Promise<
         if (s.mode === 'local') v = await withStore(entries => { const before = from > 1 ? entries[from - 2] : null, part = entries.slice(from - 1), r = verifyChain(part, before ? { seq: before.seq, hash: before.hash } : null); return { ok: r.ok, from, to: entries.length ? entries[entries.length - 1].seq : 0, checked: part.length, badSeq: r.ok ? null : r.badSeq ?? null, why: r.ok ? null : r.why ?? null }; });   // the whole chain in one pass
         else { v = { ok: true, from, to: 0, checked: 0, badSeq: null, why: null };
           for (let at = from; at <= head.seq && v.ok; at = v.to + 1) { const part = await s.call('ledgerVerify', { query: { from: at } }); v = { ok: part.ok, from, to: part.to, checked: v.checked + part.checked, badSeq: part.badSeq, why: part.why }; if (part.to < at) break; } }
-        await out(s, v, () => `${R.verifyText(v)}\n${R.headText(head).split('\n').map(l => `head    ${l}`).join('\n')}`, false);
+        // In a checkout, the heads saved by earlier anchors are checked too: a ledger rewritten after an anchor no longer matches it.
+        let anchors = ''; if (s.mode === 'local' && v.ok && from === 1) { const h = await withStore(entries => checkHeads(entries, readHeads(ctx.stateDir))); if (!h.ok) v = { ...v, ok: false, badSeq: h.badSeq, why: h.why }; else anchors = `\nanchors ${h.checked ? `${h.checked} saved ${h.checked === 1 ? 'head matches' : 'heads match'} the chain` : 'no head has been saved yet'}`; }
+        await out(s, v, () => `${R.verifyText(v)}${anchors}\n${R.headText(head).split('\n').map(l => `head    ${l}`).join('\n')}`, false);
         return v.ok ? 0 : 4; }
-      throw new Usage('Usage: apex ledger head | tail [-n N] | show <seq> | verify [--from N] | replay'); }
+      throw new Usage('Usage: apex ledger head | tail [-n N] | show <seq> | verify [--from N] | replay | anchor'); }
 
     case 'strategies': { localOnly();
       if (sub === 'fingerprint') { const f = fingerprints(ctx), p = join(ctx.root, 'packages/engine/fingerprints.json');

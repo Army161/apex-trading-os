@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Banner, utc } from '@apex/ui';
-import { ALL_SCREENS, BOTTOM, SECTIONS, screenOf, sectionOf } from '@/lib/nav';
+import { ALL_SCREENS, BOTTOM, SECTIONS, UNLISTED, screenOf, sectionOf } from '@/lib/nav';
 import { DATA_MARK, DATA_WORDS, triesText, type ShellStatus } from '@/lib/status';
 import { Ai } from '../screens';
 import LocalTime from '../LocalTime';
@@ -24,7 +24,7 @@ export const useOffline = () => useContext(Offline);
 
 export default function Shell({ initial, children }: { initial: ShellStatus; children: ReactNode }) {
   const path = usePathname() || '/', router = useRouter();
-  const section = sectionOf(path), screen = screenOf(path);
+  const unlisted = UNLISTED[path.replace(/\/+$/, '')], section = sectionOf(path), screen = unlisted ? null : screenOf(path);
   const [s, setS] = useState(initial);
   const [note, setNote] = useState(''); const [busy, setBusy] = useState(false);
   const [theme, setTheme] = useState<Theme>('system');
@@ -90,7 +90,7 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
       </header>
 
       <nav className="ax-rail" aria-label="Sections">
-        <ul>{SECTIONS.map(x => <li key={x.id}><Link href={x.href} aria-current={x.id === section.id ? 'page' : undefined} title={x.label}><span className="ax-icon" aria-hidden="true">{x.icon}</span><span className="ax-rail-label">{x.label}</span></Link></li>)}</ul>
+        <ul>{SECTIONS.map(x => <li key={x.id}><Link href={x.href} aria-current={!unlisted && x.id === section.id ? 'page' : undefined} title={x.label}><span className="ax-icon" aria-hidden="true">{x.icon}</span><span className="ax-rail-label">{x.label}</span></Link></li>)}</ul>
         <button type="button" className="ax-btn ax-theme" onClick={nextTheme} title="Switch between the system, light and dark themes"><span className="ax-icon" aria-hidden="true">◐</span><span className="ax-rail-label">Theme: {theme}</span></button>
       </nav>
 
@@ -105,8 +105,8 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
         {s.data === 'blocked' && <Banner kind="data_blocked">{s.dataBlocked.join(', ')}. Figures that depend on these datasets are not to be trusted, and their slots are paused.</Banner>}
         {!s.persistent && <Banner kind="not_persistent">Bot history, the journal and agent jobs are kept in memory and reset when the server restarts. Add Upstash Redis from the Vercel Marketplace (see You, Setup).</Banner>}
         <div className="ax-pagehead">
-          <h1>{screen?.label ?? section.label}</h1>
-          {section.screens.length > 1 && <nav className="ax-subnav" aria-label={`${section.label} screens`}>
+          <h1>{unlisted ?? screen?.label ?? section.label}</h1>
+          {!unlisted && section.screens.length > 1 && <nav className="ax-subnav" aria-label={`${section.label} screens`}>
             {section.screens.map(x => <Link key={x.href} href={x.href} aria-current={x.href === screen?.href ? 'page' : undefined}>{x.label}</Link>)}</nav>}
         </div>
         {/* With no connection every control inside a screen is off; reading and links stay. */}
@@ -114,7 +114,7 @@ export default function Shell({ initial, children }: { initial: ShellStatus; chi
       </main>
 
       <nav className="ax-bottom" aria-label="Sections">
-        {SECTIONS.filter(x => (BOTTOM as readonly string[]).includes(x.id)).map(x => <Link key={x.id} href={x.href} aria-current={x.id === section.id ? 'page' : undefined}><span className="ax-icon" aria-hidden="true">{x.icon}</span>{x.short}</Link>)}
+        {SECTIONS.filter(x => (BOTTOM as readonly string[]).includes(x.id)).map(x => <Link key={x.id} href={x.href} aria-current={!unlisted && x.id === section.id ? 'page' : undefined}><span className="ax-icon" aria-hidden="true">{x.icon}</span>{x.short}</Link>)}
         <button type="button" onClick={openPalette} aria-current={(BOTTOM as readonly string[]).includes(section.id) ? undefined : 'page'}><span className="ax-icon" aria-hidden="true">⋯</span>More</button>
       </nav>
 
