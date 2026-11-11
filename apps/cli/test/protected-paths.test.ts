@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 // @ts-ignore plain .mjs tool, no types
-import { toRegex, redOf, readGlobs, selfCheck, approvedBy, ownersOf } from '../../../tools/protected_paths.mjs';
+import { toRegex, redOf, readGlobs, selfCheck, approvedBy, ownersOf, selfAuthoredNote } from '../../../tools/protected_paths.mjs';
 
 test('red paths: globs match what they should and nothing else', () => {
   const globs = readGlobs();
@@ -17,4 +17,8 @@ test('red paths: only the code owner\'s latest review counts, and only on the cu
   assert.deepEqual(approvedBy([r('someone', 'APPROVED', 'abc')], ['army161'], 'abc'), [], 'someone else approving does not count');
   assert.deepEqual(approvedBy([r('Army161', 'APPROVED', 'abc'), r('Army161', 'CHANGES_REQUESTED', 'abc')], ['army161'], 'abc'), []);
   assert.deepEqual(approvedBy([r('Army161', 'APPROVED', 'abc'), r('Army161', 'COMMENTED', 'abc')], ['army161'], 'abc'), ['army161']);
+});
+
+test('red paths: a pull request opened under the owner\'s account cannot be approved on GitHub, and the check says what to do', () => {
+  assert.match(selfAuthoredNote('army161', ['army161']), /stays red on purpose/); assert.equal(selfAuthoredNote('someone', ['army161']), null); assert.equal(selfAuthoredNote('', ['army161']), null);
 });

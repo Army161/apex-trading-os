@@ -1,5 +1,7 @@
-# Red paths need Jeremy's approving review on the current commit (docs/design/02 section 9).
-# This check is expected to be red on a pull request that touches a red path until he approves. That is the point of it.
+# Red paths need Jeremy (docs/design/02 section 9, docs/branch-protection.md).
+# This check is red on any pull request that touches a red path until the code owner approves the current commit.
+# A pull request opened under the owner's own account cannot be approved on GitHub, so there it stays red and the owner
+# merges it himself with the admin bypass. That is on purpose: a red path never merges on a green light alone.
 name: protected-paths
 on:
   pull_request:

@@ -1,5 +1,5 @@
 # Red paths need Jeremy's review. Keep this in step with .github/red-paths.txt (tools/protected_paths.mjs --self-check compares them).
-# Enforcement needs branch protection on main with "Require review from Code Owners" (docs/branch-protection.md).
+# How this is enforced, and its limit while agents open pull requests under the owner's account: docs/branch-protection.md.
 /packages/kernel/ @Army161
 /packages/autopilot/src/broker/ @Army161
 /packages/autopilot/src/pipeline.ts @Army161

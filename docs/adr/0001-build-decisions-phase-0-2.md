@@ -20,6 +20,7 @@ Date: 2026-11-11. Status: in force. These are the places where the build had to 
 | 14 | The deflated-Sharpe readout uses every trial ever plus every new pair in the registry | Otherwise the readout depended on the order pairs were evaluated in. It is a readout only and is not part of the result hash |
 | 15 | Workflow actions are pinned to major tags (`@v4`), not commit hashes | The build container could not look the hashes up. Pinning by hash is a follow-up |
 | 16 | Fingerprint fixtures are frozen copies of three committed data files | Deterministic across machines. They must never be refreshed |
+| 17 | The `protected-paths` check stays red on a red-path pull request opened under Jeremy's account, and he merges with the admin bypass | GitHub does not let an author approve their own pull request, and agents open pull requests under his account. A hard lock needs a separate agent account (`docs/branch-protection.md`) |
 
 ## Open question for Jeremy
 

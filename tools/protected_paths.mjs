@@ -27,6 +27,14 @@ export function approvedBy(reviews, owners, headSha) {
   return owners.filter(o => { const r = latest.get(o); return r && r.state === 'APPROVED' && r.commit_id === headSha; });
 }
 
+/**
+ * GitHub does not let the author of a pull request approve it. Pull requests opened by an agent are opened under the owner's
+ * account, so no approving review is possible. The check stays red on purpose: the owner reads the change and merges it himself
+ * with the bypass box. An agent never merges a red-path pull request.
+ */
+export const selfAuthoredNote = (author, owners) => (author && owners.includes(author)
+  ? `This pull request was opened under the code owner's account (${author}), and GitHub does not let an author approve their own pull request. This check stays red on purpose. ${author} reads the red-path changes and merges with "Merge without waiting for requirements to be met". Agents never merge it.` : null);
+
 function main(argv) {
   if (argv[0] === '--self-check') { const bad = selfCheck(); for (const b of bad) console.log(b); console.log(bad.length ? 'CODEOWNERS and red-paths.txt disagree.' : 'CODEOWNERS and red-paths.txt agree.'); return bad.length ? 1 : 0; }
   if (argv[0] === '--files') { for (const f of redOf(argv.slice(1), readGlobs())) console.log(f); return 0; }
@@ -43,7 +51,8 @@ function main(argv) {
     const reviews = JSON.parse(execFileSync('gh', ['api', '--paginate', '--slurp', `repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/reviews`], { cwd: ROOT }).toString()).flat();
     const ok = approvedBy(reviews, owners, HEAD_SHA);
     if (ok.length) { console.log(`Approved on this commit by ${ok.join(', ')}.`); return 0; }
-    console.log(`Waiting for an approving review of commit ${HEAD_SHA.slice(0, 12)} from: ${owners.join(', ') || 'a code owner (none listed)'}. Red paths never merge without it.`); return 1;
+    let author = ''; try { author = String(JSON.parse(execFileSync('gh', ['api', `repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}`], { cwd: ROOT }).toString()).user?.login ?? '').toLowerCase(); } catch { /* the message below still holds */ }
+    console.log(selfAuthoredNote(author, owners) ?? `Waiting for an approving review of commit ${HEAD_SHA.slice(0, 12)} from: ${owners.join(', ') || 'a code owner (none listed)'}. Red paths never merge without it.`); return 1;
   }
   console.log('usage: protected_paths.mjs --self-check | --files <paths> | --pr'); return 2;
 }
