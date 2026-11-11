@@ -1,0 +1,6 @@
+/* Generated from tokens.ts. Do not edit by hand: change tokens.ts and run the ui tests with UPDATE_TOKENS=1. */
+:root{--bg:#0a0d12;--panel:#11161d;--panel-2:#161d26;--ink:#e6edf3;--mute:#93a0b0;--line:#222b36;--acc:#2fd59b;--info:#6ea8ff;--warn:#f0b54a;--bad:#ff7b72;--live:#ff9f43;--chip:#17202a;--on-acc:#0a0d12;--font-ui:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--font-num:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;--radius-card:12px;--radius-control:8px;--motion:120ms}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f7f9;--panel:#ffffff;--panel-2:#f0f3f6;--ink:#0f1720;--mute:#566170;--line:#e3e7ec;--acc:#0b7a5c;--info:#2456d6;--warn:#8a5600;--bad:#b42323;--live:#ad4e0a;--chip:#eef2f5;--on-acc:#ffffff}}
+:root[data-theme="light"]{--bg:#f6f7f9;--panel:#ffffff;--panel-2:#f0f3f6;--ink:#0f1720;--mute:#566170;--line:#e3e7ec;--acc:#0b7a5c;--info:#2456d6;--warn:#8a5600;--bad:#b42323;--live:#ad4e0a;--chip:#eef2f5;--on-acc:#ffffff}
+:root[data-theme="dark"]{--bg:#0a0d12;--panel:#11161d;--panel-2:#161d26;--ink:#e6edf3;--mute:#93a0b0;--line:#222b36;--acc:#2fd59b;--info:#6ea8ff;--warn:#f0b54a;--bad:#ff7b72;--live:#ff9f43;--chip:#17202a;--on-acc:#0a0d12}
+@media (prefers-reduced-motion:reduce){:root{--motion:0ms}*{animation:none!important;transition:none!important}}

@@ -29,6 +29,8 @@ Date: 2026-11-11. Status: in force. These are the places where the build had to 
 | 23 | The guard hook's rules live in `tools/guard_hook.mjs` in the repo, and the plugin only holds a launcher that loads them | The rules are reviewed with the code they guard and are a red path themselves. The launcher does nothing outside Apex and refuses the call when the rules cannot load. The hook gets only `APEX_SIGNOFF_KEY` from the environment |
 | 24 | The hook refuses `git merge` only on `main`, and `gh pr merge` when the branch touches red paths | The design says to refuse a merge on a branch that touches red paths. Read literally that also blocks merging `main` into a work branch, which is how conflicts are resolved and is harmless |
 | 25 | `.env.example` stays a red path, so an agent proposes a new variable in a pull request instead of editing the file | It is in the approved red-path list. The hook's message for other `.env` files says to list the variable there and tell Jeremy |
+| 26 | The light-theme live colour is `#ad4e0a`, not the design's `#b4520b` | The design value is 4.49:1 on the chip surface, just under the 4.5:1 rule the same document sets. The contrast test checks every text colour on every surface in both themes |
+| 27 | `packages/ui` holds display components only; controls with state (theme switch, filters, dialogs, the claim intake form) come with the app shell and screens | They need the client runtime and the routes they act on, which are P4.2 and P4.3. Everything in the package renders on the server and is tested as static markup |
 
 ## Open question for Jeremy
 
