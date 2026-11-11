@@ -3,6 +3,7 @@
 // (docs/design/07 s10). Their content is unchanged here; they are restyled with the shared components one at a time.
 import { useVoice, VoiceButtons } from './voice';
 import ReceiptsSwitch from './ReceiptsSwitch';
+import { RUNBOOKS, RUNBOOK_DIR } from '@/lib/runbooks';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import ApiKeys from './ApiKeys';
@@ -224,6 +225,8 @@ export function Setup({ s }: { s: any }) {
       <tr><td>APEX_AI_DAILY_BUDGET (optional, USD a day, default 5)</td><td><span className="badge">{s?.aiBudget ?? 5}</span></td></tr></tbody></table>
       {s?.authEnabled && <Login />}</div>
     <ReceiptsSwitch />
+    <div className="card" id="runbooks"><h3>Runbooks</h3><p>Short pages for when something goes wrong. Each has the same five parts: how you notice, the safe first step, the steps, how to confirm it is fixed, and what to write down. They are files in the repository, in <code>{RUNBOOK_DIR}</code>, so they can be read when this dashboard is down. Their commands are run against a demo ledger by a test, so a page cannot name a command that does not exist.</p>
+      <table className="wrap"><tbody>{RUNBOOKS.map(r => <tr key={r.file}><td>{r.title}<br /><code>{r.file}</code></td><td>{r.when}</td></tr>)}</tbody></table></div>
     <div className="card" id="install"><h3>Install the app</h3><p>Apex can sit on your home screen or in your dock like any app. It is this same site, so there is nothing to download from a store, and it never asks you to install by itself.</p>
       <table className="wrap"><tbody>
         <tr><td>iPhone or iPad (Safari)</td><td>Tap Share, then "Add to Home Screen".</td></tr>

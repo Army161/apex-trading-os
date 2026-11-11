@@ -7,7 +7,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { STRATEGIES } from '@apex/engine/strategies';
-import { GATE_V1, Ledger, STAGES, buildView, gateVersion, loadConfig, passBar, verifyChain } from '@apex/kernel';
+import { GATE_V1, Ledger, STAGES, buildView, gateVersion, loadConfig, passBar, verifyChain, type LedgerEntry } from '@apex/kernel';
 import { checkHeads, planAnchor, readHeads, writeHead } from './anchor';
 import { PRIOR_COSTS } from '@apex/autopilot';
 import { EXTRACT_FAILED, extractionRequest, intake, validateExtraction, type Extracted } from '@apex/claims';
@@ -115,6 +115,9 @@ export async function main(argv: string[], ctx: Ctx = makeCtx(resolve(process.en
     if (e instanceof Usage) { print(e.message); return 2; }
     if (e instanceof SourceError) { print(a.flags.json ? JSON.stringify({ code: e.code, detail: e.message, retryAfterSec: e.retryAfterSec }, null, 1) : `apex: ${e.message}${e.retryAfterSec ? ` Try again in ${e.retryAfterSec} seconds.` : ''}`);
       return e.code === 'validation' ? 2 : e.code === 'halted' || e.code === 'budget' ? 3 : 1; }
+    // A ledger file that fails its own hashes stops every command that reads it, the run and the halt included: nothing is
+    // appended to a chain that is already broken. Say so plainly, with the same exit code as `ledger verify`.
+    const v = damaged(e); if (v) { print(a.flags.json ? JSON.stringify(v, null, 1) : `apex: the ledger does not verify (entry ${v.badSeq}: ${v.why}). Nothing was written, and nothing runs until it is restored: docs/runbooks/ledger-verify-failed.md`); return 4; }
     throw e;
   }
 }
@@ -217,7 +220,8 @@ async function dispatch(a: Args, ctx: Ctx, print: (s: string) => void): Promise<
         const v = buildView(entries, cfg.paperCapital); print(`Replayed ${entries.length} entries: ${v.trials.size} trials, ${v.slots.size} slots, ${v.closed.length} closed trades, cash ${usd(v.cash)}.`); return 0; }).catch(e => { const v = damaged(e); if (!v) throw e; print(json ? JSON.stringify(v, null, 1) : R.verifyText(v)); return 4; }); }
       if (sub === 'anchor') { localOnly(); if (cfg.ledgerAnchor === 'off') { print('Anchoring is switched off (APEX_LEDGER_ANCHOR=off). Nothing was saved.'); return 0; }
         const o = await openStore(ctx), release = await o.lock(); if (!release) { await o.close(); print('Another run holds the lock. Nothing was saved.'); return 3; }
-        try { const entries = await o.store.read(), chain = verifyChain(entries), heads = chain.ok ? checkHeads(entries, readHeads(ctx.stateDir)) : null;
+        try { let entries: LedgerEntry[]; try { entries = await o.store.read(); } catch (e) { const v = damaged(e); if (!v) throw e; print(`The ledger does not verify (entry ${v.badSeq}: ${v.why}), so nothing was anchored.`); return 4; }
+          const chain = verifyChain(entries), heads = chain.ok ? checkHeads(entries, readHeads(ctx.stateDir)) : null;
           if (!chain.ok || !heads!.ok) { print(`The ledger does not verify (${chain.ok ? heads!.why : `entry ${chain.badSeq}: ${chain.why}`}), so nothing was anchored.`); return 4; }
           const plan = planAnchor(entries, ctx.now()); if ('skip' in plan) { print(plan.skip); return 0; }
           const file = writeHead(ctx.stateDir, plan.head); await new Ledger(o.store, ctx.now).append('anchor', 'cli', { seq: plan.head.seq, hash: plan.head.hash, file });
