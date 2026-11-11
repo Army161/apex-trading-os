@@ -14,6 +14,7 @@ export const VARS: { name: string; secret: boolean; from: string; about: string 
   { name: 'SUPABASE_URL', secret: false, from: 'P5.2', about: 'Proof\'s own Supabase project. Never the personal app\'s database' },
   { name: 'SUPABASE_ANON_KEY', secret: false, from: 'P5.2', about: 'Public key for sign-in. Row-level security is what protects the rows' },
   { name: 'SUPABASE_SERVICE_ROLE_KEY', secret: true, from: 'P5.2', about: 'Used only by the billing webhook and the workers' },
+  { name: 'PROOF_DATABASE_URL', secret: true, from: 'P5.3', about: 'A Postgres connection to Proof\'s own Supabase database, for the server and the workers. Every statement takes a role first' },
   { name: 'ANTHROPIC_API_KEY', secret: true, from: 'P5.3', about: 'Proof\'s own model key. The one name both apps use: it must be a different key' },
   { name: 'PROOF_AI_ACCOUNT_DAILY_USD', secret: false, from: 'P5.3', about: 'Model spend cap for one account in a day' },
   { name: 'PROOF_AI_GLOBAL_DAILY_USD', secret: false, from: 'P5.3', about: 'Model spend cap for the whole service in a day. The free plan pauses first' },

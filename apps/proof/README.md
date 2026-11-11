@@ -1,6 +1,6 @@
 # apps/proof
 
-Proof (a working name) is the claim checker as a service: docs/design/12-saas-product.md. It is a business separate from Jeremy's own trading. This folder is its app, and so far it is a skeleton (build plan P5.1): a landing page, a method page, a health route, the settings schema and the separation check. There is no sign-in, no database, no payment and no model call yet.
+Proof (a working name) is the claim checker as a service: docs/design/12-saas-product.md. It is a business separate from Jeremy's own trading. This folder is its app, and so far it is a skeleton (build plan P5.1): a landing page, a method page, a health route, the settings schema and the separation check. There is no sign-in, no hosted database, no payment and no model call yet. The tables and the claim check flow exist and are tested locally.
 
 ## Run it
 
@@ -28,9 +28,24 @@ It needs no setting to run. `.env.example` lists the ones later work packages wi
 7. **Row-level security is on and forced on every table,** and a signed-in person can write only two things: start a check and rename it. Everything else is written by the workers. A new table needs the same treatment, and the isolation test fails without it.
 8. **The per-account ledger and the count of tries are append-only for every role.**
 
+## The claim check flow
+
+`lib/checks.ts` is the flow as a library, tested on a throwaway Postgres with a stand-in for the model (`test/checks.test.ts`). No page or route calls it yet, because that needs sign-in.
+
+- `startCheck` runs as the signed-in person: intake, the plan's quota and its limit on checks in progress, the text into the store, one row.
+- `advance` does the next step as a worker. **extract** makes the one model call and keeps the answer. **run** checks the kept answer against the text again, writes every reading down in the account's ledger before it runs, runs the gate, and writes the entries, the result and the usage in one transaction.
+- `history` and `rulePage` run as the person and show their checks, their rule families and how many versions of each they tried.
+
+9. **One ledger per account, written only through the kernel's `Ledger` class** (`lib/ledger.ts`). A try is counted in `trials` when it is written down, before it runs.
+10. **Every statement takes a role first** (`lib/db.ts`): the person's, or the workers'. Nothing a person reads or starts runs as a worker.
+11. **A check counts against the month only when a reading was tested.** The quota is checked at the start and again, with the usage row locked, at the run.
+12. **The pasted text goes to the store, under the account's own prefix, never into a table or a log.** Before a step uses it, it must still match the hash the check was started with.
+
+Still to do in this flow: the real model call through one gateway with the per-account and global spend caps, the real store for the text (encrypted, with deletion), a queue, the routes and the screens. The shared checker's sentences still say "Apex" where the product should say its own name.
+
 ## Not built yet
 
-Sign-in with Supabase Auth (the second half of P5.2: it needs the Supabase project), the claim check flow (P5.3), billing in Stripe test mode (P5.4), the rest of the screens (P5.5), share links (P5.6). The market data licence is not chosen: see `DATA_LICENCE.md`.
+Sign-in with Supabase Auth (the second half of P5.2: it needs the Supabase project), the routes, screens and model call of the claim check flow (rest of P5.3), billing in Stripe test mode (P5.4), the rest of the screens (P5.5), share links (P5.6). The market data licence is not chosen: see `DATA_LICENCE.md`.
 
 ## Only Jeremy can do these
 

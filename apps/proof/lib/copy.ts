@@ -31,4 +31,15 @@ export const COPY = {
     limits: 'A check uses historical bars and assumed costs. It cannot see the future, order-book detail or anything the source did not state. "Untestable" means the source did not state rules exact enough to test.',
   },
 };
-export const allCopy = (): string[] => { const out: string[] = []; const walk = (x: unknown) => { if (typeof x === 'string') out.push(x); else if (x && typeof x === 'object') Object.values(x).forEach(walk); }; walk(COPY); return out.filter(Boolean); };
+/** What the app says when it will not start a check, and the fixed line on a rule page. Held to the same wording test as the pages. */
+export const MESSAGES = {
+  notChecked: (why: string) => `Not checked: ${why}.`,
+  noAccount: 'There is no account for this sign-in.',
+  notActive: 'This account is not active, so nothing was run.',
+  quota: (used: number, limit: number) => `This plan has ${limit} ${limit === 1 ? 'check' : 'checks'} a month and ${used} ${used === 1 ? 'is' : 'are'} used. Nothing was run and nothing was counted.`,
+  busy: (n: number) => `This plan runs ${n} ${n === 1 ? 'check' : 'checks'} at a time. Wait for the one in progress to finish.`,
+  tried: (n: number) => n === 1 ? 'You tried 1 version of this rule.' : `You tried ${n} versions of this rule. The best one is marked down for that.`,
+};
+
+/** Every fixed sentence, for the wording test. A sentence built from numbers is built once with sample numbers. */
+export const allCopy = (): string[] => { const out: string[] = []; const walk = (x: unknown) => { if (typeof x === 'string') out.push(x); else if (typeof x === 'function') walk(x(2, 3)); else if (x && typeof x === 'object') Object.values(x).forEach(walk); }; walk(COPY); walk(MESSAGES); return out.filter(Boolean); };
