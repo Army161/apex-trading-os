@@ -1,0 +1,8 @@
+{
+  "name": "@apex/store",
+  "version": "0.1.0",
+  "private": true,
+  "exports": { ".": "./src/index.ts", "./*": "./src/*.ts" },
+  "dependencies": { "@apex/kernel": "*", "pg": "^8.13.1" },
+  "devDependencies": { "@types/pg": "^8.11.10" }
+}
