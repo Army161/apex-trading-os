@@ -15,6 +15,7 @@ These are model-agnostic (archive/chat/68). Claude Code, OpenCode, Codex, or a l
 - `archive/`: every transcript Jeremy sent, word for word. `archive/INDEX.md` lists them.
 - `web/`: the Next.js dashboard. The strategy engine now lives in `packages/engine`; `web/lib/engine/` re-exports it.
 - `packages/`: the autopilot core (engine, kernel, data, store, autopilot). Read `packages/README.md` and its Invariants first.
+- `apps/proof/`: the product (the claim checker as a service), a separate business with its own deployment and keys. It shares seven packages with the rest and nothing else. Read `apps/proof/README.md` first; `node tools/separation_check.mjs` holds the line and runs as a test.
 - `apps/cli/`: the `apex` command (`npm run apex -- help`) and the code the nightly paper run uses.
 - `packages/mcp`: the MCP server (`apex mcp` over stdio, `/api/mcp` on the dashboard). It can read, start a claim check and pull the halt, and nothing else. `mcp-server/` is the old Python one.
 - `.github/red-paths.txt`: paths that need Jeremy's review. They never auto-merge.

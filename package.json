@@ -7,7 +7,7 @@
     "web"
   ],
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck -w web",
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck -w web && npm run typecheck -w proof-app",
     "test": "npm run test:packages && npm run test -w web",
     "test:packages": "tsx --test packages/*/test/*.test.ts apps/*/test/*.test.ts",
     "apex": "tsx apps/cli/src/main.ts",
