@@ -65,12 +65,13 @@ def scan(target: str):
 
 
 def units(target: str):
-    """A folder holding several skills (each with its own SKILL.md) is scored one skill at a time."""
+    """A folder holding several skills (each with its own SKILL.md) is scored as a whole first, then one skill at a time.
+    The whole comes first so that hooks, launchers, agents and commands beside the skills are never left out."""
     root = Path(target)
     if root.is_file() or (root / "SKILL.md").exists():
         return [target]
     subs = sorted({str(f.parent) for f in root.rglob("SKILL.md") if "node_modules" not in f.parts})
-    return subs or [target]
+    return [target] + subs
 
 
 def main(argv):

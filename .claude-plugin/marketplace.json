@@ -1,0 +1,7 @@
+{
+  "name": "apex-local",
+  "owner": { "name": "Apex" },
+  "plugins": [
+    { "name": "apex", "source": "./plugin", "description": "Apex trading research: skills, commands, the MCP server and the guard hook. Paper first. Holds no key and can place no order." }
+  ]
+}

@@ -23,7 +23,7 @@ Agents do research, checking and reporting. They never trade. This file fixes th
 | `reporter` | Turn the run's `ReportData` into the daily report's AI review, the weekly digest and the Telegram summary | read, analyze, notify, write_file | Sonnet 5.5 | 4 | Daily and weekly crons |
 | `code-reviewer` | Review PRs (PR-Agent in CI). Comment and suggest only | read, analyze | per PR-Agent config | per PR | GitHub Action |
 | `promotion-reviewer` | The existing owner, engineer and QA chain in `review.ts`, run before a live approval can be offered | read, analyze, write_file | Fable 5.2 | 2 | On `live_eligible` |
-| `playbook-distiller`, `build-buddy` | Existing helpers in `.claude/agents/` | unchanged | unchanged | unchanged | Manual |
+| `playbook-distiller`, `build-buddy` | Existing helpers, now in `plugin/agents/` | unchanged | unchanged | unchanged | Manual |
 
 Notes:
 - `halt` is the one non-read power any agent has, and it only ever makes things safer.

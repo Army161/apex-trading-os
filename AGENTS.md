@@ -20,7 +20,7 @@ These are model-agnostic (archive/chat/68). Claude Code, OpenCode, Codex, or a l
 - `.github/red-paths.txt`: paths that need Jeremy's review. They never auto-merge.
 - `bots/`: Python paper bots.
 - `docs/`: how-tos and design notes. Start with `docs/how-to-direct-apex-agents.md`, `docs/agent-safety-and-office.md` and `docs/validation-results.md`.
-- `.claude/agents/build-buddy.md`: the debug helper prompt. It is plain markdown, so any agent can use it.
+- `plugin/`: the Claude Code plugin. Seven skills (`plugin/skills/`), three commands, three agent prompts (`plugin/agents/`, with the debug helper `build-buddy.md`), the MCP server and the guard hook. All plain markdown, so any agent can read them.
 - `web/lib/gateway.ts`: the only file that calls a model. Switching providers is a change to that one file.
 
 ## Before you change a folder

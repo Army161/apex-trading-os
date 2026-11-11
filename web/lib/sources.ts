@@ -465,7 +465,7 @@ export const SOURCES = [
  {
   "id": "chat/67",
   "title": "Free coding agent on DeepSeek",
-  "feeds": "/.claude/agents/build-buddy.md",
+  "feeds": "plugin/agents/build-buddy.md",
   "file": "archive/chat/67-free-coding-agent-deepseek.md",
   "notes": "Paper only. Nothing installed."
  },
@@ -521,7 +521,7 @@ export const SOURCES = [
  {
   "id": "chat/75",
   "title": "Claude use cases list",
-  "feeds": "docs/trading-playbook.md, .claude/agents/playbook-distiller.md, web/lib/engine/gaps.ts, docs/strategy-gaps.md",
+  "feeds": "docs/trading-playbook.md, plugin/agents/playbook-distiller.md, web/lib/engine/gaps.ts, docs/strategy-gaps.md",
   "file": "archive/chat/75-claude-use-cases-list.md",
   "notes": "Only the playbook and gap-scan ideas used. Hacking, jailbreak, dating-bot, decompiling and haggling items not acted on."
  },
