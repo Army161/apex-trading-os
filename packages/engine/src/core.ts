@@ -59,6 +59,23 @@ export function swings(b: Bar[], left = 3, right = 3) {
   return { lastSH, lastSL, prevSH, prevSL, trend };
 }
 
+// Per-bar fill rules, shared by backtest() and the paper broker so the two cannot drift apart (docs/design/04 s10.2).
+/** An entry fills at the bar's open, moved against us by slippage. */
+export const entryFill = (open: number, side: 1 | -1, slip: number) => open * (1 + slip * side);
+/** An exit fills at the given raw price, moved against us by slippage. */
+export const exitFill = (px0: number, side: 1 | -1, slip: number) => px0 * (1 - slip * side);
+/** Stop first, then target. A gap through the stop fills at the open. Returns the raw exit price, or null if neither was touched. */
+export function barExit(bar: Bar, side: 1 | -1, stop: number, target: number, trailed = false): { px: number; reason: 'stop' | 'trail' | 'target' } | null {
+  if (side === 1) {
+    if (bar.l <= stop) return { px: Math.min(bar.o, stop), reason: trailed ? 'trail' : 'stop' };
+    if (!isNaN(target) && bar.h >= target) return { px: Math.max(bar.o, target), reason: 'target' };
+  } else {
+    if (bar.h >= stop) return { px: Math.max(bar.o, stop), reason: trailed ? 'trail' : 'stop' };
+    if (!isNaN(target) && bar.l <= target) return { px: Math.min(bar.o, target), reason: 'target' };
+  }
+  return null;
+}
+
 /** dayTarget / dayLoss (chat/86): fractions of the day's starting equity. Once realised P&L for the UTC day reaches either,
  *  no new entries that day. Open trades still run to their own exits. */
 export function backtest(b: Bar[], s: Sig, o: { capital?: number; risk?: number; fee?: number; slip?: number; dayTarget?: number; dayLoss?: number } = {}) {
@@ -68,7 +85,7 @@ export function backtest(b: Bar[], s: Sig, o: { capital?: number; risk?: number;
   let cash = capital, pos: Trade | null = null, pending: [1 | -1, number, number] | null = null, pendExit = false;
   const trades: Trade[] = [], eq: number[] = [];
   const close = (i: number, px0: number, why: string) => {
-    const p = pos!; const px = px0 * (1 - slip * p.side);
+    const p = pos!; const px = exitFill(px0, p.side, slip);
     const gross = (px - p.entry) * p.qty * p.side, cost = fee * px * p.qty;
     cash += gross - cost;
     Object.assign(p, { exit: px, exitT: b[i].t, reason: why, pnl: gross - cost - fee * p.entry * p.qty });
@@ -81,7 +98,7 @@ export function backtest(b: Bar[], s: Sig, o: { capital?: number; risk?: number;
     if (!halted && (o.dayTarget || o.dayLoss)) { const pl = cash - dayStart; if ((o.dayTarget && pl >= o.dayTarget * dayStart) || (o.dayLoss && pl <= -o.dayLoss * dayStart)) halted = true; }
     if (halted) pending = null;
     if (!pos && pending) {
-      const [side, st0, tg] = pending; const px = b[i].o * (1 + slip * side);
+      const [side, st0, tg] = pending; const px = entryFill(b[i].o, side, slip);
       let st = st0; if (isNaN(st) || (side === 1 && st >= px) || (side === -1 && st <= px)) st = px - 2 * (a[i - 1] || px * 0.025) * side;
       const d = Math.abs(px - st);
       let qty = d > 0 ? Math.min(cash * risk / d, cash / px) : 0; if (s.fullSize) qty = cash / px;
@@ -90,8 +107,7 @@ export function backtest(b: Bar[], s: Sig, o: { capital?: number; risk?: number;
     pending = null;
     if (pos) {
       const p: Trade = pos; p.bars++;
-      if (p.side === 1) { if (b[i].l <= p.stop) close(i, Math.min(b[i].o, p.stop), p.mods ? 'trail' : 'stop'); else if (!isNaN(p.target) && b[i].h >= p.target) close(i, Math.max(b[i].o, p.target), 'target'); }
-      else { if (b[i].h >= p.stop) close(i, Math.max(b[i].o, p.stop), p.mods ? 'trail' : 'stop'); else if (!isNaN(p.target) && b[i].l <= p.target) close(i, Math.min(b[i].o, p.target), 'target'); }
+      const x = barExit(b[i], p.side, p.stop, p.target, !!p.mods); if (x) close(i, x.px, x.reason);
     }
     if (pos && trailer) { const p: Trade = pos; const ns = trailer(i, p.side, p.entry, p.stop); if (!isNaN(ns)) { p.stop = ns; p.mods = (p.mods ?? 0) + 1; } }  // chat/81 trail, live next bar
     if (pos) { const p: Trade = pos; if ((p.side === 1 && s.lx[i]) || (p.side === -1 && s.sx[i]) || (s.maxBars && p.bars >= s.maxBars)) pendExit = true; }
