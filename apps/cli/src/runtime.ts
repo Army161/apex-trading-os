@@ -14,8 +14,11 @@ import { FileLedgerStore, fileLock } from '@apex/store';
 import { PRIOR_COSTS, renderReport, renderShort, runAutopilot, type RunInput, type RunOutput } from '@apex/autopilot';
 
 import { renderMarkdown as renderClaim, runClaimCheck, type CheckOutput, type Extracted, type Intake } from '@apex/claims';
+import { createHash, createHmac } from 'node:crypto';
+import { createInterface } from 'node:readline';
 export type Env = Record<string, string | undefined>;
-export type Ctx = { root: string; env: Env; stateDir: string; now: () => number };
+/** `confirm` asks a person at the keyboard to type `expect`. It is absent when there is no real terminal, and commands that need a person refuse. */
+export type Ctx = { root: string; env: Env; stateDir: string; now: () => number; confirm?: (question: string, expect: string) => Promise<boolean> };
 export const makeCtx = (root: string, env: Env = process.env, now: () => number = Date.now): Ctx => ({ root, env, stateDir: env.APEX_STATE_DIR || join(root, '.apex'), now });
 
 export type Opened = { store: LedgerStore; kind: 'postgres' | 'file'; where: string; lock: () => Promise<(() => Promise<void>) | null>; saveReport: (id: string, at: number, md: string, summary: unknown) => Promise<string>; close: () => Promise<void> };
@@ -122,4 +125,16 @@ export async function claimCheck(ctx: Ctx, intake: Intake, extracted: Extracted,
     if (!o.dryRun && out.appends.length) await new Ledger(opened.store, () => now).appendAll('claim-checker', out.appends);
     return { out, markdown: renderClaim(out.result), head: await opened.store.head(), store: `${opened.kind} (${opened.where})` };
   } finally { await release(); await opened.close(); }
+}
+
+/** A guard-hook sign-off (docs/design/10 s3.2): one red path, the exact file content it was made against, 48 hours. The
+ *  signature is the one tools/guard_hook.mjs checks; a test makes a sign-off here and has the hook verify it. */
+export function makeSignoff(root: string, path: string, reason: string, key: string, now: number) {
+  const baseHash = existsSync(join(root, path)) ? createHash('sha256').update(readFileSync(join(root, path))).digest('hex') : 'new', expires = new Date(now + 48 * 3600e3).toISOString();
+  return { path, baseHash, reason, expires, sig: createHmac('sha256', key).update(`${path}|${baseHash}|${reason}|${expires}`).digest('hex') };
+}
+/** The keyboard prompt for commands only a person may run. Returns undefined when stdin or stdout is not a terminal. */
+export function terminalConfirm(): Ctx['confirm'] {
+  if (!process.stdin.isTTY || !process.stdout.isTTY) return undefined;
+  return (question, expect) => new Promise(done => { const rl = createInterface({ input: process.stdin, output: process.stdout }); rl.question(question, ans => { rl.close(); done(ans.trim() === expect); }); });
 }

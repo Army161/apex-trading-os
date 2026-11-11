@@ -1,13 +1,14 @@
 #!/usr/bin/env -S npx tsx
-// apex: the command line (docs/design/08). Read commands print; `run`, `validate`, `claim` and `halt` are the only ones that write,
+// apex: the command line (docs/design/08). Read commands print; `run`, `validate`, `claim` and `halt` are the only ones that write to the ledger,
 // and they write only ledger entries. There is no order command, no resume command and no way to go live from here.
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, relative, resolve } from 'node:path';
 import { STRATEGIES } from '@apex/engine/strategies';
 import { CEILINGS, DEFAULT_LIMITS, GATE_V1, LIMIT_KEYS, Ledger, STAGES, bookAt, buildView, effectiveLimits, gateVersion, liveAllowed, loadConfig, passBar, slotsEver, trialsEver, verifyChain } from '@apex/kernel';
 import { PRIOR_COSTS } from '@apex/autopilot';
 import { EXTRACT_FAILED, extractionRequest, intake, validateExtraction, type Extracted } from '@apex/claims';
-import { claimCheck, execute, fingerprints, haltsFrom, loadData, makeCtx, openStore, pullData, sendTelegram, type Ctx } from './runtime';
+import { claimCheck, execute, makeSignoff, terminalConfirm, fingerprints, haltsFrom, loadData, makeCtx, openStore, pullData, sendTelegram, type Ctx } from './runtime';
 
 const HELP = `apex: paper-first trading research. Nothing here places a live order.
 
@@ -25,6 +26,7 @@ const HELP = `apex: paper-first trading research. Nothing here places a live ord
                                        Test the rules a source states. Each reading is one try
   apex claim <file> --request          Print the extraction request (prompt and schema). No model is called here
   apex halt "<reason>"                 Pull the andon cord. Always allowed
+  apex signoff <path> --reason "..."   Jeremy only: allow one edit of a red path for 48 hours. Needs APEX_SIGNOFF_KEY and a keyboard
   apex live status                     The four locks, read-only
   apex doctor                          Config, ledger chain, data, fingerprints
 
@@ -137,6 +139,19 @@ export async function main(argv: string[], ctx: Ctx = makeCtx(resolve(process.en
       print(r.markdown); print(a.flags['dry-run'] ? 'Dry run: nothing was written.' : `Ledger: ${r.store}, head seq ${r.head?.seq ?? 0}.`);
       return r.out.result.status === 'waiting_budget' ? 3 : 0;
     }
+    case 'signoff': {
+      // Jeremy's own command (docs/design/10 s3.2). It needs the key, which exists only on his machine, and a person at the keyboard.
+      const reason = typeof a.flags.reason === 'string' ? a.flags.reason.trim() : '', key = ctx.env.APEX_SIGNOFF_KEY;
+      if (!sub || !reason) { print('Usage: apex signoff <path> --reason "<why this red path may change>"'); return 2; }
+      if (!key) { print('Refused: APEX_SIGNOFF_KEY is not set. It exists only on Jeremy\'s own machine, so a sign-off cannot be made here.'); return 2; }
+      if (!ctx.confirm) { print('Refused: a sign-off needs a person at a real terminal. This session has none.'); return 2; }
+      const path = relative(ctx.root, resolve(ctx.root, sub)).split('\\').join('/');
+      if (path.startsWith('..')) { print('Refused: that path is outside the repo.'); return 2; }
+      if (!(await ctx.confirm(`Sign off one change to ${path} for 48 hours? Type the path to confirm: `, path))) { print('Not signed. The path typed did not match.'); return 2; }
+      const s = makeSignoff(ctx.root, path, reason.slice(0, 300), key, ctx.now()), file = join(ctx.root, '.apex/signoff', `${createHash('sha256').update(path).digest('hex')}.json`);
+      mkdirSync(join(ctx.root, '.apex/signoff'), { recursive: true }); writeFileSync(file, JSON.stringify(s, null, 1) + '\n');
+      print(`Signed: ${path} may be edited until ${s.expires}, as long as it is still the file you signed for. The edit still goes through a pull request and your review.`); return 0;
+    }
     case 'halt': { const reason = a._.slice(1).join(' ').trim(); if (!reason) { print('Say why: apex halt "<reason>"'); return 2; }
       return withStore(async (_e, o) => { const e = await new Ledger(o.store, ctx.now).append('halt', 'cli', { level: 'andon', by: 'cli', reason: reason.slice(0, 500) });
         print(`Andon cord pulled (ledger seq ${e.seq}). No new entries will be opened until it is resumed on the dashboard.`); return 0; }); }
@@ -168,4 +183,4 @@ function summary(e: { kind: string; payload: any }): string { const p = e.payloa
 function validatorSummary(appends: { kind: string; payload: any }[]): string { const v = appends.filter(x => x.kind === 'validator_run').map(x => x.payload);
   return v.length ? ['Validator runs:', ...v.map(x => `- ${x.purpose} ${x.level} on ${x.slotKey ?? x.trialKey.slice(0, 12)}: ${x.agrees ? (x.exact ? 'agrees exactly' : 'agrees within tolerance') : `DISAGREES (${x.diffs.join('; ')})`}`)].join('\n') : 'Nothing was waiting for the validator.'; }
 
-if (require.main === module) main(process.argv.slice(2)).then(c => process.exit(c), e => { console.error(`apex: ${(e as Error).message}`); process.exit(1); });
+if (require.main === module) main(process.argv.slice(2), { ...makeCtx(resolve(process.env.APEX_ROOT || process.cwd())), confirm: terminalConfirm() }).then(c => process.exit(c), e => { console.error(`apex: ${(e as Error).message}`); process.exit(1); });
