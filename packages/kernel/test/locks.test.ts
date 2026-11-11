@@ -37,3 +37,9 @@ test('config fails closed and refuses trading keys or the sign-off key in the wr
   assert.deepEqual(loadConfig({ APEX_SIGNOFF_KEY: 'x' }, 'executor').problems, []);
   const c = loadConfig({ APEX_PAPER_CAPITAL: 'lots', APEX_TRIALS_PER_WEEK: '7.9', APEX_LEDGER_ANCHOR: 'weird' }); assert.equal(c.paperCapital, 10000); assert.equal(c.trialsPerWeek, 7); assert.equal(c.ledgerAnchor, 'git');
 });
+
+test('P0.6: a door with no secret set is open only in local development', async () => {
+  const { openWithoutSecret, loadConfig } = await import('../src/config');
+  assert.equal(openWithoutSecret(true), false); assert.equal(openWithoutSecret(false), true);
+  const c = loadConfig({ NODE_ENV: 'production' }, 'web'); assert.ok(c.problems.some(p => /APEX_ADMIN_PASSWORD/.test(p)) && c.problems.some(p => /APEX_INGEST_TOKEN/.test(p)) && c.problems.some(p => /CRON_SECRET/.test(p)));
+});

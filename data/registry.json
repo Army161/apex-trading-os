@@ -98,7 +98,8 @@
     "fx-majors-daily"
    ],
    "costBucket": "liquid",
-   "file": "eurusd_1d.csv"
+   "file": "eurusd_1d.csv",
+   "ticker": "C:EURUSD"
   },
   {
    "id": "csv:BTC:1d:raw",
@@ -114,7 +115,8 @@
     "crypto-daily"
    ],
    "costBucket": "liquid",
-   "file": "btc_1d.csv"
+   "file": "btc_1d.csv",
+   "ticker": "X:BTCUSD"
   }
  ]
 }

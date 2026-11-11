@@ -1,0 +1,71 @@
+# The daily paper run (docs/design/13 and 04 section 19). Paper only: this job holds no key that can trade, and the pipeline has
+# no code path that sends an order to a broker.
+#
+# State (the ledger, refreshed bars and reports) lives on the `apex-state` branch, so git history is a second witness of the
+# ledger. When DATABASE_URL is set as a secret, Postgres is the ledger instead and the branch keeps the reports and bars.
+#
+# Order each night: refresh bars, then the validator (it re-checks what an earlier run found), then the run. A pair is never
+# promoted by the run that found it, so a new pass waits for the next night's validator.
+name: nightly
+on:
+  schedule:
+    - cron: '30 22 * * 1-5'   # 22:30 UTC, Monday to Friday, after the US close
+  workflow_dispatch:
+    inputs:
+      full:
+        description: Evaluate every pair again (default is a budgeted tick)
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: apex-nightly
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      APEX_STATE_DIR: ${{ github.workspace }}/.apex-state/state
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: fetch the state branch, or start it
+        run: |
+          if git fetch origin apex-state --depth 1 2>/dev/null; then
+            git worktree add --detach .apex-state FETCH_HEAD
+          else
+            git worktree add --detach .apex-state
+            cd .apex-state && git checkout -q --orphan apex-state && git rm -rfq . && cd ..
+            echo "Apex state: the paper ledger, refreshed bars and daily reports. Written by the nightly workflow. Do not edit by hand." > .apex-state/README.md
+          fi
+          mkdir -p "$APEX_STATE_DIR"
+      - name: the ledger chain is intact before anything is added
+        run: npm run -s apex -- ledger verify
+      - name: refresh bars
+        run: npm run -s apex -- data pull
+      - name: validator
+        run: npm run -s apex -- validate
+      - name: run
+        run: |
+          # The first run ever is the plan-approved seed batch (P1.13): every pair once. After that, a budgeted tick.
+          if [ "${{ inputs.full }}" = "true" ]; then FULL=--full; else FULL=; fi
+          npm run -s apex -- run $FULL --seed-if-empty plan:P1.13 --send telegram > "$RUNNER_TEMP/report.md"
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: the ledger chain is intact after the run
+        run: npm run -s apex -- ledger verify
+      - name: save state
+        if: always()
+        run: |
+          cd .apex-state
+          git config user.name "apex-nightly" && git config user.email "apex-nightly@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "nothing to save"; exit 0; }
+          git commit -q -m "nightly state $(date -u +%Y-%m-%d)"
+          git push origin HEAD:apex-state

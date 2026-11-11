@@ -29,7 +29,7 @@ def main() -> int:
             r = d / "README.md"
             if not r.exists():
                 bad.append(f"bots/{d.name}: no README.md")
-    for r in [ROOT / "bots/README.md", ROOT / "web/lib/README.md"]:
+    for r in [ROOT / "bots/README.md", ROOT / "web/lib/README.md", ROOT / "packages/README.md", ROOT / "apps/cli/README.md"]:
         if not r.exists() or "## Invariants" not in r.read_text():
             bad.append(f"{rel(r)}: missing '## Invariants' section")
     # 2. Bots start in paper. Any bot code that can switch to live must also require APEX_ALLOW_LIVE=yes (the second switch).
@@ -42,7 +42,7 @@ def main() -> int:
             bad.append(f"{rel(p)}: can switch to live without the APEX_ALLOW_LIVE=yes second switch")
     # 3. No withdraw or transfer tools anywhere. The only allowed mentions are the deny list and its test.
     allow = {"web/lib/policy.ts", "web/lib/engine/selftest.ts", "tools/drift_check.py"}
-    for base in [ROOT / "bots", ROOT / "web", ROOT / "mcp-server", ROOT / "tools"]:
+    for base in [ROOT / "bots", ROOT / "web", ROOT / "mcp-server", ROOT / "tools", ROOT / "packages", ROOT / "apps"]:
         if not base.exists():
             continue
         for p in files(base):

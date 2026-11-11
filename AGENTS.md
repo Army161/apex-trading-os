@@ -13,7 +13,10 @@ These are model-agnostic (archive/chat/68). Claude Code, OpenCode, Codex, or a l
 
 ## Where things are
 - `archive/`: every transcript Jeremy sent, word for word. `archive/INDEX.md` lists them.
-- `web/`: the Next.js dashboard and the TypeScript strategy engine (`web/lib/engine/`).
+- `web/`: the Next.js dashboard. The strategy engine now lives in `packages/engine`; `web/lib/engine/` re-exports it.
+- `packages/`: the autopilot core (engine, kernel, data, store, autopilot). Read `packages/README.md` and its Invariants first.
+- `apps/cli/`: the `apex` command (`npm run apex -- help`) and the code the nightly paper run uses.
+- `.github/red-paths.txt`: paths that need Jeremy's review. They never auto-merge.
 - `bots/`: Python paper bots.
 - `docs/`: how-tos and design notes. Start with `docs/how-to-direct-apex-agents.md`, `docs/agent-safety-and-office.md` and `docs/validation-results.md`.
 - `.claude/agents/build-buddy.md`: the debug helper prompt. It is plain markdown, so any agent can use it.
@@ -24,6 +27,8 @@ Read its README.md first. The `## Invariants` section lists rules that must stay
 
 ## Checks before you say you're done
 ```
-cd web && npx tsc --noEmit -p . && npm test
-python3 tools/drift_check.py
+npm run typecheck && npm test
+npm run apex -- strategies fingerprint --check
+python3 -m pytest -q
+python3 tools/drift_check.py && node tools/protected_paths.mjs --self-check
 ```

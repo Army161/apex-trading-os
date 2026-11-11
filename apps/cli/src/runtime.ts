@@ -1,13 +1,14 @@
 // What the CLI and the nightly job share: open the ledger, load data, build the run input, run, append, write the report.
 // The pipeline itself is pure (packages/autopilot). Everything that touches disk, clock, network or environment is here.
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { STRATEGIES } from '@apex/engine/strategies';
 import { computeFingerprints, diffFingerprints, type Fingerprints } from '@apex/engine/fingerprint';
 import { GATE_V1, Ledger, buildView, loadConfig, type LedgerStore, type LedgerEntry, type Halts } from '@apex/kernel';
 import { checkData } from '@apex/data/firewall';
-import { loadCsvDataset, loadRegistry } from '@apex/data/registry';
+import { cachePath, loadCsvDataset, loadRegistry, pullDataset } from '@apex/data/registry';
+import { massiveAdapter } from '@apex/data/adapters';
 import type { DataHealth, LoadedDataset } from '@apex/data/types';
 import { FileLedgerStore, fileLock } from '@apex/store';
 import { PRIOR_COSTS, renderReport, renderShort, runAutopilot, type RunInput, type RunOutput } from '@apex/autopilot';
@@ -36,10 +37,29 @@ export function loadData(ctx: Ctx, only?: (id: string) => boolean): { datasets: 
   for (const spec of loadRegistry(ctx.root).datasets) {
     if (only && !only(spec.id)) continue;
     if (spec.source !== 'csv') { problems.push(`${spec.id}: live source ${spec.source} is pulled by \`apex data pull\`, which needs its key and accepted terms`); continue; }
-    try { const d = loadCsvDataset(ctx.root, spec, now); datasets.push(d); health.push(checkData(d.bars, spec, d.version, GATE_V1.firewall, { now, fetchedAt: d.fetchedAt, termsRef: 'data/SOURCES.md#csv' })); }
+    try { const d = loadCsvDataset(ctx.root, spec, now, join(ctx.stateDir, 'data')); datasets.push(d); health.push(checkData(d.bars, spec, d.version, GATE_V1.firewall, { now, fetchedAt: d.fetchedAt, termsRef: 'data/SOURCES.md#csv' })); }
     catch (e) { problems.push(`${spec.id}: ${(e as Error).message}`); }
   }
   return { datasets, health, problems };
+}
+
+/**
+ * Refresh the bars. Each committed file is copied into the state directory once and then only appended to, so history stays the
+ * same and the same pair stays the same trial. Needs MASSIVE_API_KEY (a data key: it cannot trade) and an accepted terms entry.
+ */
+export async function pullData(ctx: Ctx, fetchFn: typeof fetch = fetch, sleep: (ms: number) => Promise<void> = ms => new Promise(r => setTimeout(r, ms))): Promise<{ pulled: string[]; problems: string[] }> {
+  const key = ctx.env.MASSIVE_API_KEY, pulled: string[] = [], problems: string[] = [];
+  if (!key) return { pulled, problems: ['MASSIVE_API_KEY is not set: the committed files are used as they are, and stale data cannot open paper orders'] };
+  const cacheDir = join(ctx.stateDir, 'data'), sourcesMd = readFileSync(join(ctx.root, 'data/SOURCES.md'), 'utf8'), adapter = massiveAdapter(key, fetchFn as any), done = new Set<string>(); mkdirSync(cacheDir, { recursive: true });
+  for (const spec of loadRegistry(ctx.root).datasets) {
+    const path = cachePath(cacheDir, spec), file = spec.from?.file ?? spec.file; if (spec.source !== 'csv' || !file || done.has(path)) continue; done.add(path);
+    try { if (!existsSync(path)) copyFileSync(join(ctx.root, 'data', file), path);
+      if (done.size > 1) await sleep(Math.ceil(60000 / adapter.rateLimit.perMinute) + 500);
+      const r = await pullDataset({ ...spec, tf: spec.from?.tf ?? spec.tf, from: undefined }, adapter, { cacheDir, now: ctx.now(), sourcesMd });
+      pulled.push(`${spec.symbol} ${spec.from?.tf ?? spec.tf}: ${r.added} new bars${r.restated.length ? `, ${r.restated.length} restated by the provider` : ''}`); }
+    catch (e) { problems.push(`${spec.symbol}: ${(e as Error).message.replace(key, '[key]')}`); }
+  }
+  return { pulled, problems };
 }
 
 export function fingerprints(ctx: Ctx): { now: Fingerprints; committed: Fingerprints | null; diffs: string[] } {
@@ -57,7 +77,7 @@ export function haltsFrom(entries: LedgerEntry[], capital: number): Halts {
   catch { return { readable: false, kill: false, andon: false }; }
 }
 
-export type RunOpts = { mode: 'tick' | 'full' | 'validator'; budget?: number; dryRun?: boolean; seedSource?: string; level?: 'L1' | 'L2' | 'L3'; only?: (id: string) => boolean; extraHalts?: Partial<Halts> };
+export type RunOpts = { mode: 'tick' | 'full' | 'validator'; budget?: number; dryRun?: boolean; seedSource?: string; seedIfEmpty?: string; level?: 'L1' | 'L2' | 'L3'; only?: (id: string) => boolean; extraHalts?: Partial<Halts> };
 export type RunResult = { out: RunOutput; markdown: string; short: string; reportPath: string | null; head: { seq: number; hash: string } | null; store: string; skipped?: string };
 export async function execute(ctx: Ctx, o: RunOpts): Promise<RunResult> {
   const cfg = loadConfig(ctx.env, 'cli'), opened = await openStore(ctx), release = o.dryRun ? async () => {} : await opened.lock();
@@ -65,6 +85,8 @@ export async function execute(ctx: Ctx, o: RunOpts): Promise<RunResult> {
   try {
     const now = ctx.now(), entries = await opened.store.read(), data = loadData(ctx, o.only), fp = fingerprints(ctx);
     const registry = STRATEGIES.map(def => ({ def, fingerprint: fp.now.strategies[def.id] }));
+    // A ledger with no trial yet gets the plan-approved seed batch: every pair once, exempt from the weekly budget.
+    if (o.seedIfEmpty && o.mode !== 'validator' && !entries.some(e => e.kind === 'prereg')) o = { ...o, mode: 'full', seedSource: o.seedIfEmpty };
     const runId = `${new Date(now).toISOString().replace(/[-:]/g, '').slice(0, 15)}-${o.mode}`, base = haltsFrom(entries, cfg.paperCapital);
     const inp: RunInput = { now, runId, commit: commitOf(ctx), mode: o.mode, datasets: data.datasets, health: data.health, registry, engineFingerprint: fp.now.engine, entries, durable: opened.store.durable,
       requestedLimits: cfg.limits, halts: { readable: base.readable && o.extraHalts?.readable !== false, kill: base.kill || !!o.extraHalts?.kill, andon: base.andon || !!o.extraHalts?.andon },

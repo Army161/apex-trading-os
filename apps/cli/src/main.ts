@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 import { STRATEGIES } from '@apex/engine/strategies';
 import { CEILINGS, DEFAULT_LIMITS, GATE_V1, LIMIT_KEYS, Ledger, STAGES, bookAt, buildView, effectiveLimits, gateVersion, liveAllowed, loadConfig, passBar, slotsEver, trialsEver, verifyChain } from '@apex/kernel';
 import { PRIOR_COSTS } from '@apex/autopilot';
-import { execute, fingerprints, haltsFrom, loadData, makeCtx, openStore, sendTelegram, type Ctx } from './runtime';
+import { execute, fingerprints, haltsFrom, loadData, makeCtx, openStore, pullData, sendTelegram, type Ctx } from './runtime';
 
 const HELP = `apex: paper-first trading research. Nothing here places a live order.
 
@@ -17,7 +17,7 @@ const HELP = `apex: paper-first trading research. Nothing here places a live ord
   apex report [--send telegram]        Print the latest report
   apex board [--status S] [--market M] [--top N]
   apex slots | book | risk | costs
-  apex data health
+  apex data health | pull              pull needs MASSIVE_API_KEY (a data key; it cannot trade)
   apex ledger head | tail [-n N] | show <seq> | verify | replay
   apex strategies list | fingerprint [--write | --check]
   apex halt "<reason>"                 Pull the andon cord. Always allowed
@@ -45,8 +45,9 @@ export async function main(argv: string[], ctx: Ctx = makeCtx(resolve(process.en
 
     case 'run': case 'validate': {
       const mode = cmd === 'validate' ? 'validator' : a.flags.full ? 'full' : 'tick', seed = typeof a.flags.seed === 'string' ? a.flags.seed : undefined;
-      if (seed && !/^plan:[\w.-]+$/.test(seed)) { print('--seed must name an approved plan item, like plan:P1.13'); return 2; }
-      const r = await execute(ctx, { mode, budget: a.flags.budget ? Number(a.flags.budget) : undefined, dryRun: !!a.flags['dry-run'], seedSource: seed, level: (a.flags.level as any) ?? 'L1' });
+      const seedIfEmpty = typeof a.flags['seed-if-empty'] === 'string' ? a.flags['seed-if-empty'] as string : undefined;
+      if ((seed && !/^plan:[\w.-]+$/.test(seed)) || (seedIfEmpty && !/^plan:[\w.-]+$/.test(seedIfEmpty))) { print('--seed must name an approved plan item, like plan:P1.13'); return 2; }
+      const r = await execute(ctx, { mode, budget: a.flags.budget ? Number(a.flags.budget) : undefined, dryRun: !!a.flags['dry-run'], seedSource: seed, seedIfEmpty, level: (a.flags.level as any) ?? 'L1' });
       print(a.flags.json ? JSON.stringify({ report: r.out.report, head: r.head }, null, 1) : cmd === 'validate' ? validatorSummary(r.out.appends) : r.markdown);
       print(`\n${a.flags['dry-run'] ? 'Dry run: nothing was written.' : `Ledger: ${r.store}, head seq ${r.head?.seq ?? 0}.`}${r.reportPath ? ` Report: ${r.reportPath}` : ''}`);
       if (a.flags.send === 'telegram' && !a.flags['dry-run']) { const t = await sendTelegram(ctx.env, r.short); print(t.sent ? 'Sent to Telegram.' : `Not sent to Telegram: ${t.why}.`); }
@@ -95,7 +96,9 @@ export async function main(argv: string[], ctx: Ctx = makeCtx(resolve(process.en
     case 'costs': print(`Cost model ${PRIOR_COSTS.version.slice(0, 12)} (one way, basis points). All rows are assumed until paper fills are measured.\n`);
       print(table([['venue', 'class', 'bucket', 'fee', 'half spread', 'slip', 'source', 'n'], ...PRIOR_COSTS.rows.map(r => [r.venue, r.assetClass, r.bucket, r.feeBps, r.halfSpreadBps, r.slipBps, r.source, r.n])])); return 0;
 
-    case 'data': { const d = loadData(ctx);
+    case 'data': {
+      if (sub === 'pull') { const r = await pullData(ctx); for (const x of r.pulled) print(`Pulled ${x}.`); for (const x of r.problems) print(`Problem: ${x}.`); if (!r.pulled.length && !r.problems.length) print('Nothing to pull.'); return 0; }
+      const d = loadData(ctx);
       print(table([['dataset', 'bars', 'last bar', 'status', 'tradable', 'notes'], ...d.datasets.map((x, i) => [x.spec.id, x.bars.length, when(x.bars[x.bars.length - 1]?.t ?? 0), d.health[i].status, d.health[i].tradable ? 'yes' : 'no', d.health[i].checks.filter(c => c.status !== 'ok').map(c => `${c.id}: ${c.detail}`).join('; ')])]));
       for (const p of d.problems) print(`Problem: ${p}`); return d.health.some(h => h.status === 'blocked') ? 1 : 0; }
 

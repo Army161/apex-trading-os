@@ -1,0 +1,61 @@
+# Every pull request and every push to main (docs/design/13). No secrets are used here, and none are needed.
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  types-and-unit:
+    name: types, unit, parity, fingerprints, golden, db
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: apex_owner, POSTGRES_PASSWORD: test, POSTGRES_DB: apex_test }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U apex_owner -d apex_test" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      APEX_TEST_DATABASE_URL: postgres://apex_owner:test@127.0.0.1:5432/apex_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: types
+        run: npm run typecheck
+      - name: unit, golden report and database tests
+        run: npm run test:packages
+      - name: engine self-test and TypeScript/Python parity
+        run: npm run test -w web
+      - name: fingerprints (a strategy or the fill logic changed without the file being updated)
+        run: npm run -s apex -- strategies fingerprint --check
+      - name: the command line starts and the checks it runs are clean
+        run: npm run -s apex -- doctor
+        env: { APEX_STATE_DIR: '${{ runner.temp }}/apex-state' }
+  python:
+    name: python
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -e engine pytest
+      - run: python -m pytest -q
+  invariants:
+    name: invariants
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: drift check (paper first, no money tools, no keys committed)
+        run: python3 tools/drift_check.py
+      - name: red-path list and CODEOWNERS agree
+        run: node tools/protected_paths.mjs --self-check

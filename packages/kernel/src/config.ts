@@ -25,3 +25,6 @@ export function loadConfig(env: Record<string, string | undefined>, where: 'web'
     ledgerAnchor: anchor === 'git+ots' || anchor === 'off' ? anchor : 'git', validatorSource: env.APEX_VALIDATOR_SOURCE?.trim() || null,
     receiptsPublic: env.APEX_RECEIPTS_PUBLIC === 'yes', production, problems, warnings };
 }
+
+/** P0.6: a door whose secret is not set is open only in local development. In production it is closed. */
+export const openWithoutSecret = (production: boolean) => !production;

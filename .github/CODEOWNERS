@@ -1,0 +1,23 @@
+# Red paths need Jeremy's review. Keep this in step with .github/red-paths.txt (tools/protected_paths.mjs --self-check compares them).
+# Enforcement needs branch protection on main with "Require review from Code Owners" (docs/branch-protection.md).
+/packages/kernel/ @Army161
+/packages/autopilot/src/broker/ @Army161
+/packages/autopilot/src/pipeline.ts @Army161
+/packages/engine/src/validate.ts @Army161
+/packages/engine/src/stats/deflated.ts @Army161
+/web/lib/policy.ts @Army161
+/web/lib/auth.ts @Army161
+/web/lib/andon.ts @Army161
+/web/app/api/killswitch/ @Army161
+/web/app/api/live/ @Army161
+/apps/executor/ @Army161
+/bots/**/broker*.py @Army161
+/bots/**/executor* @Army161
+/bots/**/keeper.py @Army161
+/tools/drift_check.py @Army161
+/tools/guard_hook.mjs @Army161
+/tools/protected_paths.mjs @Army161
+/plugin/hooks/ @Army161
+/.github/ @Army161
+/.env.example @Army161
+/db/migrations/ @Army161
