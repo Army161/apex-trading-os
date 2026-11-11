@@ -258,3 +258,48 @@ This is still a lead only. It isn't significant on its own, and its deflated Sha
 | 3× | 1.21 | −20.4% |
 
 Borrowing costs make Sharpe fall, not hold steady, and drawdown scales with leverage. Leverage is not a setting anywhere in the bots.
+
+## First autopilot run: check 7 across the 266 pairs (run 2026-11-11, plan item P1.13)
+
+This is the first run of the new pipeline (`npm run apex -- run --full --seed plan:P1.13`), with every result pre-registered and written to a hash-chained ledger before it was looked at. Gate `standard-bar-v1` (version `5fc1ec70c4da`) has seven checks. The first six are the ones the earlier board used; check 7 is new: the strategy's Sharpe must beat buy and hold of its own market over the same bars, with a positive return. Costs are the cost-model priors, which are assumed, not measured.
+
+**Result: 1 of 266 pairs passes all seven checks.** 261 are rejected, 4 need more trades, none errored.
+
+| | Count |
+|---|---|
+| Pairs evaluated | 266 (38 strategies on 7 markets) |
+| Pass checks 1 to 6 | 1 |
+| Pass check 7 alone (beat hold on Sharpe) | 21 |
+| Pass all seven | 1 |
+| Failed check 1 (50 trades) | 233 |
+| Failed check 2 (monkey test) | 258 |
+
+**The one that passes is still `dave_prev_range` on SPY 1h** (bars from 2024-11-11 to 2026-11-10):
+
+| Measure | Value |
+|---|---|
+| Trades | 51 (the bar is 50) |
+| Return | +8.7%, against +25.5% for holding SPY |
+| Sharpe | 0.90, against 0.75 for holding SPY |
+| Max drawdown | -8.4%, against -20.5% for holding SPY |
+| Win rate, profit factor | 55%, 1.46 |
+| t-stat | 1.27 |
+| Deflated Sharpe after 266 trials | 4.6% (the forward gate asks for 95%) |
+
+**How to read it.** It passes the bar, so it moves on. It is not proven:
+
+- It made about a third of what holding SPY made. It wins check 7 only on risk, because it sat in cash 70% of the time.
+- 51 trades is one over the minimum.
+- With 266 things tried, one pass is about what luck alone would produce. The deflated Sharpe of 4.6% says the same.
+- The same rule on SPY 4h has 25 trades and fails only on the trade count. That is weak support, not confirmation.
+
+**What happened next.** A separate validator run re-ran it on the same bars and agreed exactly (level L1: same data, so this catches bugs, not bad data). The next run locked it into paper as the first slot. Its status is **checking**. It will be judged only on bars after the lock. The earliest it can graduate is six months of forward bars and 50 forward trades.
+
+**Limits of this run.**
+
+- The validator could only use the same file. A second data source (level L2) needs a data key and accepted terms, which are Jeremy's to set up.
+- The SPY 1h file is a day old, so the firewall marks it not tradable and no paper order was opened. That is correct behaviour. Paper orders start when the nightly run has fresh bars.
+- With one slot the weight cap is 25% of equity. On this strategy's tight intraday stops, that cap leaves less than half the intended risk on 68 of 79 past signals, and the risk guard blocks those rather than take an odd size. The slot's own forward record is not affected (it is judged at fixed risk), but the paper book would take few of its trades. This is a rule choice for Jeremy, not something to loosen quietly.
+- The ledger for this run was made in a build container. The ledger of record starts with the first nightly run in GitHub Actions, which repeats this run from an empty ledger.
+
+Still not passing, as before: trails (chat/81), GARCH (chat/82), daily stop and midday filter (chat/86), the Peak systems (chat/88), and every daily strategy on 2 years of data (too few trades). The IWM AR(1) lead is not in this registry yet.

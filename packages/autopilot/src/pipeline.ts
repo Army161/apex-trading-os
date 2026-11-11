@@ -165,6 +165,9 @@ export function runAutopilot(inp: RunInput): RunOutput {
       pairs.push({ d, s, key, inputs, ih: inputHash(inputs), t: view.trials.get(key) });
     }
     pairsTotal = pairs.length;
+    // The N behind the deflated-Sharpe readout is every trial ever plus every new pair in this registry, so the readout does not
+    // depend on the order pairs happen to be evaluated in. It is a readout only: it is not part of the result hash.
+    const nReadout = view.trials.size + pairs.filter(p => !p.t).length;
     pairs.sort((a, b) => (a.t ? a.t.lastSeq : -1) - (b.t ? b.t.lastSeq : -1));                // never evaluated first, then oldest first (stable)
     const budget = inp.mode === 'full' ? Infinity : inp.budget ?? 10, weekAgo = inp.now - 7 * DAY;
     let newThisWeek = [...view.preregs.values()].filter(p => p.source === 'factory' && p.ts > weekAgo).length;
@@ -181,7 +184,7 @@ export function runAutopilot(inp: RunInput): RunOutput {
           strategy: { id: p.s.def.id, fingerprint: p.s.fingerprint }, panel: p.d.spec.id, tf: p.d.spec.tf, gateVersion: gv, passBar: passBar(g), plannedVariants: 1 });
         newThisWeek++; newTrials++;
       }
-      const res = evaluate(p.d.bars, p.s.def.build, costFor(cm, p.d.spec), g, trialsEver(view) + (p.t ? 0 : 1)); if (res.error) errors++;
+      const res = evaluate(p.d.bars, p.s.def.build, costFor(cm, p.d.spec), g, Math.max(nReadout, trialsEver(view) + (p.t ? 0 : 1))); if (res.error) errors++;
       emit('trial_result', { trialKey: p.key, gateVersion: gv, inputs: p.inputs, inputHash: p.ih, resultHash: resultHash(res), status: res.status, why: res.why, checks: res.checks, metrics: res.metrics, readouts: res.readouts,
         data: { first: p.d.bars[0]?.t ?? 0, last: p.d.bars[p.d.bars.length - 1]?.t ?? 0, rows: p.d.bars.length }, strategy: p.s.def.id, panel: p.d.spec.id, symbol: p.d.spec.symbol, tf: p.d.spec.tf, runId: inp.runId, ...(res.error ? { error: res.error } : {}) });
       evaluated++;
@@ -273,7 +276,7 @@ export function runAutopilot(inp: RunInput): RunOutput {
     book: { equity: book.equity, cash: view.cash, peak: book.peak, capital: inp.capital, dayPnl: book.dayPnl, weekPnl: book.weekPnl, drawdown: book.peak > 0 ? book.equity / book.peak - 1 : 0, openRisk, closedTrades: view.closed.length,
       positions: book.positions.map(p => ({ slotKey: p.slotKey, symbol: p.symbol, side: p.side, qty: p.qty, entry: p.entry, stop: p.stop, riskUsd: p.riskUsd })) },
     slots: [...view.slots.values()].map(s => { const rec = records.get(s.slotKey), gr = grads.get(s.slotKey); return { slotKey: s.slotKey, status: s.status, role: s.role, shadowOf: s.shadowOf, weight: s.weight, riskFraction: s.riskFraction, lockedAt: s.lockedAt,
-      months: rec?.months ?? 0, trades: rec?.trades ?? 0, tradesNeeded: g.forward.minTrades, ret: rec?.ret ?? 0, dd: rec?.dd ?? 0, dsrM: gr?.dsrM ?? 0, dsrN: gr?.dsrN ?? 0, cusum: s.cusum, driftPauses: s.driftPauses, grad: gr?.state ?? 'too_early', clock: gr?.clock.note ?? '',
+      months: rec?.months ?? 0, trades: rec?.trades ?? 0, tradesNeeded: g.forward.minTrades, ret: rec?.ret ?? 0, dd: rec?.dd ?? 0, dsrM: gr?.dsrM ?? 0, dsrN: gr?.dsrN ?? 0, cusum: s.cusum, driftPauses: s.driftPauses, grad: gr?.state ?? 'too_early', clock: gr?.clock.note ?? 'locked this run; the forward record starts with the next bar',
       bookTrades: view.closed.filter(c => c.slotKey === s.slotKey).length }; }),
     intents: runIntents.map(i => ({ slotKey: i.slotKey, symbol: i.symbol, side: i.side, barT: i.barT, qty: i.qty, riskUsd: i.riskUsd, stop: i.stop })),
     blocks: runBlocks.map(b => ({ slotKey: b.slotKey, symbol: b.symbol, side: b.side, barT: b.barT, rules: b.rules.map((r: any) => r.id) })),

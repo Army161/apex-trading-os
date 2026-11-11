@@ -1,0 +1,7 @@
+{
+  "name": "@apex/cli",
+  "version": "0.1.0",
+  "private": true,
+  "bin": { "apex": "./src/main.ts" },
+  "dependencies": { "@apex/engine": "*", "@apex/kernel": "*", "@apex/data": "*", "@apex/store": "*", "@apex/autopilot": "*" }
+}
