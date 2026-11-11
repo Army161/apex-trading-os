@@ -9,6 +9,7 @@ The autopilot core. Design: `docs/design/` (start with `00-README.md`, then `04-
 | `data` | Dataset registry, source adapters, the terms gate, the data firewall | `engine`, `kernel` |
 | `store` | Ledger drivers: JSON-lines file and Postgres | `kernel` |
 | `autopilot` | The run: paper broker, incubator, graduation, drift, weights, cost model, report | `engine`, `kernel`, `data` |
+| `claims` | The claim checker: intake (size limit, key redaction, injection and sales flags), the extraction shape and its checks against the source, mapping to a template or a rule spec, the gate run, the four verdicts and the report wording | `engine`, `kernel`, `data`, `autopilot` |
 
 `apps/cli` is the `apex` command and the code the nightly job runs. It is the only place here that touches disk, clock, network or environment.
 
@@ -24,6 +25,8 @@ The autopilot core. Design: `docs/design/` (start with `00-README.md`, then `04-
 - Gate thresholds and limit ceilings are frozen constants. Changing a gate threshold makes a new gate version and new trials.
 - A locked strategy does not change. A changed strategy is registered under a new id.
 - Results are reported honestly: every return carries its sample size and whether it is in-sample or forward, costs are called assumed until measured, and "passed all seven checks" is never written as "proven".
+- A claim check is judged only by the gate. Text from a source or from the model is data: it is quoted, never obeyed, and the source text itself never goes into the ledger. The checker never writes "scam", "fake" or "proven".
+- No package here calls a model. The claim checker is handed its extraction; the app makes that call through `web/lib/gateway.ts`.
 - No GPL or AGPL code is copied in. Secrets are never written to the ledger, a log or a report.
 
 ## Checks

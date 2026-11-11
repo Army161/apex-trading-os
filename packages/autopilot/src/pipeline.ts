@@ -176,7 +176,7 @@ export function runAutopilot(inp: RunInput): RunOutput {
     const nReadout = view.trials.size + pairs.filter(p => !p.t).length;
     pairs.sort((a, b) => (a.t ? a.t.lastSeq : -1) - (b.t ? b.t.lastSeq : -1));                // never evaluated first, then oldest first (stable)
     const budget = inp.mode === 'full' ? Infinity : inp.budget ?? 10, weekAgo = inp.now - 7 * DAY;
-    let newThisWeek = [...view.preregs.values()].filter(p => (p.source === 'factory' || p.source.startsWith('queue:')) && p.ts > weekAgo).length;
+    let newThisWeek = [...view.preregs.values()].filter(p => (p.source === 'factory' || p.source.startsWith('queue:') || p.source.startsWith('claim:')) && p.ts > weekAgo).length;
     for (const p of pairs) {
       if (evaluated >= budget) break;
       if (p.t && p.t.result.inputHash === p.ih) continue;                                     // already judged on exactly these inputs

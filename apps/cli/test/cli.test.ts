@@ -72,3 +72,18 @@ test('data pull: without a key nothing is fetched; with one, new bars are append
   assert.equal(after.bars.length, before.bars.length + 2); assert.notEqual(after.version, before.version); assert.deepEqual(after.bars.slice(0, before.bars.length - 1), before.bars.slice(0, -1), 'history is unchanged');
   assert.equal(readFileSync(join(ROOT, 'data/spy_30m.csv'), 'utf8'), committed);
 });
+
+test('claim: a saved extraction is checked, tested through the gate and recorded; the command line never calls a model', async () => {
+  const ctx = fresh(), src = 'archive/chat/03-turtle-breakout-ai-trading-bot-tradingview.md', fx = 'packages/claims/test/fixtures/turtle.extraction.json';
+  const none = await run(ctx, 'claim', src); assert.equal(none.code, 2); assert.match(none.text, /never calls a model/);
+  const req = await run(ctx, 'claim', src, '--request'); assert.equal(req.code, 0); assert.deepEqual(Object.keys(JSON.parse(req.text)).sort(), ['maxTokens', 'schema', 'system', 'user']);
+  const dry = await run(ctx, 'claim', src, '--extraction', fx, '--dry-run'); assert.equal(dry.code, 0); assert.match(dry.text, /## Verdict: No edge found/); assert.ok(!existsSync(join(ctx.stateDir, 'ledger.jsonl')));
+  const real = await run(ctx, 'claim', src, '--extraction', fx); assert.equal(real.code, 0); assert.match(real.text, /Tries used by this check: 1 new of 1 run/); assert.ok(!/Hidden text/.test(real.text));
+  const lines = readFileSync(join(ctx.stateDir, 'ledger.jsonl'), 'utf8').trim().split('\n').map(l => JSON.parse(l));
+  assert.deepEqual(lines.map(e => e.kind), ['gate_version', 'prereg', 'trial_result', 'claim_check']); assert.equal(lines[1].payload.strategy.id, 'turtle_55_20'); assert.match(lines[1].payload.source, /^claim:chk_/);
+  assert.equal((await run(ctx, 'ledger', 'verify')).code, 0); assert.match((await run(ctx, 'status')).text, /Trials ever \(N\): 1/);
+  const again = await run(ctx, 'claim', src, '--extraction', fx); assert.match(again.text, /Tries used by this check: 0 new of 1 run/); assert.match(again.text, /already in the ledger, not counted again/);
+  // The nightly run then treats that pair as already tried: it is not registered a second time.
+  await run(ctx, 'run', '--budget', '400'); const after = readFileSync(join(ctx.stateDir, 'ledger.jsonl'), 'utf8').trim().split('\n').map(l => JSON.parse(l));
+  assert.equal(after.filter(e => e.kind === 'prereg' && e.payload.strategy.id === 'turtle_55_20' && e.payload.panel === 'csv:BTC:1d:raw').length, 1);
+});

@@ -1,12 +1,13 @@
 #!/usr/bin/env -S npx tsx
-// apex: the command line (docs/design/08). Read commands print; `run`, `validate` and `halt` are the only ones that write,
+// apex: the command line (docs/design/08). Read commands print; `run`, `validate`, `claim` and `halt` are the only ones that write,
 // and they write only ledger entries. There is no order command, no resume command and no way to go live from here.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { STRATEGIES } from '@apex/engine/strategies';
 import { CEILINGS, DEFAULT_LIMITS, GATE_V1, LIMIT_KEYS, Ledger, STAGES, bookAt, buildView, effectiveLimits, gateVersion, liveAllowed, loadConfig, passBar, slotsEver, trialsEver, verifyChain } from '@apex/kernel';
 import { PRIOR_COSTS } from '@apex/autopilot';
-import { execute, fingerprints, haltsFrom, loadData, makeCtx, openStore, pullData, sendTelegram, type Ctx } from './runtime';
+import { EXTRACT_FAILED, extractionRequest, intake, validateExtraction, type Extracted } from '@apex/claims';
+import { claimCheck, execute, fingerprints, haltsFrom, loadData, makeCtx, openStore, pullData, sendTelegram, type Ctx } from './runtime';
 
 const HELP = `apex: paper-first trading research. Nothing here places a live order.
 
@@ -20,6 +21,9 @@ const HELP = `apex: paper-first trading research. Nothing here places a live ord
   apex data health | pull              pull needs MASSIVE_API_KEY (a data key; it cannot trade)
   apex ledger head | tail [-n N] | show <seq> | verify | replay
   apex strategies list | fingerprint [--write | --check]
+  apex claim <file> --extraction <json> [--kind transcript|pine|page|rules] [--dry-run]
+                                       Test the rules a source states. Each reading is one try
+  apex claim <file> --request          Print the extraction request (prompt and schema). No model is called here
   apex halt "<reason>"                 Pull the andon cord. Always allowed
   apex live status                     The four locks, read-only
   apex doctor                          Config, ledger chain, data, fingerprints
@@ -30,7 +34,7 @@ type Args = { _: string[]; flags: Record<string, string | boolean> };
 export function parse(argv: string[]): Args {
   const a: Args = { _: [], flags: {} };
   for (let i = 0; i < argv.length; i++) { const x = argv[i];
-    if (x.startsWith('--')) { const [k, v] = x.slice(2).split('='); if (v !== undefined) a.flags[k] = v; else if (argv[i + 1] !== undefined && !argv[i + 1].startsWith('-') && !['full', 'dry-run', 'write', 'check', 'json'].includes(k)) a.flags[k] = argv[++i]; else a.flags[k] = true; }
+    if (x.startsWith('--')) { const [k, v] = x.slice(2).split('='); if (v !== undefined) a.flags[k] = v; else if (argv[i + 1] !== undefined && !argv[i + 1].startsWith('-') && !['full', 'dry-run', 'write', 'check', 'json', 'request'].includes(k)) a.flags[k] = argv[++i]; else a.flags[k] = true; }
     else if (x === '-n') a.flags.n = argv[++i]; else a._.push(x); }
   return a;
 }
@@ -120,6 +124,19 @@ export async function main(argv: string[], ctx: Ctx = makeCtx(resolve(process.en
       const f = fingerprints(ctx); print(table([['id', 'tf', 'direction', 'source', 'fingerprint', 'name'], ...STRATEGIES.map(s => [s.id, s.tf, s.direction, s.source, f.now.strategies[s.id].slice(0, 12), s.name])])); return 0;
     }
 
+    case 'claim': {
+      if (!sub || !existsSync(resolve(sub))) { print('Give a text file: apex claim <file> --extraction <json>'); return 2; }
+      const kind = typeof a.flags.kind === 'string' ? a.flags.kind : /\.pine$/i.test(sub) ? 'pine' : 'transcript', inp = intake(readFileSync(resolve(sub), 'utf8').replace(/^<!-- source: [^\n]*-->\s*/, ''), kind);       // files in archive/ start with Apex's own provenance line
+      if (!inp.ok) { print(`Not checked: ${inp.error}.`); return 2; }
+      if (a.flags.request) { print(JSON.stringify(extractionRequest(inp.intake), null, 1)); return 0; }
+      if (typeof a.flags.extraction !== 'string' || !existsSync(resolve(a.flags.extraction))) { print('The command line never calls a model. Run the extraction in the app, or pass its saved answer: --extraction <json>. Use --request to print the prompt and schema.'); return 2; }
+      let raw: unknown; try { raw = JSON.parse(readFileSync(resolve(a.flags.extraction), 'utf8')); } catch { raw = null; }
+      const v = validateExtraction(raw, inp.intake), extracted: Extracted = v.ok ? { ok: true, extraction: v.extraction, attempts: 1 } : { ok: false, reason: EXTRACT_FAILED, errors: v.errors, attempts: 1 };
+      if (!v.ok) print(`The extraction failed its checks:\n${v.errors.map(e => `  - ${e}`).join('\n')}\n`);
+      const r = await claimCheck(ctx, inp.intake, extracted, { dryRun: !!a.flags['dry-run'] });
+      print(r.markdown); print(a.flags['dry-run'] ? 'Dry run: nothing was written.' : `Ledger: ${r.store}, head seq ${r.head?.seq ?? 0}.`);
+      return r.out.result.status === 'waiting_budget' ? 3 : 0;
+    }
     case 'halt': { const reason = a._.slice(1).join(' ').trim(); if (!reason) { print('Say why: apex halt "<reason>"'); return 2; }
       return withStore(async (_e, o) => { const e = await new Ledger(o.store, ctx.now).append('halt', 'cli', { level: 'andon', by: 'cli', reason: reason.slice(0, 500) });
         print(`Andon cord pulled (ledger seq ${e.seq}). No new entries will be opened until it is resumed on the dashboard.`); return 0; }); }

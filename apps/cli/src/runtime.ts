@@ -13,6 +13,7 @@ import type { DataHealth, LoadedDataset } from '@apex/data/types';
 import { FileLedgerStore, fileLock } from '@apex/store';
 import { PRIOR_COSTS, renderReport, renderShort, runAutopilot, type RunInput, type RunOutput } from '@apex/autopilot';
 
+import { renderMarkdown as renderClaim, runClaimCheck, type CheckOutput, type Extracted, type Intake } from '@apex/claims';
 export type Env = Record<string, string | undefined>;
 export type Ctx = { root: string; env: Env; stateDir: string; now: () => number };
 export const makeCtx = (root: string, env: Env = process.env, now: () => number = Date.now): Ctx => ({ root, env, stateDir: env.APEX_STATE_DIR || join(root, '.apex'), now });
@@ -108,4 +109,17 @@ export async function sendTelegram(env: Env, text: string, fetchFn: typeof fetch
   try { const r = await fetchFn(`https://api.telegram.org/bot${token}/sendMessage`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ chat_id: chat, text: text.slice(0, 4000), disable_web_page_preview: true }) });
     return r.ok ? { sent: true } : { sent: false, why: `Telegram answered ${r.status}` }; }
   catch (e) { return { sent: false, why: `Telegram could not be reached (${(e as Error).name})` }; }      // never echo the URL: it holds the token
+}
+
+/** One claim check against the ledger (docs/design/05). The extraction is passed in: nothing here calls a model. Takes the run
+ *  lock, because it pre-registers and records trials like a run does. A dry run reads everything and writes nothing. */
+export async function claimCheck(ctx: Ctx, intake: Intake, extracted: Extracted, o: { dryRun?: boolean } = {}): Promise<{ out: CheckOutput; markdown: string; head: { seq: number; hash: string } | null; store: string }> {
+  const cfg = loadConfig(ctx.env, 'cli'), opened = await openStore(ctx), release = o.dryRun ? async () => {} : await opened.lock();
+  if (!release) { await opened.close(); throw new Error('another run holds the lock; nothing was done'); }
+  try {
+    const now = ctx.now(), entries = await opened.store.read(), data = loadData(ctx);
+    const out = runClaimCheck({ now, intake, extracted, datasets: data.datasets, health: data.health, entries, gate: GATE_V1, costModel: PRIOR_COSTS, engineFingerprint: fingerprints(ctx).now.engine, capital: cfg.paperCapital, trialsPerWeek: cfg.trialsPerWeek });
+    if (!o.dryRun && out.appends.length) await new Ledger(opened.store, () => now).appendAll('claim-checker', out.appends);
+    return { out, markdown: renderClaim(out.result), head: await opened.store.head(), store: `${opened.kind} (${opened.where})` };
+  } finally { await release(); await opened.close(); }
 }

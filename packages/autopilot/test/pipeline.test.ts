@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { verifyChain, buildView, DEFAULT_LIMITS } from '@apex/kernel';
+import { verifyChain, buildView, DEFAULT_LIMITS, GATE_V1, gateVersion, passBar } from '@apex/kernel';
 import { runAutopilot, renderReport, renderShort, FIRST_LINE, NOTHING_PASSED, type ReportData } from '../src/index';
 import { plantedBars, coinFlip } from '../../kernel/test/helpers';
 import { Sim, dataset, healthy, spec, strat, MARKER, FLIP } from './helpers';
@@ -165,4 +165,11 @@ test('research queue: a queue test pairs only with its panel and timeframe, is p
   assert.equal(a.report.funnel.waitingBudget, 2, 'qb@BOTH and qc@QH wait; nothing pairs qa or qb with the 1h set, or qc with a daily one');
   sim.now += 8 * 24 * 3600e3; const b = await sim.run({ datasets: ds, health: ds.map(d => healthy(d)), mode: 'full' });
   assert.deepEqual((await sim.of('prereg') as any[]).slice(pre.length).map(pairOf), ['qb@BOTH', 'qc@QH']); assert.equal(b.report.funnel.waitingBudget, 0);
+});
+
+test('weekly budget: tries spent by a claim check leave fewer for the factory in the same week', async () => {
+  const d = dataset(PAST, spec('BOARD', { panels: ['stress-board'] })), sim = new Sim({ registry: [MARKER, FLIP], trialsPerWeek: 2 });
+  await sim.ledger.appendAll('claim-checker', [{ kind: 'prereg', payload: { trialKey: 'k'.repeat(64), hypothesis: 'claim check', source: 'claim:chk_test', strategy: { id: 'tpl:x', fingerprint: 'fp' }, panel: d.spec.id, tf: '1d', gateVersion: gateVersion(GATE_V1), passBar: passBar(GATE_V1) } }]);
+  const a = await sim.run({ datasets: [d], health: [healthy(d)], mode: 'full' });
+  assert.equal((await sim.of('prereg') as any[]).filter(p => p.source === 'factory').length, 1); assert.equal(a.report.funnel.waitingBudget, 1);
 });
