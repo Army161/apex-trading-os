@@ -3,7 +3,7 @@
 // graduation are earned again; live_eligible and the live stages are never set by hand. Retiring is final.
 // Pure: it is handed the facts and answers with the move, or the reason it will not make it. Unknown facts refuse.
 import type { LedgerEntry } from './ledger';
-import { STAGES } from './locks';
+import { STAGES } from './stages';
 
 export const LIVE_STAGE_STATUSES: readonly string[] = STAGES.map(s => s.id);
 export const PAUSED_STATUSES: readonly string[] = ['paused_drift', 'paused_data'];

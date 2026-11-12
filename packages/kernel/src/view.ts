@@ -2,7 +2,7 @@
 // so trials, slots, positions and the book cannot be lost, reset or quietly edited (S10; docs/design/04 s17 "counted from the ledger").
 import type { LedgerEntry, LedgerKind } from './ledger';
 import type { LimitsSnapshot, AssetClass, Side, OpenPosition, BookView } from './guard';
-import { STAGES } from './locks';
+import { STAGES } from './stages';
 
 const DAY = 864e5;
 export type Baseline = { n: number; mu: number; sigma: number; p: number; ddR95: number };

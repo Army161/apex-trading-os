@@ -98,4 +98,5 @@ export function verifyApproval(key: string, approvalHash: string, signature: str
   return timingSafeEqual(Buffer.from(signApproval(key, approvalHash), 'hex'), Buffer.from(signature, 'hex'));
 }
 
-export const STAGES = [{ id: 'micro_live', size: 0.01 }, { id: 'live_10', size: 0.1 }, { id: 'live_50', size: 0.5 }, { id: 'live_100', size: 1 }] as const;
+// The stages live in their own file with no imports, so screens that build the view never pull node:crypto into the browser.
+export { STAGES } from './stages';
