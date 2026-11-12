@@ -9,6 +9,8 @@
 //  - Paper slots are stepped before any new evaluation. A slot is judged only on bars after its lock (S11).
 //  - Every order intent goes through the risk guard, and size comes from nowhere else (S5).
 //  - A slot is never retired because an in-sample re-run moved. Retirement comes from the forward record or drift.
+//  - Every automatic pause acts on paper, live_eligible and the live stages alike, and records the status it came from.
+//    A paused slot is not paused again and a retired one is never touched (kernel/src/slots.ts).
 import type { Sig } from '@apex/engine/core';
 import type { StratDef } from '@apex/engine/strategies';
 import { hashOf, normalise, sha256 } from '@apex/kernel/canonical';
@@ -16,6 +18,7 @@ import type { Append, LedgerEntry, LedgerKind } from '@apex/kernel/ledger';
 import { evaluate, gateVersion, inputHash, passBar, resultHash, trialKey, type GateConfig, type GateResult, type TrialInputs } from '@apex/kernel/gate';
 import { checkIntent, effectiveLimits, type Halts, type Intent, type Limits } from '@apex/kernel/guard';
 import { applyEntry, bookAt, buildView, slotsEver, trialsEver, type LedgerView, type SlotState, type TrialState } from '@apex/kernel/view';
+import { autoPausable, PAUSED_STATUSES } from '@apex/kernel/slots';
 import { TF_MS, type DataHealth, type LoadedDataset } from '@apex/data/types';
 import { versionOf } from '@apex/data/bars';
 import { costFor, measured, type CostModel } from './costs';
@@ -89,7 +92,7 @@ export function runAutopilot(inp: RunInput): RunOutput {
     for (const s of active) {
       if (!usable(s)) { problems.push(`${s.slotKey}: its strategy or dataset is missing from this run, slot not stepped`); continue; }
       if (reg.get(s.strategy)!.fingerprint !== s.fingerprint) {               // frozen while locked (04 s2)
-        if (s.status === 'paper') emit('slot_status', { slotKey: s.slotKey, from: s.status, to: 'paused_data', reason: 'the strategy code changed after the lock; a changed strategy must be registered under a new id', numbers: {} });
+        if (autoPausable(s.status)) emit('slot_status', { slotKey: s.slotKey, from: s.status, to: 'paused_data', reason: 'the strategy code changed after the lock; a changed strategy must be registered under a new id', numbers: {} });
         problems.push(`${s.slotKey}: strategy fingerprint differs from the one in its lock`); continue;
       }
       const bars = dsById.get(s.dataset)!.bars, cursor = view.cursors[s.slotKey] ?? s.lockedAt - 1;
@@ -104,9 +107,9 @@ export function runAutopilot(inp: RunInput): RunOutput {
       for (const c of view.closed.slice(before)) {
         const fr = view.closed.filter(x => x.slotKey === k).map(x => x.r), rd = driftReading(fr, s.cusum, s.baseline, g.drift);
         emit('drift_reading', { slotKey: k, n: rd.n, s: rd.s, winP: rd.winP, ddR: rd.ddR, alarms: rd.alarms, costNote: rd.costNote, tradeR: c.r, exitT: c.exitT });
-        if (rd.alarms.length && s.status === 'paper') {
+        if (rd.alarms.length && autoPausable(s.status)) {
           const third = s.driftPauses + 1 >= g.drift.maxPauses;
-          emit('slot_status', { slotKey: k, from: 'paper', to: 'paused_drift', reason: `drift alarm: ${rd.alarms.join('; ')}`, numbers: { n: rd.n, s: rd.s, winP: rd.winP, ddR: rd.ddR } });
+          emit('slot_status', { slotKey: k, from: s.status, to: 'paused_drift', reason: `drift alarm: ${rd.alarms.join('; ')}`, numbers: { n: rd.n, s: rd.s, winP: rd.winP, ddR: rd.ddR } });
           if (third) { emit('slot_status', { slotKey: k, from: 'paused_drift', to: 'retired', reason: `${g.drift.maxPauses} drift pauses`, numbers: {} }); weightsStale = true; }
         }
         const b = bookAt(view, bar.t, marks);
@@ -240,15 +243,18 @@ export function runAutopilot(inp: RunInput): RunOutput {
         if (v.sameVersion && !v.exact) { pullAndon = `validator: identical bars gave a different result for ${r.strategy} on ${r.panel}. That is a bug, not noise`; emit('halt', { level: 'andon', by: 'validator', reason: pullAndon }); }
       }
     }
-    const month = monthOf(inp.now);
+    const month = monthOf(inp.now), statusSeq = new Map<string, number>();
+    for (const e of inp.entries) if (e.kind === 'slot_status') statusSeq.set(e.payload.slotKey, e.seq);
     for (const s of [...view.slots.values()]) {
       if (s.status === 'retired' || !usable(s)) continue; const t = view.trials.get(s.trialKey); if (!t) continue;
       const wantsGrad = s.lastGrad?.state === 'strict_pass' && !t.validator.some(v => v.purpose === 'graduation' && v.slotKey === s.slotKey && v.seq > s.lastGrad.seq);
       const wantsMonthly = !t.validator.some(v => v.purpose === 'monthly' && v.slotKey === s.slotKey && v.month === month);
-      if (!wantsGrad && !wantsMonthly) continue;
+      // A paused slot is re-run once after its pause, so Jeremy has a fresh answer before he may bring it back (02 s4).
+      const wantsPause = PAUSED_STATUSES.includes(s.status) && !t.validator.some(v => v.slotKey === s.slotKey && v.seq > (statusSeq.get(s.slotKey) ?? 0));
+      if (!wantsGrad && !wantsMonthly && !wantsPause) continue;
       const v = rerun(s.strategy, s.dataset, s.lock.data, s.lock.digest, s.lock.resultHash, s.lock.inputs.dataset[0].version); if (!v) continue;
-      emit('validator_run', { trialKey: s.trialKey, slotKey: s.slotKey, purpose: wantsGrad ? 'graduation' : 'monthly', month, level, source, resultOf: s.lock.resultHash, ...v, runId: inp.runId, commit: inp.commit });
-      if (!v.agrees && s.status === 'paper') emit('slot_status', { slotKey: s.slotKey, from: 'paper', to: 'paused_data', reason: `re-validation no longer reproduces the locked result: ${v.diffs.join('; ')}`, numbers: {} });
+      emit('validator_run', { trialKey: s.trialKey, slotKey: s.slotKey, purpose: wantsGrad ? 'graduation' : wantsMonthly ? 'monthly' : 'pause', month, level, source, resultOf: s.lock.resultHash, ...v, runId: inp.runId, commit: inp.commit });
+      if (!v.agrees && autoPausable(s.status)) emit('slot_status', { slotKey: s.slotKey, from: s.status, to: 'paused_data', reason: `re-validation no longer reproduces the locked result: ${v.diffs.join('; ')}`, numbers: {} });
       if (v.sameVersion && !v.exact) { pullAndon = `validator: identical bars gave a different result for locked slot ${s.slotKey}`; emit('halt', { level: 'andon', by: 'validator', reason: pullAndon }); }
     }
   }

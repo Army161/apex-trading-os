@@ -5,3 +5,4 @@ export * from './guard';
 export * from './locks';
 export * from './config';
 export * from './view';
+export * from './executor-auth';

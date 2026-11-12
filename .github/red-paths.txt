@@ -12,6 +12,8 @@ web/app/api/killswitch/**
 web/app/api/resume/**
 web/app/api/live/**
 web/app/api/admin/**
+web/app/api/executor/**
+web/lib/promotion.ts
 web/lib/api/keys.ts
 apps/executor/**
 bots/**/broker*.py

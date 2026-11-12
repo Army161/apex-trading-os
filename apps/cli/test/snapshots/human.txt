@@ -90,7 +90,7 @@ Drift: reading 0.30, paused for drift 0 of 3 times.
 demo_alpha@csv:SPY:1h:split: live is closed
   closed evidence: the slot has not graduated from paper
   closed validated: needs a fresh agreeing validator run and a clean review
-  closed approved: needs Jeremy’s signed-in approval, made after the validator run and not expired
+  closed approved: needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired
   closed machine: opens only on Jeremy’s own machine, with his key. There is no button for this
 
 $ apex slot demo_alpha@csv:SPY:1h:split --trades --fixtures
@@ -322,7 +322,7 @@ Live trading is off. Going live needs all four locks, and the last three are Jer
 demo_alpha@csv:SPY:1h:split: live is closed
   closed evidence: the slot has not graduated from paper
   closed validated: needs a fresh agreeing validator run and a clean review
-  closed approved: needs Jeremy’s signed-in approval, made after the validator run and not expired
+  closed approved: needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired
   closed machine: opens only on Jeremy’s own machine, with his key. There is no button for this
 
 Stages once live is allowed: micro_live (1% size) -> live_10 (10% size) -> live_50 (50% size) -> live_100 (100% size).
@@ -333,7 +333,7 @@ Live trading is off. Going live needs all four locks, and the last three are Jer
 demo_alpha@csv:SPY:1h:split: live is closed
   closed evidence: the slot has not graduated from paper
   closed validated: needs a fresh agreeing validator run and a clean review
-  closed approved: needs Jeremy’s signed-in approval, made after the validator run and not expired
+  closed approved: needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired
   closed machine: opens only on Jeremy’s own machine, with his key. There is no button for this
 
 Stages once live is allowed: micro_live (1% size) -> live_10 (10% size) -> live_50 (50% size) -> live_100 (100% size).

@@ -10,7 +10,7 @@ Nothing. The pause is the safe state: a paused slot opens no new position.
 1. Read the readings: `npm run apex -- slot <key> --drift`, and the events with `--events`.
 2. Ask what changed: the market, the costs, or the data. `npm run apex -- costs` shows the cost model against what was observed.
 3. Leave it paused. The third drift pause retires the slot for good.
-4. Bringing a paused slot back to paper by hand is not built yet, and neither is retiring one by hand. Today a drift-paused slot stays paused.
+4. To bring it back, wait for the validator's re-run after the pause (the next nightly run makes one). If it agrees, open the slot on the dashboard while signed in and choose Back to paper: type the slot's name, your password again and why. It goes back to paper only, never straight to live, so its forward record and graduation are earned again. Retire works the same way and is final. Neither exists in the terminal.
 
 ## How to confirm
 `npm run apex -- slots` shows the slot's status. The paper book holds no new position for it.

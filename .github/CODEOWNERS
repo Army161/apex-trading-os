@@ -12,6 +12,8 @@
 /web/app/api/resume/ @Army161
 /web/app/api/live/ @Army161
 /web/app/api/admin/ @Army161
+/web/app/api/executor/ @Army161
+/web/lib/promotion.ts @Army161
 /web/lib/api/keys.ts @Army161
 /apps/executor/ @Army161
 /bots/**/broker*.py @Army161

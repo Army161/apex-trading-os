@@ -1,10 +1,12 @@
 // Trial ledger: append-only, hash-chained (docs/design/04 s3 and s4). Red path.
 // The ledger is the system of record. Every other table or view is a projection that can be rebuilt by replaying it.
 import { canonicalJson, normalise, sha256 } from './canonical';
+import { liveFillProblems } from './view';
+import { reviewShapeProblems } from './locks';
 
 export const LEDGER_KINDS = ['config_snapshot', 'gate_version', 'data_version', 'strategy_registered', 'prereg', 'trial_result', 'skipped_data',
   'validator_run', 'slot_locked', 'slot_status', 'weights', 'intent', 'intent_blocked', 'fill', 'book_snapshot', 'drift_reading', 'cost_model',
-  'graduation_check', 'live_approval', 'live_stage', 'halt', 'resume', 'limit_change_pending', 'claim_check', 'anchor', 'run'] as const;
+  'graduation_check', 'promotion_review', 'live_approval', 'live_stage', 'live_fill', 'halt', 'resume', 'limit_change_pending', 'claim_check', 'anchor', 'run'] as const;
 export type LedgerKind = typeof LEDGER_KINDS[number];
 export type LedgerEntry = { seq: number; ts: number; kind: LedgerKind; actor: string; payload: any; payloadHash: string; prevHash: string; hash: string };
 export type Head = { seq: number; hash: string };
@@ -27,7 +29,9 @@ export const REQUIRED: Partial<Record<LedgerKind, string[]>> = {
   book_snapshot: ['at', 'equity', 'cash', 'peak', 'cursors'],
   drift_reading: ['slotKey', 'n', 's'],
   graduation_check: ['slotKey', 'state', 'm', 'n'],
+  promotion_review: ['slotKey', 'trialKey', 'gradSeq', 'verdict', 'steps', 'by', 'model'],
   live_approval: ['slotKey', 'stage', 'sizeCap', 'expiresAt', 'by', 'checklist'],
+  live_fill: ['intent', 'slotKey', 'symbol', 'side', 'kind', 't', 'price', 'qty', 'fee', 'brokerOrderId', 'stage'],
   halt: ['level', 'by', 'reason'],
   resume: ['level', 'by'],
   anchor: ['seq', 'hash'],
@@ -47,6 +51,9 @@ export function makeEntry(prev: Head | null, ts: number, kind: LedgerKind, actor
   if (SECRET.test(canon)) throw new Error('ledger: payload looks like it contains a secret; refused (S14)');
   const stored = JSON.parse(canon);
   for (const k of REQUIRED[kind] ?? []) if (stored[k] === undefined || stored[k] === null) throw new Error(`ledger: ${kind} is missing ${k}`);
+  // The two live-path kinds are checked field by field as well, so a malformed one never reaches the chain.
+  const bad = kind === 'live_fill' ? liveFillProblems(stored) : kind === 'promotion_review' ? reviewShapeProblems(stored) : [];
+  if (bad.length) throw new Error(`ledger: ${kind} refused: ${bad.join('; ')}`);
   const e = { seq: (prev?.seq ?? 0) + 1, ts, kind, actor, payload: stored, payloadHash: sha256(canon), prevHash: prev?.hash ?? GENESIS, hash: '' };
   e.hash = entryHash(e);
   return e;
@@ -75,6 +82,9 @@ export interface LedgerStore {
   durable: boolean;
 }
 export class LedgerConflict extends Error { constructor() { super('ledger: another writer appended first'); } }
+/** A live fill already recorded under the same intent, kind and broker order id. */
+export class LiveFillDuplicate extends Error { constructor() { super('ledger: this live fill is already recorded'); } }
+export const liveFillKey = (p: any) => `${p?.intent}|${p?.kind}|${p?.brokerOrderId}`;
 
 /** In-memory store: unit tests, and the base of the file store. */
 export class MemoryLedgerStore implements LedgerStore {
@@ -93,14 +103,15 @@ export type Append = { kind: LedgerKind; actor?: string; payload: object };
 
 /**
  * The only way to write. Enforces S9: a trial_result (or claim_check, validator_run) is refused unless a prereg with the same
- * trialKey and gateVersion has a lower sequence number.
+ * trialKey and gateVersion has a lower sequence number. A live fill already recorded (same intent, kind and broker order id) is refused.
  */
 export class Ledger {
   private preregs = new Map<string, string>();     // trialKey -> gateVersion
+  private liveFills = new Set<string>();           // intent|kind|brokerOrderId of every live fill
   private loadedTo = 0;
   constructor(public store: LedgerStore, private clock: () => number = Date.now) {}
 
-  private index(e: LedgerEntry) { if (e.kind === 'prereg') this.preregs.set(e.payload.trialKey, e.payload.gateVersion); this.loadedTo = e.seq; }
+  private index(e: LedgerEntry) { if (e.kind === 'prereg') this.preregs.set(e.payload.trialKey, e.payload.gateVersion); if (e.kind === 'live_fill') this.liveFills.add(liveFillKey(e.payload)); this.loadedTo = e.seq; }
   private async sync() { for (const e of await this.store.read(this.loadedTo + 1)) this.index(e); }
 
   async append(kind: LedgerKind, actor: string, payload: object): Promise<LedgerEntry> {
@@ -113,6 +124,8 @@ export class Ledger {
         if (kind === 'trial_result' && g !== p.gateVersion) throw new Error('ledger: trial_result refused, gate version differs from the pre-registration');
       }
       if (kind === 'prereg' && this.preregs.has(p.trialKey)) throw new Error('ledger: this trial is already pre-registered');
+      // Checked again after every conflict, so two writers posting the same fill record it once.
+      if (kind === 'live_fill' && this.liveFills.has(liveFillKey(p))) throw new LiveFillDuplicate();
       const head = await this.store.head();
       const e = makeEntry(head, Math.max(Math.floor(this.clock()), 1), kind, actor, payload);
       try { await this.store.append(e); this.index(e); return e; }

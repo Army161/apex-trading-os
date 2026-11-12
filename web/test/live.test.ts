@@ -58,8 +58,9 @@ test('route: session, same origin, the password again, locks from the ledger, an
   assert.equal(r.match(/\.append\(/g)!.length, 1); assert.doesNotMatch(r, /slot_status|live_stage|setJSON|releaseCord|ledgerResume|broker/);
   // The screen offers the form only when locks 1 and 2 are open and lock 3 is closed.
   assert.match(src('app/autopilot/slots/[key]/page.tsx'), /stage && d\.locks\[0\]\.open && d\.locks\[1\]\.open && !d\.locks\[2\]\.open \? <LiveApproval/);
-  // Lock 2 cannot open yet: nothing records the review chain's result, and the query says so instead of guessing.
-  assert.match(src('../packages/api/src/queries.ts'), /reviewClean: false, approval, machine: null/);
+  // Locks 1 to 3 come from the kernel's one derivation, never worked out by hand here, and no machine facts are passed.
+  const q = src('../packages/api/src/queries.ts'); assert.match(q, /liveAllowed\(slotKey, \{ \.\.\.lockFactsOf\(v, entries, slotKey\), machine: null \}, now\)/);
+  assert.doesNotMatch(q, /reviewClean:|graduationPassedSeq:|validatorAgreeSeq:|'live_approval'/, 'the query derives no lock fact of its own');
 });
 
 test('lock 4: nothing in the dashboard, the API, MCP or the terminal can sign an approval, set the live flag or claim the machine', () => {

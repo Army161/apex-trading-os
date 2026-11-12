@@ -60,6 +60,8 @@ test('rule family: the same rules with other numbers are one family, and other r
 test('claim check flow: per-account ledger, counted tries, quota at the boundary, steps that are safe to repeat', { skip: !admin && 'set APEX_TEST_DATABASE_URL to run' }, async () => {
   const name = `proof_flow_${process.pid}_${Date.now()}`, root = new pg.Client(admin); await root.connect(); await root.query(`create database ${name}`);
   const url = new URL(admin!); url.pathname = `/${name}`; const pool = new pg.Pool({ connectionString: url.toString(), max: 6 });
+  // The database is dropped with force at the end, which ends any pooled connection still open. That is teardown, not a failure.
+  pool.on('error', () => {});
   try {
     await pool.query(readFileSync(join(DB, 'test/supabase_shim.sql'), 'utf8'));
     for (const f of readdirSync(join(DB, 'migrations')).filter(f => /^\d{4}_.*\.sql$/.test(f)).sort()) await pool.query(readFileSync(join(DB, 'migrations', f), 'utf8'));

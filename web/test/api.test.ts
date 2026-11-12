@@ -209,7 +209,7 @@ const walk = (dir: string): string[] => readdirSync(dir).flatMap(n => { const p 
 test('inventory: every HTTP route is accounted for, and none outside the dashboard\'s own list can move money or open a lock', () => {
   const api = join(web, 'app/api'), files = walk(api).map(f => ({ name: '/' + relative(api, f).replace(/\/route\.ts$/, ''), src: readFileSync(f, 'utf8') }));
   // Session-only dashboard routes whose names hold a guarded word. Each needs the signed-in session; none is reachable with an API key.
-  const SESSION_ONLY = ['/resume', '/admin/keys', '/admin/keys/[id]', '/admin/live/[key]/approve', '/killswitch', '/decisions', '/proposals'];
+  const SESSION_ONLY = ['/resume', '/admin/keys', '/admin/keys/[id]', '/admin/live/[key]/approve', '/admin/live/[key]/review', '/killswitch', '/decisions', '/proposals'];
   const guarded = /order|withdraw|transfer|pay|approve|resume|release|live|signoff|key|decision|proposal|kill/i;
   for (const f of files) if (guarded.test(f.name)) { assert.ok(SESSION_ONLY.includes(f.name), `${f.name} has a guarded word in its name and is not on the session-only list`); assert.match(f.src, /isAdmin\(\)/, `${f.name} checks the session`); }
   // Every route that changes something says how the caller is checked.
@@ -218,7 +218,8 @@ test('inventory: every HTTP route is accounted for, and none outside the dashboa
     '/telegram': /TELEGRAM_WEBHOOK_SECRET/,                                                             // Telegram calls it: it checks the webhook secret
     '/risk': /guard\(\)/, '/builder': /guard\(\)/,
     '/share': /NextResponse\.redirect\(to, 303\)/,
-    '/automations': /if \(on && !\(await isAdmin\(\)\)\)/ };                                        // a job's switch: off is open like Halt (it only stops something), on checks the session                                                // the share target's landing: it writes nothing and only sends the browser to New claim check                                                    // model chats that change nothing but their own notes: held by the daily AI budget
+    '/automations': /if \(on && !\(await isAdmin\(\)\)\)/,                                        // a job's switch: off is open like Halt (it only stops something), on checks the session                                                // the share target's landing: it writes nothing and only sends the browser to New claim check                                                    // model chats that change nothing but their own notes: held by the daily AI budget
+    '/executor/fill': /const auth = verifyExecutor\(process\.env\.APEX_EXECUTOR_KEY, .*\);\n\s*if \(!auth\.ok\) return Response\.json\(.*\{ status: 401 \}\);/ };   // the executor posts fills: it checks the HMAC signature before anything else
   for (const f of files) { if (!/export (async function|const) (POST|PUT|PATCH|DELETE)\b/.test(f.src)) continue;
     if (OPEN_BY_DESIGN[f.name]) { assert.match(f.src, OPEN_BY_DESIGN[f.name], f.name); continue; }
     assert.match(f.src, /isAdmin\(\)|ingestOk\(|CRON_SECRET|cronOk\(|serve\(req, deps\)|await deps\.key\(auth\)/, `${f.name} changes something and names its check`); }

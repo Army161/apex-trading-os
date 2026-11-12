@@ -6,6 +6,7 @@ import { verifyChain, buildView, DEFAULT_LIMITS, GATE_V1, gateVersion, passBar }
 import { runAutopilot, renderReport, renderShort, FIRST_LINE, NOTHING_PASSED, type ReportData } from '../src/index';
 import { plantedBars, coinFlip } from '../../kernel/test/helpers';
 import { Sim, dataset, healthy, spec, strat, MARKER, FLIP } from './helpers';
+import { rerunSince, slotMove } from '@apex/kernel/slots';
 
 const ALL = plantedBars(2200), PAST = ALL.slice(0, 1800);
 const withData = (bars = PAST, over = {}) => { const d = dataset(bars); return { datasets: [d], health: [healthy(d, over)] }; };
@@ -120,6 +121,59 @@ test('a locked strategy is frozen: if its code changes the slot is paused and no
   const out = await sim.run({ ...withData(ALL), registry: [{ ...MARKER, fingerprint: 'fp-marker-edited' }] });
   const st: any = out.appends.find(a => a.kind === 'slot_status')!.payload; assert.equal(st.to, 'paused_data'); assert.match(st.reason, /new id/);
   assert.equal(out.appends.filter(a => a.kind === 'intent' || a.kind === 'fill').length, 0);
+});
+
+test('automatic pauses act on live_eligible and the live stages too, record where they came from, and never touch a retired slot', async () => {
+  const KEY = 'marker@csv:TEST:1d:raw', edited = [{ ...MARKER, fingerprint: 'fp-marker-edited' }];
+  // Bars after the lock where the marker's edge is gone: the drift alarm fires within a few trades, well before six months.
+  const dead = [...PAST, ...plantedBars(60, { drift: -0.004, seed: 8 }).map((b, i) => ({ ...b, t: PAST[PAST.length - 1].t + (i + 1) * 864e5 }))];
+  const at = async (status: string) => { const sim = new Sim(); await lockMarker(sim); if (status !== 'paper') await sim.ledger.append('slot_status', 'test', { slotKey: KEY, from: 'paper', to: status, reason: 'test' }); return sim; };
+  const statuses = async (sim: Sim, from: number) => (await sim.store.read()).slice(from).filter(e => e.kind === 'slot_status').map(e => e.payload as any);
+
+  // Drift on a live_eligible slot pauses it, and the entry says it was live_eligible.
+  let sim = await at('live_eligible'), n = (await sim.store.read()).length, out = await sim.run({ ...withData(dead) });
+  const drift = (await statuses(sim, n))[0]; assert.deepEqual([drift.from, drift.to], ['live_eligible', 'paused_drift']); assert.match(drift.reason, /drift alarm/);
+  assert.equal(buildView(await sim.store.read(), 10000).slots.get(KEY)!.driftPauses, 1);
+  const paused = out.appends.findIndex(a => a.kind === 'slot_status'); assert.ok(paused > 0);
+  assert.ok(!out.appends.slice(paused).some(a => a.kind === 'intent'), 'no new order after the pause'); assert.ok(out.appends.slice(paused).some(a => a.kind === 'intent_blocked'));
+
+  // A changed strategy pauses a live_eligible slot and a slot at any live stage, from that stage.
+  for (const status of ['live_eligible', 'micro_live', 'live_10', 'live_50', 'live_100']) {
+    sim = await at(status); n = (await sim.store.read()).length; out = await sim.run({ ...withData(ALL), registry: edited });
+    const st = await statuses(sim, n); assert.equal(st.length, 1, status); assert.deepEqual([st[0].from, st[0].to], [status, 'paused_data']); assert.match(st[0].reason, /new id/);
+    assert.equal(out.appends.filter(a => a.kind === 'intent' || a.kind === 'fill').length, 0, status);
+    // Already paused: the next run does not pause it again.
+    n = (await sim.store.read()).length; await sim.run({ ...withData(ALL), registry: edited }); assert.deepEqual(await statuses(sim, n), [], `${status} is paused once`);
+  }
+
+  // A failed re-validation pauses a live stage too. Bars that are not the ones it was locked on make the re-run disagree.
+  sim = await at('micro_live'); n = (await sim.store.read()).length;
+  const other = plantedBars(1800, { drift: 0, seed: 41 }).map((b, i) => ({ ...b, t: PAST[i].t }));
+  await sim.run({ ...withData(other), mode: 'validator', validator: { level: 'L2', source: 'second' } });
+  const rv = await statuses(sim, n); assert.equal(rv.length, 1); assert.deepEqual([rv[0].from, rv[0].to], ['micro_live', 'paused_data']); assert.match(rv[0].reason, /re-validation/);
+
+  // A retired slot is final: no drift pause, no fingerprint pause, no validator re-run, no order.
+  sim = await at('retired'); n = (await sim.store.read()).length;
+  for (const o of [{ ...withData(dead) }, { ...withData(ALL), registry: edited }, { ...withData(other), mode: 'validator' as const, validator: { level: 'L2' as const, source: 'second' } }]) await sim.run(o);
+  const after = (await sim.store.read()).slice(n);
+  assert.deepEqual(after.filter(e => e.kind === 'slot_status' || e.kind === 'intent' || (e.kind === 'validator_run' && e.payload.slotKey === KEY)), []);
+});
+
+test('a paused slot gets one validator re-run after its pause, and only an agreeing one lets Jeremy bring it back to paper', async () => {
+  const KEY = 'marker@csv:TEST:1d:raw', sim = new Sim(); await lockMarker(sim);
+  await sim.run({ ...withData(), mode: 'validator', validator: { level: 'L1', source: 'same' } });                // this month's re-run, before any pause
+  const fresh = () => ({ status: buildView(entries, 10000).slots.get(KEY)!.status, fingerprintMatches: true, datasetReadable: true, rerun: rerunSince(entries, KEY).verdict });
+  let entries = await sim.store.read(); assert.equal(rerunSince(entries, KEY).verdict, 'agrees');
+  await sim.run({ ...withData(ALL), registry: [{ ...MARKER, fingerprint: 'fp-marker-edited' }] });
+  entries = await sim.store.read(); assert.equal(rerunSince(entries, KEY).verdict, 'none', 'a run from before the pause does not count');
+  assert.match((slotMove(fresh(), 'paper') as { why: string }).why, /has not re-run it since the pause/);
+  const v = await sim.run({ ...withData(), mode: 'validator', validator: { level: 'L1', source: 'same' } });
+  assert.deepEqual(v.appends.filter(a => a.kind === 'validator_run').map(a => (a.payload as any).purpose), ['pause']);
+  const again = await sim.run({ ...withData(), mode: 'validator', validator: { level: 'L1', source: 'same' } });
+  assert.equal(again.appends.filter(a => a.kind === 'validator_run').length, 0, 'once per pause');
+  entries = await sim.store.read(); const r = rerunSince(entries, KEY); assert.equal(r.verdict, 'agrees'); assert.ok(r.seq! > 0);
+  assert.deepEqual(slotMove(fresh(), 'paper'), { ok: true, from: 'paused_data', to: 'paper' });
+  assert.equal(slotMove({ ...fresh(), fingerprintMatches: false }, 'paper').ok, false, 'the strategy that paused it still differs');
 });
 
 test('validator mode never opens an order or locks a slot, and promotion needs level L2 once a second source exists', async () => {

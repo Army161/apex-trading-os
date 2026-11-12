@@ -28,7 +28,7 @@ read two ways; anything that only works with information not in the rules. ${RUL
 
 const RANK = { ok: 0, concerns: 1, block: 2 } as const;
 type Verdict = keyof typeof RANK;
-type Note = { step: string; verdict: Verdict; summary: string; issues: { severity: 'high' | 'medium' | 'low'; issue: string; fix: string }[] };
+export type Note = { step: string; verdict: Verdict; summary: string; issues: { severity: 'high' | 'medium' | 'low'; issue: string; fix: string }[] };
 
 /** "Stop overthinking" (archive/chat/36): only serious issues block. A block with no high-severity issue becomes a concern. */
 export function finalVerdict(notes: Note[]): Verdict {
@@ -42,6 +42,25 @@ export function triage(issues: Note['issues']) {
   return { serious: issues.filter(i => i.severity === 'high'), optional: issues.filter(i => i.severity === 'medium'), ignore: issues.filter(i => i.severity === 'low') };
 }
 
+export type Ask = (feature: string, params: Record<string, any>) => Promise<{ stop_reason: string | null; content: any[] }>;
+/**
+ * The owner, engineer and QA steps in order, each reading the notes before it. Every model call goes through `ask`, which is
+ * the gateway's unless a test hands in a fake. A refusal or an answer outside the schema throws, so nothing half-done is kept.
+ */
+export async function reviewChain(subject: string, o: { ask?: Ask; model?: string } = {}): Promise<Note[]> {
+  const call = o.ask ?? ask, model = o.model ?? REVIEW_MODEL, notes: Note[] = [];
+  for (const [step, system] of STEPS) {
+    const r = await call('review', { model, max_tokens: 2500, system, output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMA } },
+      messages: [{ role: 'user', content: `${subject}\n\nEarlier review notes:\n${notes.length ? JSON.stringify(notes) : 'none, you are first'}` }],
+    });
+    if (r.stop_reason === 'refusal') throw new Error(`the ${step} reviewer declined`);
+    const v = JSON.parse(textOf(r as any));
+    if (!(v?.verdict in RANK) || !Array.isArray(v.issues ?? []) || (v.issues ?? []).some((x: any) => !['high', 'medium', 'low'].includes(x?.severity))) throw new Error(`the ${step} reviewer's answer did not fit the review shape`);
+    notes.push({ step, verdict: v.verdict, summary: String(v.summary ?? ''), issues: (v.issues ?? []).map((x: any) => ({ ...x, issue: `[${step}] ${x.issue}` })) });
+  }
+  return notes;
+}
+
 export async function secondOpinion(id: string) {
   await guard();
   const s = await getStrategy(id); if (!s) throw new Error('strategy not found');
@@ -50,14 +69,7 @@ export async function secondOpinion(id: string) {
   const notes: Note[] = [];
   const fresh = ask('review', { model: REVIEW_MODEL, max_tokens: 2000, system: GOLDFISH, output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMA } },
     messages: [{ role: 'user', content: `Strategy rules:\n${JSON.stringify(s.spec)}` }] });
-  for (const [step, system] of STEPS) {
-    const r = await ask('review', { model: REVIEW_MODEL, max_tokens: 2500, system, output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMA } } as any,
-      messages: [{ role: 'user', content: `Strategy and backtest:\n${JSON.stringify(payload)}\n\nEarlier review notes:\n${notes.length ? JSON.stringify(notes) : 'none, you are first'}` }],
-    });
-    if (r.stop_reason === 'refusal') throw new Error(`the ${step} reviewer declined`);
-    const v = JSON.parse(textOf(r));
-    notes.push({ step, verdict: v.verdict, summary: v.summary, issues: (v.issues ?? []).map((x: any) => ({ ...x, issue: `[${step}] ${x.issue}` })) });
-  }
+  notes.push(...await reviewChain(`Strategy and backtest:\n${JSON.stringify(payload)}`));
   const g = await fresh;
   if (g.stop_reason !== 'refusal') { const v = JSON.parse(textOf(g)); notes.push({ step: 'goldfish', verdict: v.verdict, summary: v.summary, issues: (v.issues ?? []).map((x: any) => ({ ...x, issue: `[goldfish] ${x.issue}` })) }); }
   const worst = finalVerdict(notes);

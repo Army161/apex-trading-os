@@ -6,6 +6,7 @@ import { slotDetail } from '@/lib/queries';
 import { Card, Hash, IntentsTable, NoLedger, Ref, Side, SlotsTable, TradesTable, pairHref, param, receiptHref } from '@/components/autopilot/parts';
 import LocalTime from '@/components/LocalTime';
 import LiveApproval from '@/components/autopilot/LiveApproval';
+import { PromotionReview, SlotChange } from '@/components/autopilot/SlotActions';
 import { CHECKLIST, MAX_EXPIRY_DAYS, nextStage } from '@/app/api/admin/live/approval';
 export const metadata = { title: 'Slot' };
 export const dynamic = 'force-dynamic';
@@ -27,7 +28,10 @@ export default async function Page({ params }: { params: Promise<{ key: string }
       </Card>
       <Card><div className="ax-scroll"><LockPanel locks={d.locks} /></div><p className="ax-n">{FIXED.live}</p>
         {/* The approval step shows only when locks 1 and 2 are open and lock 3 is not. The server works that out again before it records anything. */}
-        {stage && d.locks[0].open && d.locks[1].open && !d.locks[2].open ? <LiveApproval slotKey={s.slotKey} stage={stage.id} sizePct={stage.size * 100} maxDays={MAX_EXPIRY_DAYS} checklist={CHECKLIST} /> : null}</Card>
+        {stage && d.locks[0].open && d.locks[1].open && !d.locks[2].open ? <LiveApproval slotKey={s.slotKey} stage={stage.id} sizePct={stage.size * 100} maxDays={MAX_EXPIRY_DAYS} checklist={CHECKLIST} /> : null}
+        {/* The review shows only for a live-eligible slot whose lock 2 is closed. The server works that out again. */}
+        {s.status === 'live_eligible' && d.locks[0].open && !d.locks[1].open ? <PromotionReview slotKey={s.slotKey} /> : null}
+        {s.status !== 'retired' ? <SlotChange slotKey={s.slotKey} paused={s.status.startsWith('paused')} /> : null}</Card>
     </div>
     <div className="grid g2">
       <Card title="Forward record (after the lock)">

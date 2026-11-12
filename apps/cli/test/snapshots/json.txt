@@ -895,7 +895,7 @@ $ apex slot demo_alpha@csv:SPY:1h:split --fixtures --json
   {
    "id": "approved",
    "open": false,
-   "why": "needs Jeremy’s signed-in approval, made after the validator run and not expired"
+   "why": "needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired"
   },
   {
    "id": "machine",
@@ -1727,7 +1727,7 @@ $ apex live status --fixtures --json
     {
      "id": "approved",
      "open": false,
-     "why": "needs Jeremy’s signed-in approval, made after the validator run and not expired"
+     "why": "needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired"
     },
     {
      "id": "machine",
@@ -1760,7 +1760,7 @@ $ apex live status demo_alpha@csv:SPY:1h:split --fixtures --json
     {
      "id": "approved",
      "open": false,
-     "why": "needs Jeremy’s signed-in approval, made after the validator run and not expired"
+     "why": "needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired"
     },
     {
      "id": "machine",
