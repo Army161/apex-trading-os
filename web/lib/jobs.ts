@@ -8,7 +8,10 @@ import { sendTelegram } from './telegram';
 export type Stage = 'queued' | 'working' | 'needs_you' | 'done' | 'failed';
 export type Output = { kind: 'spec' | 'backtest' | 'review' | 'strategy' | 'text'; label: string; data?: unknown; ref?: string };
 export type Job = { id: string; title: string; kind: string; stage: Stage; step: string; agent: string; risk: 'low' | 'medium' | 'high';
-  round: number; created: number; updated: number; ms: number; input: any; notes: { ts: number; by: string; text: string }[]; outputs: Output[] };
+  round: number; created: number; updated: number; ms: number; input: any; notes: { ts: number; by: string; text: string }[]; outputs: Output[];
+  /** Why a job waits for Jeremy: one question and its options (docs/design/06 s1 rule 5). Cleared when the job moves on. */
+  ask?: Ask; snoozedUntil?: number };
+export type Ask = { question: string; options: string[] };
 
 const K = 'jobs', MAX = 100;
 export const STAGES: Stage[] = ['queued', 'working', 'needs_you', 'done', 'failed'];
@@ -31,10 +34,11 @@ export async function createJob(title: string, kind: string, input: any, risk: J
 }
 
 /** Move a job. Pure state change plus a Telegram ping on done / needs you. */
-export async function advance(id: string, p: { stage?: Stage; step?: string; agent?: string; note?: string; by?: string; output?: Output; round?: number; risk?: Job['risk']; spentMs?: number }) {
+export async function advance(id: string, p: { stage?: Stage; step?: string; agent?: string; note?: string; by?: string; output?: Output; round?: number; risk?: Job['risk']; spentMs?: number; ask?: Ask; quiet?: boolean }) {
   const j = await getJob(id); if (!j) throw new Error('job not found');
   const was = j.stage, now = Date.now();
-  if (p.stage) j.stage = p.stage;
+  if (p.stage) { j.stage = p.stage; if (p.stage !== 'needs_you') { delete j.ask; delete j.snoozedUntil; } }
+  if (p.ask) j.ask = { question: p.ask.question.slice(0, 300), options: p.ask.options.slice(0, 4).map(o => o.slice(0, 60)) };
   if (p.step) j.step = p.step;
   if (p.agent) j.agent = p.agent;
   if (p.round !== undefined) j.round = p.round;
@@ -44,7 +48,7 @@ export async function advance(id: string, p: { stage?: Stage; step?: string; age
   if (p.output) j.outputs = [...j.outputs.filter(o => o.label !== p.output!.label), p.output];
   j.updated = now;
   await save(j);
-  if (was !== j.stage && (j.stage === 'done' || j.stage === 'needs_you' || j.stage === 'failed'))
+  if (!p.quiet && was !== j.stage && (j.stage === 'done' || j.stage === 'needs_you' || j.stage === 'failed'))
     await sendTelegram(`${j.stage === 'done' ? 'Done' : j.stage === 'failed' ? 'Failed' : 'Needs you'}: ${j.title}${p.note ? `\n${p.note.slice(0, 300)}` : ''}`);
   return j;
 }
@@ -52,4 +56,10 @@ export async function advance(id: string, p: { stage?: Stage; step?: string; age
 /** Record Jeremy's answer on a needs-you card and put it back in the queue at the step he chose. */
 export async function feedback(id: string, text: string, step?: string) {
   return advance(id, { stage: 'queued', step, by: 'you', note: `Your answer: ${text}` });
+}
+
+/** Put a needs-you card away for some hours. It stays needs-you: the Inbox shows it again when the time is up. */
+export async function snooze(id: string, hours: number, now = Date.now()) {
+  const j = await getJob(id); if (!j) throw new Error('job not found'); if (j.stage !== 'needs_you') throw new Error('only a job that is waiting for you can be snoozed');
+  j.snoozedUntil = now + Math.min(168, Math.max(1, Math.round(hours))) * 3600e3; return save(j);
 }

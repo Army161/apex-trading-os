@@ -24,7 +24,7 @@ The videos say these tools are MIT licensed and that OpenBot needs a hosted serv
 | New agents default to **ask for approval**, never full access. Only reads and analysis skip the ask. | chat/70 | `Agent.approval`, `asks()` |
 | A scheduled run is skipped while the last one is still going. | chat/70 | `shouldRun()` |
 | Imported routines arrive paused, with connections off until Jeremy approves them. | chat/70 | `imported()` |
-| Debug agent: finds every error, explains each in plain English, fixes it, and ends with how to check the fix. | chat/67 | `.claude/agents/build-buddy.md` |
+| Debug agent: finds every error, explains each in plain English, fixes it, and ends with how to check the fix. | chat/67 | `plugin/agents/build-buddy.md` |
 
 ## Agent view on the dashboard (to build next)
 
@@ -57,7 +57,7 @@ Do not use the tool's anti-bot-detection features on exchanges or brokers. That 
 - When a team is exported, chat history, keys, model choices and machines never go in the export file.
 
 ## Models
-- **Model-agnostic** (chat/68): skills, instructions and tool config live in the repo (`AGENTS.md`, `.claude/agents/`, `docs/`). That way Claude, DeepSeek, Ollama or NVIDIA can all run the same tasks. `web/lib/gateway.ts` stays the one file that calls a provider.
+- **Model-agnostic** (chat/68): skills, instructions and tool config live in the repo (`AGENTS.md`, `plugin/`, `docs/`). That way Claude, DeepSeek, Ollama or NVIDIA can all run the same tasks. `web/lib/gateway.ts` stays the one file that calls a provider.
 - **Routing** (chat/69, `web/lib/router.ts`, tested): an ordered model list with priority or round-robin fallback. A model that errors or hits a rate limit is skipped for 5 minutes. There is an optional free-models-only mode, and each key has its own spend cap. The usage view is the existing AI spend page (`web/lib/usage.ts`). Wiring the router into the dashboard chat waits until Jeremy picks the extra providers. NVIDIA NIM is a good fit for that pick, but check its license and free-tier terms first; they are the provider's and can change.
 
 DeepSeek V4.1 Flash is described in chat/67 as free inside Open Code, with fair-use limits. It is noted as one more option for Jeremy's pending model choice, alongside Ollama and NVIDIA. Apex stays on Claude until he decides.

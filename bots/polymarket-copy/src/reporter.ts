@@ -13,10 +13,13 @@ export async function report(payload: Record<string, unknown>) {
   } catch (e: any) { console.log(`[reporter] dashboard unreachable: ${e.message}`); return null; }
 }
 
+// The dashboard keeps handing out a command until this bot acknowledges it by its ref. The caller applies it in the same tick.
 export async function pollCommand(): Promise<string | null> {
   if (!config.dashboardUrl) return null;
   try {
-    const r = await axios.get(`${config.dashboardUrl}/api/bots/${bot.id}/command`, { headers: { 'x-apex-token': config.ingestToken }, timeout: 8000 });
+    const url = `${config.dashboardUrl}/api/bots/${bot.id}/command`, h = { 'x-apex-token': config.ingestToken };
+    const r = await axios.get(url, { headers: h, timeout: 8000 });
+    if (r.data?.ref) await axios.delete(url, { headers: h, params: { ref: r.data.ref }, timeout: 8000 }).catch(() => null);
     return r.data?.command ?? null;
   } catch { return null; }
 }

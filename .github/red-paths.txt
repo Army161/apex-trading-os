@@ -1,0 +1,29 @@
+# Red paths (docs/design/02 section 9). One list, used by CODEOWNERS, the protected-paths check and the guard hook.
+# A pull request that touches any of these needs Jeremy's approving review. Nothing here ever auto-merges.
+packages/kernel/**
+packages/autopilot/src/broker/**
+packages/autopilot/src/pipeline.ts
+packages/engine/src/validate.ts
+packages/engine/src/stats/deflated.ts
+web/lib/policy.ts
+web/lib/auth.ts
+web/lib/andon.ts
+web/app/api/killswitch/**
+web/app/api/resume/**
+web/app/api/live/**
+web/app/api/admin/**
+web/app/api/executor/**
+web/lib/promotion.ts
+web/lib/api/keys.ts
+apps/executor/**
+bots/**/broker*.py
+bots/**/executor*
+bots/**/keeper.py
+tools/drift_check.py
+tools/guard_hook.mjs
+tools/protected_paths.mjs
+plugin/hooks/**
+.github/**
+.env.example
+db/migrations/**
+apps/proof/db/migrations/**

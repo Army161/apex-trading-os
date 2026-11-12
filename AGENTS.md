@@ -13,10 +13,15 @@ These are model-agnostic (archive/chat/68). Claude Code, OpenCode, Codex, or a l
 
 ## Where things are
 - `archive/`: every transcript Jeremy sent, word for word. `archive/INDEX.md` lists them.
-- `web/`: the Next.js dashboard and the TypeScript strategy engine (`web/lib/engine/`).
+- `web/`: the Next.js dashboard. The strategy engine now lives in `packages/engine`; `web/lib/engine/` re-exports it.
+- `packages/`: the autopilot core (engine, kernel, data, store, autopilot). Read `packages/README.md` and its Invariants first.
+- `apps/proof/`: the product (the claim checker as a service), a separate business with its own deployment and keys. It shares seven packages with the rest and nothing else. Read `apps/proof/README.md` first; `node tools/separation_check.mjs` holds the line and runs as a test.
+- `apps/cli/`: the `apex` command (`npm run apex -- help`) and the code the nightly paper run uses.
+- `packages/mcp`: the MCP server (`apex mcp` over stdio, `/api/mcp` on the dashboard). It can read, start a claim check and pull the halt, and nothing else. `mcp-server/` is the old Python one.
+- `.github/red-paths.txt`: paths that need Jeremy's review. They never auto-merge.
 - `bots/`: Python paper bots.
 - `docs/`: how-tos and design notes. Start with `docs/how-to-direct-apex-agents.md`, `docs/agent-safety-and-office.md` and `docs/validation-results.md`.
-- `.claude/agents/build-buddy.md`: the debug helper prompt. It is plain markdown, so any agent can use it.
+- `plugin/`: the Claude Code plugin. Seven skills (`plugin/skills/`), three commands, three agent prompts (`plugin/agents/`, with the debug helper `build-buddy.md`), the MCP server and the guard hook. All plain markdown, so any agent can read them.
 - `web/lib/gateway.ts`: the only file that calls a model. Switching providers is a change to that one file.
 
 ## Before you change a folder
@@ -24,6 +29,8 @@ Read its README.md first. The `## Invariants` section lists rules that must stay
 
 ## Checks before you say you're done
 ```
-cd web && npx tsc --noEmit -p . && npm test
-python3 tools/drift_check.py
+npm run typecheck && npm test
+npm run apex -- strategies fingerprint --check
+python3 -m pytest -q
+python3 tools/drift_check.py && node tools/protected_paths.mjs --self-check
 ```

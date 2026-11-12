@@ -1,0 +1,7 @@
+{
+  "name": "@apex/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "exports": { ".": "./src/index.ts", "./*": "./src/*.ts" },
+  "dependencies": { "@apex/sdk": "*", "@modelcontextprotocol/sdk": "1.32.2" }
+}

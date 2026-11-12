@@ -1,0 +1,7 @@
+{
+  "name": "@apex/executor",
+  "version": "0.1.0",
+  "private": true,
+  "bin": { "apex-executor": "./src/main.ts" },
+  "dependencies": { "@apex/kernel": "*", "@apex/store": "*", "@apex/autopilot": "*", "@apex/data": "*" }
+}

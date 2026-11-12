@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "tsx lib/engine/selftest.ts",
+    "test": "tsx lib/engine/selftest.ts && tsx --test test/*.test.ts",
     "check:ui": "node scripts/ui-check.mjs"
   },
   "dependencies": {
@@ -15,12 +15,22 @@
     "lightweight-charts": "^4.2.3",
     "next": "15.5.29",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "@apex/engine": "*",
+    "@apex/kernel": "*",
+    "@apex/autopilot": "*",
+    "@apex/claims": "*",
+    "@apex/data": "*",
+    "@apex/store": "*",
+    "@apex/ui": "*",
+    "@apex/sdk": "*",
+    "@apex/api": "*", "@apex/mcp": "*", "@modelcontextprotocol/sdk": "1.32.2"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "playwright": "1.63.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }

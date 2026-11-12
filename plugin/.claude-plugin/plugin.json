@@ -1,0 +1,5 @@
+{
+  "name": "apex",
+  "version": "0.1.0",
+  "description": "Apex trading research: skills, commands, the MCP server (read, claim check and halt only) and the guard hook for red paths. Paper first. Holds no key and can place no order."
+}

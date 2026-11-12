@@ -258,3 +258,75 @@ This is still a lead only. It isn't significant on its own, and its deflated Sha
 | 3× | 1.21 | −20.4% |
 
 Borrowing costs make Sharpe fall, not hold steady, and drawdown scales with leverage. Leverage is not a setting anywhere in the bots.
+
+## First autopilot run: check 7 across the 266 pairs (run 2026-11-11, plan item P1.13)
+
+This is the first run of the new pipeline (`npm run apex -- run --full --seed plan:P1.13`), with every result pre-registered and written to a hash-chained ledger before it was looked at. Gate `standard-bar-v1` (version `5fc1ec70c4da`) has seven checks. The first six are the ones the earlier board used; check 7 is new: the strategy's Sharpe must beat buy and hold of its own market over the same bars, with a positive return. Costs are the cost-model priors, which are assumed, not measured.
+
+**Result: 1 of 266 pairs passes all seven checks.** 261 are rejected, 4 need more trades, none errored.
+
+| | Count |
+|---|---|
+| Pairs evaluated | 266 (38 strategies on 7 markets) |
+| Pass checks 1 to 6 | 1 |
+| Pass check 7 alone (beat hold on Sharpe) | 21 |
+| Pass all seven | 1 |
+| Failed check 1 (50 trades) | 233 |
+| Failed check 2 (monkey test) | 258 |
+
+**The one that passes is still `dave_prev_range` on SPY 1h** (bars from 2024-11-11 to 2026-11-10):
+
+| Measure | Value |
+|---|---|
+| Trades | 51 (the bar is 50) |
+| Return | +8.7%, against +25.5% for holding SPY |
+| Sharpe | 0.90, against 0.75 for holding SPY |
+| Max drawdown | -8.4%, against -20.5% for holding SPY |
+| Win rate, profit factor | 55%, 1.46 |
+| t-stat | 1.27 |
+| Deflated Sharpe after 266 trials | 4.6% (the forward gate asks for 95%) |
+
+**How to read it.** It passes the bar, so it moves on. It is not proven:
+
+- It made about a third of what holding SPY made. It wins check 7 only on risk, because it sat in cash 70% of the time.
+- 51 trades is one over the minimum.
+- With 266 things tried, one pass is about what luck alone would produce. The deflated Sharpe of 4.6% says the same.
+- The same rule on SPY 4h has 25 trades and fails only on the trade count. That is weak support, not confirmation.
+
+**What happened next.** A separate validator run re-ran it on the same bars and agreed exactly (level L1: same data, so this catches bugs, not bad data). The next run locked it into paper as the first slot. Its status is **checking**. It will be judged only on bars after the lock. The earliest it can graduate is six months of forward bars and 50 forward trades.
+
+**Limits of this run.**
+
+- The validator could only use the same file. A second data source (level L2) needs a data key and accepted terms, which are Jeremy's to set up.
+- The SPY 1h file is a day old, so the firewall marks it not tradable and no paper order was opened. That is correct behaviour. Paper orders start when the nightly run has fresh bars.
+- With one slot the weight cap is 25% of equity. On this strategy's tight intraday stops, that cap leaves less than half the intended risk on 68 of 79 past signals, and the risk guard blocks those rather than take an odd size. The slot's own forward record is not affected (it is judged at fixed risk), but the paper book would take few of its trades. This is a rule choice for Jeremy, not something to loosen quietly.
+- The ledger for this run was made in a build container. The ledger of record starts with the first nightly run in GitHub Actions, which repeats this run from an empty ledger.
+
+Still not passing, as before: trails (chat/81), GARCH (chat/82), daily stop and midday filter (chat/86), the Peak systems (chat/88), and every daily strategy on 2 years of data (too few trades). The IWM AR(1) lead is not in this registry yet.
+
+## Addendum, 11 November 2026: research queue, tests 1 to 5 (P3.2)
+
+The first five tests in the plan's queue are now registered strategies. They ran through the same seven checks on SPY, QQQ and IWM (30m and 1h, bars from 2024-11-11 to 2026-11-10). That is 27 more tries, so the count is 293. The rules were written before the run and were not changed after it.
+
+| Test | Strategy | Pairs | Result |
+|---|---|---|---|
+| 1 | `dave_prev_range__measured_move` | 3 (1h) | Rejected on all three. SPY +1.5%, IWM +5.2%, QQQ -8.2% |
+| 1 | `dave_prev_range__close_break` | 3 (1h) | SPY +11.7% (Sharpe 1.20, 44 trades) and IWM +12.8% (Sharpe 1.33, 33 trades) fail only on the trade count. QQQ -6.6%, rejected |
+| 1 | `dave_prev_range__macd_impulse` | 3 (1h) | Rejected on all three. SPY +4.4%, IWM +5.0%, QQQ -5.1% |
+| 1 | `dave_prev_range__weak_stop` | 3 (1h) | Rejected on all three. No better than random entries |
+| 2 | `opening_range_breakout` | 3 (30m) | Rejected on all three. -23% to -50% after costs, on about 470 trades each |
+| 3 | `vwap_trend_pullback` | 3 (30m) | Rejected on all three. -26% to -46% |
+| 3 | `vwap_flat_fade` | 3 (30m) | Rejected on all three. -3% to -6%, 31 to 47 trades |
+| 4 | `momentum_candle_breakout` | 3 (30m) | Rejected on all three. -8% to -38% |
+| 5 | `divergence_pivot` | 3 (1h) | **SPY passes all seven checks.** QQQ -18.7% and IWM -17.5%, rejected |
+
+**The one new pass is `divergence_pivot` on SPY 1h:** 76 trades, +11.5% against +25.5% for holding SPY, Sharpe 1.03 against 0.75, max drawdown -4.9%, win rate 45%, profit factor 1.39, t-stat 1.45, deflated Sharpe after 293 trials 6.9% (the forward gate asks for 95%).
+
+**How to read it.**
+
+- The same rule loses about 18% on QQQ and on IWM. A real edge in index divergence would not be this different across three index funds, so this pass is most likely luck. It still goes to the validator and then to paper, because that is the rule for anything that passes, and paper is where luck gets found out.
+- The three intraday families (opening range, VWAP, momentum candle) lose after costs on every market. They trade about once a day, and costs alone take most of what they lose.
+- The close-break variant is the only change to `dave_prev_range` that looks no worse than the original. It has too few trades to judge and stays at "needs more trades".
+- Nothing here changes the status of anything: both passes are "checking", and nothing is proven.
+
+**Limits.** This run was made in the build container on the committed files. In the ledger of record the nightly run registers 25 of these 27 pairs in the first week and the last 2 in the next, because the weekly trial budget is 25. Every strategy in the registry, old and new, now has a look-ahead test (`packages/engine/test/lookahead.test.ts`): cut the history at a bar, run the rule again, and the answer on that bar must not change.

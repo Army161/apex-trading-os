@@ -30,7 +30,7 @@ export async function pullCord(by: string, reason: string) {
   await setJSON('andon', { on: true, ts: was.on ? was.ts : now, by: was.on ? was.by : by, reason: was.on ? was.reason : reason });
   await push('andon_log', { ts: now, by, reason } as Pull, 500);
   await push('events', { ts: now, bot: by, level: 'halt', message: `ANDON CORD pulled: ${reason}. Every bot is told to pause.` });
-  if (!was.on) await sendTelegram(`APEX HALTED by ${by}: ${reason}\nEvery bot is paused. Check the dashboard, then send /release when it is safe.`);
+  if (!was.on) await sendTelegram(`APEX HALTED by ${by}: ${reason}\nEvery bot is paused. Check the dashboard. Only you can release it, on Today.`);
   return { on: true, already: was.on };
 }
 

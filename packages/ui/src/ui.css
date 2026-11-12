@@ -1,0 +1,53 @@
+/* Component styles for @apex/ui (docs/design/07 s3). They use only the tokens in tokens.css. Sizes follow the 4 px grid;
+   radius is 12 for cards, 8 for controls and 999 for chips. Colour is never the only carrier of meaning: every toned element
+   also has a label or a shape in the markup. */
+.ax-label{font:12px/1.45 var(--font-ui);color:var(--mute)}
+.ax-n{font:12px/1.45 var(--font-ui);color:var(--mute)}
+.ax-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:var(--chip);color:var(--ink);font:12px/1.45 var(--font-ui);white-space:nowrap}
+[data-tone="acc"]{color:var(--acc)}[data-tone="info"]{color:var(--info)}[data-tone="warn"]{color:var(--warn)}[data-tone="bad"]{color:var(--bad)}[data-tone="live"]{color:var(--live)}[data-tone="mute"]{color:var(--mute)}
+.ax-status{font-weight:600}.ax-shape{font-family:var(--font-num)}
+
+.ax-metric{display:grid;gap:4px;min-width:0}
+.ax-figure{font:600 20px/1.2 var(--font-num);font-variant-numeric:tabular-nums;color:var(--ink)}
+.ax-metric-page .ax-figure{font-size:28px}
+.ax-arrow{font-size:.6em;vertical-align:.2em}
+.ax-context{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.ax-receipt{font:12px/1.45 var(--font-num);color:var(--info)}
+
+.ax-scroll{overflow-x:auto;max-width:100%}
+.ax-table{width:100%;border-collapse:collapse;font:13px/1.45 var(--font-ui);color:var(--ink)}
+.ax-table caption{text-align:left;font:600 16px/1.45 var(--font-ui);padding:0 0 8px}
+.ax-table th,.ax-table td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.ax-table thead th{background:var(--panel-2);color:var(--mute);font-weight:600;position:sticky;top:0}
+.ax-table tbody th{font-weight:600}
+.ax-table td:has(> .ax-mark),.ax-table td code{font-variant-numeric:tabular-nums}
+.ax-mark{font-weight:600;white-space:nowrap}
+.ax-strip{display:inline-flex;gap:2px;font:12px/1 var(--font-num)}
+
+.ax-funnel{margin:0}.ax-funnel figcaption{font:600 16px/1.45 var(--font-ui);padding-bottom:8px}
+.ax-funnel ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ax-funnel li{display:grid;grid-template-columns:minmax(96px,160px) 1fr auto;align-items:center;gap:8px}
+.ax-funnel-label{font:13px/1.45 var(--font-ui)}
+.ax-bar{display:block;height:12px;border-radius:4px;background:var(--info);min-width:2px}
+.ax-funnel-count{font:600 13px/1.2 var(--font-num);font-variant-numeric:tabular-nums}
+
+.ax-clock{display:grid;gap:8px}
+.ax-clock-row{display:grid;grid-template-columns:minmax(120px,200px) 1fr minmax(96px,auto);align-items:center;gap:8px}
+.ax-track{display:block;height:8px;border-radius:999px;background:var(--panel-2);overflow:hidden}
+.ax-fill{display:block;height:100%;background:var(--info)}.ax-fill[data-done="true"]{background:var(--acc)}
+
+.ax-why h3{font:600 16px/1.45 var(--font-ui);margin:0 0 8px}.ax-why ul{margin:0;padding-left:16px;display:grid;gap:4px}
+.ax-receipt-card{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font:13px/1.45 var(--font-ui)}
+.ax-receipt-card dt{color:var(--mute)}.ax-receipt-card dd{margin:0}.ax-hash{display:contents}
+.ax-receipt-card code,.ax-why code,.ax-table code{font:12px/1.45 var(--font-num)}
+
+.ax-banner{padding:12px 16px;border-radius:var(--radius-control);border:1px solid currentColor;background:var(--panel);font:14px/1.45 var(--font-ui)}
+.ax-banner>*{color:var(--ink)}.ax-banner>strong{color:inherit}
+.ax-empty{padding:24px 16px;border:1px dashed var(--line);border-radius:var(--radius-card);text-align:center;color:var(--ink)}
+.ax-empty-title{font:600 16px/1.45 var(--font-ui);margin:0 0 4px}.ax-empty p{margin:0 0 4px}
+
+.ax-quote{display:grid;gap:4px}.ax-quote p{margin:0}
+.ax-quote blockquote{margin:0;padding:8px 12px;border-left:3px solid var(--info);background:var(--panel-2);border-radius:0 var(--radius-control) var(--radius-control) 0;font:13px/1.45 var(--font-ui)}
+
+a.ax-receipt:focus-visible,.ax-quote a:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+@media (max-width:480px){.ax-funnel li,.ax-clock-row{grid-template-columns:1fr auto}.ax-bar,.ax-track{grid-column:1 / -1;grid-row:2}}

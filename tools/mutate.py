@@ -30,7 +30,7 @@ TARGETS = {
                 "what": "Python RiskGuard: sizing, pre-trade check, loss cooldown, drawdown auto-pause"},
     "ts-check-trade": {"file": "web/lib/assistants.ts", "funcs": ["checkTrade"], "test": TS_TEST,
                        "what": "Risk Mitigator reward:risk gate and 1%-risk position size"},
-    "ts-backtest": {"file": "web/lib/engine/core.ts", "funcs": ["backtest"], "test": TS_TEST,
+    "ts-backtest": {"file": "packages/engine/src/core.ts", "funcs": ["backtest"], "test": TS_TEST,
                     "what": "Engine: size = risk / stop distance, stop checked before target, fill at next open"},
     "ts-halt": {"file": "web/lib/andon.ts", "funcs": ["botCommand", "shouldPull"], "test": TS_TEST,
                 "what": "Kill switch and andon cord: which command a bot gets, and when a check halts everything"},

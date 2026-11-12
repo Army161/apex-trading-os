@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Apex Autopilot board</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+a{color:#6ea8ff}a:hover{color:#9cc3ff}
+</style>
+</helmet>
+<div style="min-height: 1010px; background: #0a0d12; color: #e6edf3; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.45">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 24px; background: #11161d; border-bottom: 1px solid #222b36">
+    <a href="Main.dc.html" style="font-weight: 700; letter-spacing: 0.08em; font-size: 16px; color: #e6edf3; text-decoration: none">APEX</a>
+    <span style="padding: 3px 10px; border-radius: 999px; border: 1px solid #2fd59b; color: #2fd59b; font-size: 12px; font-weight: 600; letter-spacing: 0.06em">PAPER</span>
+    <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #93a0b0">266 tries counted</span>
+    <div style="flex-grow: 1"></div>
+    <button style="background: #ff7b72; border: 0; color: #1a0503; padding: 8px 18px; border-radius: 8px; font: inherit; font-weight: 700; min-height: 44px">Halt</button>
+  </header>
+  <main style="max-width: 1360px; margin: 0 auto; padding: 20px 24px 40px; display: flex; flex-direction: column; gap: 16px; box-sizing: border-box">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+      <h1 style="margin: 0; font-size: 20px; font-weight: 600; margin-right: 12px">Autopilot</h1>
+      <a href="Autopilot.dc.html" style="padding: 10px 12px; border-radius: 8px; background: #17202a; color: #e6edf3; font-weight: 600; text-decoration: none">Board</a>
+      <a href="#book" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Paper book</a>
+      <a href="#risk" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Risk</a>
+      <a href="#queue" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Research queue</a>
+      <a href="#data" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Data health</a>
+      <a href="#reports" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Reports</a>
+      <a href="#ledger" style="padding: 10px 12px; border-radius: 8px; color: #93a0b0; text-decoration: none">Ledger</a>
+    </div>
+
+    <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px">
+      <div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; line-height: 1.2">266</div><div style="color: #93a0b0; font-size: 13px">pairs tried</div></div>
+      <div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; line-height: 1.2">260</div><div style="color: #93a0b0; font-size: 13px">no edge</div></div>
+      <div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; line-height: 1.2; color: #f0b54a">5</div><div style="color: #93a0b0; font-size: 13px">one check short</div></div>
+      <div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; line-height: 1.2; color: #6ea8ff">1</div><div style="color: #93a0b0; font-size: 13px">passed, being checked</div></div>
+      <div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; line-height: 1.2">0</div><div style="color: #93a0b0; font-size: 13px">in paper</div></div>
+      <div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; line-height: 1.2">0</div><div style="color: #93a0b0; font-size: 13px">eligible</div></div>
+      <div><div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; line-height: 1.2">0</div><div style="color: #93a0b0; font-size: 13px">live</div></div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #93a0b0">Status<select style="background: #0a0d12; border: 1px solid #222b36; color: #e6edf3; border-radius: 8px; padding: 10px; font: inherit; min-height: 44px"><option>All</option><option>Checking</option><option>Near miss</option><option>Needs data</option><option>No edge</option></select></label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #93a0b0">Market<select style="background: #0a0d12; border: 1px solid #222b36; color: #e6edf3; border-radius: 8px; padding: 10px; font: inherit; min-height: 44px"><option>All</option><option>SPY</option><option>QQQ</option><option>IWM</option><option>GLD</option><option>USO</option></select></label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #93a0b0; flex: 1 1 200px">Search<input type="search" placeholder="Strategy name" style="background: #0a0d12; border: 1px solid #222b36; color: #e6edf3; border-radius: 8px; padding: 10px; font: inherit; min-height: 44px; box-sizing: border-box; width: 100%"></label>
+      <button style="align-self: flex-end; background: #17202a; border: 1px solid #222b36; color: #e6edf3; padding: 10px 14px; border-radius: 8px; font: inherit; min-height: 44px">Export CSV</button>
+      <button style="align-self: flex-end; background: #2fd59b; border: 0; color: #04140e; padding: 10px 14px; border-radius: 8px; font: inherit; font-weight: 600; min-height: 44px">Run a tick</button>
+    </div>
+
+    <section style="background: #11161d; border: 1px solid #222b36; border-radius: 12px; overflow-x: auto">
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 920px">
+        <thead>
+          <tr style="background: #161d26; color: #93a0b0; text-align: left">
+            <th scope="col" style="padding: 10px 12px; font-weight: 600">Strategy</th>
+            <th scope="col" style="padding: 10px 12px; font-weight: 600">Market</th>
+            <th scope="col" style="padding: 10px 12px; font-weight: 600">Status</th>
+            <th scope="col" style="padding: 10px 12px; font-weight: 600">Checks</th>
+            <th scope="col" style="padding: 10px 12px; font-weight: 600; text-align: right">Trades</th>
+            <th scope="col" style="padding: 10px 12px; font-weight: 600; text-align: right">Net return</th>
+            <th scope="col" style="padding: 10px 12px; font-weight: 600; text-align: right">Drawdown</th>
+            <th scope="col" style="padding: 10px 12px; font-weight: 600; text-align: right">Beat random</th>
+            <th scope="col" style="padding: 10px 12px; font-weight: 600">Why not</th>
+          </tr>
+        </thead>
+        <tbody style="font-family: 'JetBrains Mono', ui-monospace, monospace">
+          <tr style="border-top: 1px solid #222b36">
+            <td style="padding: 11px 12px"><a href="Slot.dc.html">dave_prev_range</a></td><td style="padding: 11px 12px">SPY 1h</td>
+            <td style="padding: 11px 12px"><span style="padding: 2px 10px; border-radius: 999px; border: 1px solid #6ea8ff; color: #6ea8ff; font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 600">Checking</span></td>
+            <td style="padding: 11px 12px; color: #2fd59b">6 of 6</td><td style="padding: 11px 12px; text-align: right">51</td><td style="padding: 11px 12px; text-align: right">+9.1%</td><td style="padding: 11px 12px; text-align: right">−8.3%</td><td style="padding: 11px 12px; text-align: right">97.5%</td>
+            <td style="padding: 11px 12px; font-family: Inter, system-ui, sans-serif; color: #93a0b0">Hold comparison and validator pending</td>
+          </tr>
+          <tr style="border-top: 1px solid #222b36">
+            <td style="padding: 11px 12px">dave_prev_range</td><td style="padding: 11px 12px">SPY 4h</td>
+            <td style="padding: 11px 12px"><span style="padding: 2px 10px; border-radius: 999px; border: 1px solid #6ea8ff; color: #6ea8ff; font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 600">Needs data</span></td>
+            <td style="padding: 11px 12px; color: #f0b54a">5 of 6</td><td style="padding: 11px 12px; text-align: right">25</td><td style="padding: 11px 12px; text-align: right">+11.9%</td><td style="padding: 11px 12px; text-align: right">−3.7%</td><td style="padding: 11px 12px; text-align: right">98.5%</td>
+            <td style="padding: 11px 12px; font-family: Inter, system-ui, sans-serif; color: #93a0b0">Enough trades: 25 of 50</td>
+          </tr>
+          <tr style="border-top: 1px solid #222b36">
+            <td style="padding: 11px 12px">demand_second_leg</td><td style="padding: 11px 12px">USO 1d</td>
+            <td style="padding: 11px 12px"><span style="padding: 2px 10px; border-radius: 999px; border: 1px solid #6ea8ff; color: #6ea8ff; font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 600">Needs data</span></td>
+            <td style="padding: 11px 12px; color: #f0b54a">5 of 6</td><td style="padding: 11px 12px; text-align: right">3</td><td style="padding: 11px 12px; text-align: right">+12.1%</td><td style="padding: 11px 12px; text-align: right">−1.2%</td><td style="padding: 11px 12px; text-align: right">97.5%</td>
+            <td style="padding: 11px 12px; font-family: Inter, system-ui, sans-serif; color: #93a0b0">Enough trades: 3 of 50</td>
+          </tr>
+          <tr style="border-top: 1px solid #222b36">
+            <td style="padding: 11px 12px">turtle_55_20</td><td style="padding: 11px 12px">GLD 1d</td>
+            <td style="padding: 11px 12px"><span style="padding: 2px 10px; border-radius: 999px; border: 1px solid #93a0b0; color: #93a0b0; font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 600">No edge</span></td>
+            <td style="padding: 11px 12px">4 of 6</td><td style="padding: 11px 12px; text-align: right">3</td><td style="padding: 11px 12px; text-align: right">+15.5%</td><td style="padding: 11px 12px; text-align: right">−7.5%</td><td style="padding: 11px 12px; text-align: right">69.0%</td>
+            <td style="padding: 11px 12px; font-family: Inter, system-ui, sans-serif; color: #93a0b0">Enough trades; monkey test</td>
+          </tr>
+          <tr style="border-top: 1px solid #222b36">
+            <td style="padding: 11px 12px"><a href="Claim.dc.html">turtle_55_20</a></td><td style="padding: 11px 12px">SPY 1h</td>
+            <td style="padding: 11px 12px"><span style="padding: 2px 10px; border-radius: 999px; border: 1px solid #93a0b0; color: #93a0b0; font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 600">No edge</span></td>
+            <td style="padding: 11px 12px">1 of 6</td><td style="padding: 11px 12px; text-align: right">74</td><td style="padding: 11px 12px; text-align: right">−2.2%</td><td style="padding: 11px 12px; text-align: right">−9.4%</td><td style="padding: 11px 12px; text-align: right">32.0%</td>
+            <td style="padding: 11px 12px; font-family: Inter, system-ui, sans-serif; color: #93a0b0">Monkey test; locked window; one bar late; double costs; costs</td>
+          </tr>
+          <tr style="border-top: 1px solid #222b36">
+            <td style="padding: 11px 12px">turtle_55_20</td><td style="padding: 11px 12px">SPY 4h</td>
+            <td style="padding: 11px 12px"><span style="padding: 2px 10px; border-radius: 999px; border: 1px solid #93a0b0; color: #93a0b0; font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 600">No edge</span></td>
+            <td style="padding: 11px 12px">1 of 6</td><td style="padding: 11px 12px; text-align: right">22</td><td style="padding: 11px 12px; text-align: right">−1.2%</td><td style="padding: 11px 12px; text-align: right">−7.6%</td><td style="padding: 11px 12px; text-align: right">28.5%</td>
+            <td style="padding: 11px 12px; font-family: Inter, system-ui, sans-serif; color: #93a0b0">Five checks failed</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; color: #93a0b0; font-size: 13px">
+      <span>Showing 6 of 266. Sorted by status, then checks passed. Never by return.</span>
+      <span>All figures: in-sample, net of costs, SPY and ETF bars from the 10 Nov 2026 board.</span>
+      <span>Buy and hold on SPY over the same bars: +25.4%, drawdown −20.5%.</span>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":1010}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

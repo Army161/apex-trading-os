@@ -1,0 +1,40 @@
+{
+  "sections": [
+    { "id": "today", "label": "Today", "short": "Today", "icon": "◎", "href": "/", "screens": [
+      { "href": "/", "label": "Today" }
+    ] },
+    { "id": "autopilot", "label": "Autopilot", "short": "Auto", "icon": "▤", "href": "/autopilot", "screens": [
+      { "href": "/autopilot", "label": "Funnel and board" },
+      { "href": "/autopilot/slots", "label": "Slots" },
+      { "href": "/autopilot/book", "label": "Paper book" },
+      { "href": "/autopilot/risk", "label": "Risk" },
+      { "href": "/autopilot/queue", "label": "Research queue" },
+      { "href": "/autopilot/data", "label": "Data health" },
+      { "href": "/autopilot/reports", "label": "Reports" },
+      { "href": "/autopilot/ledger", "label": "Ledger" }
+    ] },
+    { "id": "claims", "label": "Claim check", "short": "Claim", "icon": "⚖", "href": "/claims", "screens": [
+      { "href": "/claims", "label": "Claim check" }
+    ] },
+    { "id": "research", "label": "Research", "short": "Research", "icon": "⌕", "href": "/research", "screens": [
+      { "href": "/research", "label": "Strategies" },
+      { "href": "/research/lab", "label": "Lab" },
+      { "href": "/research/signals", "label": "Signals" },
+      { "href": "/research/library", "label": "Library" },
+      { "href": "/research/council", "label": "Council" },
+      { "href": "/research/assistants", "label": "Assistants" }
+    ] },
+    { "id": "agents", "label": "Agents", "short": "Agents", "icon": "⚙", "href": "/agents", "screens": [
+      { "href": "/agents", "label": "Roster" },
+      { "href": "/agents/inbox", "label": "Inbox" },
+      { "href": "/agents/outbox", "label": "Outbox" },
+      { "href": "/agents/activity", "label": "Activity" },
+      { "href": "/agents/automations", "label": "Automations" },
+      { "href": "/agents/team", "label": "Strategy team" }
+    ] },
+    { "id": "you", "label": "You", "short": "You", "icon": "☺", "href": "/you", "screens": [
+      { "href": "/you", "label": "Journal and rules" },
+      { "href": "/you/setup", "label": "Setup" }
+    ] }
+  ]
+}

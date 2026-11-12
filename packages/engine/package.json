@@ -1,0 +1,6 @@
+{
+  "name": "@apex/engine",
+  "version": "0.1.0",
+  "private": true,
+  "exports": { ".": "./src/index.ts", "./*": "./src/*.ts", "./fixtures/*": "./src/fixtures/*" }
+}

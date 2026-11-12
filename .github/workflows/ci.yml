@@ -1,0 +1,82 @@
+# Every pull request and every push to main (docs/design/13). No secrets are used here, and none are needed.
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  types-and-unit:
+    name: types, unit, parity, fingerprints, golden, db
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: apex_owner, POSTGRES_PASSWORD: test, POSTGRES_DB: apex_test }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U apex_owner -d apex_test" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      APEX_TEST_DATABASE_URL: postgres://apex_owner:test@127.0.0.1:5432/apex_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: types
+        run: npm run typecheck
+      - name: unit, golden report and database tests
+        run: npm run test:packages
+      - name: engine self-test and TypeScript/Python parity
+        run: npm run test -w web
+      - name: fingerprints (a strategy or the fill logic changed without the file being updated)
+        run: npm run -s apex -- strategies fingerprint --check
+      - name: the command line starts and the checks it runs are clean
+        run: npm run -s apex -- doctor
+        env: { APEX_STATE_DIR: '${{ runner.temp }}/apex-state' }
+  ui:
+    name: ui (every screen, both themes, phone and desktop)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx -w web playwright install --with-deps chromium
+      # The runner context cannot be read in a job-level env block, so the state folder is set here for the steps below.
+      - run: echo "APEX_STATE_DIR=$RUNNER_TEMP/apex-state" >> "$GITHUB_ENV"
+      - name: a paper ledger for the screens to read
+        run: npm run -s apex -- run --full > /dev/null
+      - run: npm run build -w web
+      - name: start the app and open every screen
+        # UI_OFFLINE: market data hosts refuse some CI networks, and this check is about the screens, not those hosts.
+        run: |
+          (npm start -w web -- -p 3100 > "$RUNNER_TEMP/web.log" 2>&1 &)
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:3100/api/status && break; sleep 1; done
+          APEX_URL=http://localhost:3100 UI_OFFLINE=1 UI_SHOTS=0 npm run check:ui -w web || { tail -50 "$RUNNER_TEMP/web.log"; exit 1; }
+  python:
+    name: python
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -e engine pytest
+      - run: python -m pytest -q
+  invariants:
+    name: invariants
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: drift check (paper first, no money tools, no keys committed)
+        run: python3 tools/drift_check.py
+      - name: red-path list and CODEOWNERS agree
+        run: node tools/protected_paths.mjs --self-check

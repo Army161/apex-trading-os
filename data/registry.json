@@ -1,0 +1,204 @@
+{
+ "note": "Committed default registry. The stress-board panel is the seven markets of the 10 Nov 2026 board; every strategy is paired with every one of them (266 pairs). Other panels pair by timeframe. The queue-etf-intraday panel is for research-queue tests only (docs/design/04 s16): SPY, QQQ and IWM on 30m and 1h. Only strategies that name it are paired with it.",
+ "datasets": [
+  {
+   "id": "csv:SPY:1h:split",
+   "source": "csv",
+   "symbol": "SPY",
+   "tf": "1h",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "eth",
+   "calendar": "XNYS",
+   "panels": [
+    "stress-board",
+    "us-etf-intraday",
+    "queue-etf-intraday"
+   ],
+   "costBucket": "mega",
+   "from": {
+    "file": "spy_30m.csv",
+    "tf": "30m"
+   }
+  },
+  {
+   "id": "csv:SPY:4h:split",
+   "source": "csv",
+   "symbol": "SPY",
+   "tf": "4h",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "eth",
+   "calendar": "XNYS",
+   "panels": [
+    "stress-board",
+    "us-etf-intraday"
+   ],
+   "costBucket": "mega",
+   "from": {
+    "file": "spy_30m.csv",
+    "tf": "30m"
+   }
+  },
+  {
+   "id": "csv:GLD:1d:split",
+   "source": "csv",
+   "symbol": "GLD",
+   "tf": "1d",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "rth",
+   "calendar": "XNYS",
+   "panels": [
+    "stress-board"
+   ],
+   "costBucket": "liquid",
+   "file": "gld_1d.csv"
+  },
+  {
+   "id": "csv:USO:1d:split",
+   "source": "csv",
+   "symbol": "USO",
+   "tf": "1d",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "rth",
+   "calendar": "XNYS",
+   "panels": [
+    "stress-board"
+   ],
+   "costBucket": "liquid",
+   "file": "uso_1d.csv"
+  },
+  {
+   "id": "csv:QQQ:1d:split",
+   "source": "csv",
+   "symbol": "QQQ",
+   "tf": "1d",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "rth",
+   "calendar": "XNYS",
+   "panels": [
+    "stress-board"
+   ],
+   "costBucket": "mega",
+   "file": "qqq_1d.csv"
+  },
+  {
+   "id": "csv:EURUSD:1d:raw",
+   "source": "csv",
+   "symbol": "EURUSD",
+   "tf": "1d",
+   "assetClass": "fx",
+   "adj": "raw",
+   "session": "24x7",
+   "calendar": "FX",
+   "panels": [
+    "stress-board",
+    "fx-majors-daily"
+   ],
+   "costBucket": "liquid",
+   "file": "eurusd_1d.csv",
+   "ticker": "C:EURUSD"
+  },
+  {
+   "id": "csv:BTC:1d:raw",
+   "source": "csv",
+   "symbol": "BTC",
+   "tf": "1d",
+   "assetClass": "crypto",
+   "adj": "raw",
+   "session": "24x7",
+   "calendar": "CRYPTO",
+   "panels": [
+    "stress-board",
+    "crypto-daily"
+   ],
+   "costBucket": "liquid",
+   "file": "btc_1d.csv",
+   "ticker": "X:BTCUSD"
+  },
+  {
+   "id": "csv:SPY:30m:split",
+   "source": "csv",
+   "symbol": "SPY",
+   "tf": "30m",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "eth",
+   "calendar": "XNYS",
+   "panels": [
+    "queue-etf-intraday"
+   ],
+   "costBucket": "mega",
+   "file": "spy_30m.csv"
+  },
+  {
+   "id": "csv:QQQ:30m:split",
+   "source": "csv",
+   "symbol": "QQQ",
+   "tf": "30m",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "eth",
+   "calendar": "XNYS",
+   "panels": [
+    "queue-etf-intraday"
+   ],
+   "costBucket": "mega",
+   "file": "qqq_30m.csv"
+  },
+  {
+   "id": "csv:QQQ:1h:split",
+   "source": "csv",
+   "symbol": "QQQ",
+   "tf": "1h",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "eth",
+   "calendar": "XNYS",
+   "panels": [
+    "queue-etf-intraday"
+   ],
+   "costBucket": "mega",
+   "from": {
+    "file": "qqq_30m.csv",
+    "tf": "30m"
+   }
+  },
+  {
+   "id": "csv:IWM:30m:split",
+   "source": "csv",
+   "symbol": "IWM",
+   "tf": "30m",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "eth",
+   "calendar": "XNYS",
+   "panels": [
+    "queue-etf-intraday"
+   ],
+   "costBucket": "liquid",
+   "file": "iwm_30m.csv"
+  },
+  {
+   "id": "csv:IWM:1h:split",
+   "source": "csv",
+   "symbol": "IWM",
+   "tf": "1h",
+   "assetClass": "etf",
+   "adj": "split",
+   "session": "eth",
+   "calendar": "XNYS",
+   "panels": [
+    "queue-etf-intraday"
+   ],
+   "costBucket": "liquid",
+   "from": {
+    "file": "iwm_30m.csv",
+    "tf": "30m"
+   }
+  }
+ ]
+}

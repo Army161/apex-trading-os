@@ -1,0 +1,1774 @@
+$ apex status --fixtures --json
+{
+ "mode": "paper",
+ "halted": false,
+ "halts": [],
+ "ledger": "file",
+ "entries": 22,
+ "trials": 3,
+ "slots": 1,
+ "data": "ok",
+ "dataBlocked": [],
+ "dataStale": [],
+ "lastRun": {
+  "id": "20260105T143020-full",
+  "mode": "full",
+  "ts": "2026-01-05T14:30:21.000Z"
+ },
+ "aiEnabled": false,
+ "at": "2026-01-05T15:30:21.000Z"
+}
+
+$ apex board --fixtures --json
+{
+ "items": [
+  {
+   "trialKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "strategy": "demo_alpha",
+   "symbol": "SPY",
+   "tf": "1h",
+   "panel": "csv:SPY:1h:split",
+   "status": "paper",
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "checksPassed": 7,
+   "checks": [
+    {
+     "n": 1,
+     "name": "enough trades",
+     "pass": true,
+     "why": "met",
+     "value": 1
+    },
+    {
+     "n": 2,
+     "name": "monkey test",
+     "pass": true,
+     "why": "met",
+     "value": 2
+    },
+    {
+     "n": 3,
+     "name": "locked test window",
+     "pass": true,
+     "why": "met",
+     "value": 3
+    },
+    {
+     "n": 4,
+     "name": "one bar late",
+     "pass": true,
+     "why": "met",
+     "value": 4
+    },
+    {
+     "n": 5,
+     "name": "double costs",
+     "pass": true,
+     "why": "met",
+     "value": 5
+    },
+    {
+     "n": 6,
+     "name": "costs under half moves",
+     "pass": true,
+     "why": "met",
+     "value": 6
+    },
+    {
+     "n": 7,
+     "name": "beats hold on risk",
+     "pass": true,
+     "why": "met",
+     "value": 7
+    }
+   ],
+   "why": "7 of 7 checks passed",
+   "source": "factory",
+   "validated": true,
+   "error": null,
+   "nTrials": 3,
+   "metrics": {
+    "ret": {
+     "value": 0.2,
+     "unit": "pct",
+     "n": 60,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 5
+    },
+    "sharpe": {
+     "value": 0.9,
+     "unit": "ratio",
+     "n": 60,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 5
+    },
+    "maxDrawdown": {
+     "value": -0.1,
+     "unit": "pct",
+     "n": 60,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 5
+    },
+    "dsr": {
+     "value": 0.4,
+     "unit": "prob",
+     "n": 60,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 5
+    }
+   },
+   "receipt": 5
+  },
+  {
+   "trialKey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "strategy": "demo_beta",
+   "symbol": "SPY",
+   "tf": "1h",
+   "panel": "csv:SPY:1h:split",
+   "status": "watch",
+   "slotKey": null,
+   "checksPassed": 5,
+   "checks": [
+    {
+     "n": 1,
+     "name": "enough trades",
+     "pass": true,
+     "why": "met",
+     "value": 1
+    },
+    {
+     "n": 2,
+     "name": "monkey test",
+     "pass": true,
+     "why": "met",
+     "value": 2
+    },
+    {
+     "n": 3,
+     "name": "locked test window",
+     "pass": true,
+     "why": "met",
+     "value": 3
+    },
+    {
+     "n": 4,
+     "name": "one bar late",
+     "pass": true,
+     "why": "met",
+     "value": 4
+    },
+    {
+     "n": 5,
+     "name": "double costs",
+     "pass": true,
+     "why": "met",
+     "value": 5
+    },
+    {
+     "n": 6,
+     "name": "costs under half moves",
+     "pass": false,
+     "why": "not met",
+     "value": 6
+    },
+    {
+     "n": 7,
+     "name": "beats hold on risk",
+     "pass": false,
+     "why": "not met",
+     "value": 7
+    }
+   ],
+   "why": "5 of 7 checks passed",
+   "source": "claim:demo1",
+   "validated": false,
+   "error": null,
+   "nTrials": 3,
+   "metrics": {
+    "ret": {
+     "value": 0.31,
+     "unit": "pct",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    },
+    "sharpe": {
+     "value": 0.6,
+     "unit": "ratio",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    },
+    "maxDrawdown": {
+     "value": -0.18,
+     "unit": "pct",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    },
+    "dsr": {
+     "value": 0.4,
+     "unit": "prob",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    }
+   },
+   "receipt": 7
+  },
+  {
+   "trialKey": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+   "strategy": "demo_gamma",
+   "symbol": "SPY",
+   "tf": "1h",
+   "panel": "csv:SPY:1h:split",
+   "status": "rejected",
+   "slotKey": null,
+   "checksPassed": 1,
+   "checks": [
+    {
+     "n": 1,
+     "name": "enough trades",
+     "pass": true,
+     "why": "met",
+     "value": 1
+    },
+    {
+     "n": 2,
+     "name": "monkey test",
+     "pass": false,
+     "why": "not met",
+     "value": 2
+    },
+    {
+     "n": 3,
+     "name": "locked test window",
+     "pass": false,
+     "why": "not met",
+     "value": 3
+    },
+    {
+     "n": 4,
+     "name": "one bar late",
+     "pass": false,
+     "why": "not met",
+     "value": 4
+    },
+    {
+     "n": 5,
+     "name": "double costs",
+     "pass": false,
+     "why": "not met",
+     "value": 5
+    },
+    {
+     "n": 6,
+     "name": "costs under half moves",
+     "pass": false,
+     "why": "not met",
+     "value": 6
+    },
+    {
+     "n": 7,
+     "name": "beats hold on risk",
+     "pass": false,
+     "why": "not met",
+     "value": 7
+    }
+   ],
+   "why": "1 of 7 checks passed",
+   "source": "factory",
+   "validated": false,
+   "error": null,
+   "nTrials": 3,
+   "metrics": {
+    "ret": {
+     "value": -0.02,
+     "unit": "pct",
+     "n": 74,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 9
+    },
+    "sharpe": {
+     "value": -0.1,
+     "unit": "ratio",
+     "n": 74,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 9
+    },
+    "maxDrawdown": {
+     "value": -0.09,
+     "unit": "pct",
+     "n": 74,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 9
+    },
+    "dsr": {
+     "value": 0.4,
+     "unit": "prob",
+     "n": 74,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 9
+    }
+   },
+   "receipt": 9
+  }
+ ],
+ "next": null
+}
+
+$ apex board --sort sharpe --top 2 --fixtures --json
+{
+ "items": [
+  {
+   "trialKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "strategy": "demo_alpha",
+   "symbol": "SPY",
+   "tf": "1h",
+   "panel": "csv:SPY:1h:split",
+   "status": "paper",
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "checksPassed": 7,
+   "checks": [
+    {
+     "n": 1,
+     "name": "enough trades",
+     "pass": true,
+     "why": "met",
+     "value": 1
+    },
+    {
+     "n": 2,
+     "name": "monkey test",
+     "pass": true,
+     "why": "met",
+     "value": 2
+    },
+    {
+     "n": 3,
+     "name": "locked test window",
+     "pass": true,
+     "why": "met",
+     "value": 3
+    },
+    {
+     "n": 4,
+     "name": "one bar late",
+     "pass": true,
+     "why": "met",
+     "value": 4
+    },
+    {
+     "n": 5,
+     "name": "double costs",
+     "pass": true,
+     "why": "met",
+     "value": 5
+    },
+    {
+     "n": 6,
+     "name": "costs under half moves",
+     "pass": true,
+     "why": "met",
+     "value": 6
+    },
+    {
+     "n": 7,
+     "name": "beats hold on risk",
+     "pass": true,
+     "why": "met",
+     "value": 7
+    }
+   ],
+   "why": "7 of 7 checks passed",
+   "source": "factory",
+   "validated": true,
+   "error": null,
+   "nTrials": 3,
+   "metrics": {
+    "ret": {
+     "value": 0.2,
+     "unit": "pct",
+     "n": 60,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 5
+    },
+    "sharpe": {
+     "value": 0.9,
+     "unit": "ratio",
+     "n": 60,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 5
+    },
+    "maxDrawdown": {
+     "value": -0.1,
+     "unit": "pct",
+     "n": 60,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 5
+    },
+    "dsr": {
+     "value": 0.4,
+     "unit": "prob",
+     "n": 60,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 5
+    }
+   },
+   "receipt": 5
+  },
+  {
+   "trialKey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "strategy": "demo_beta",
+   "symbol": "SPY",
+   "tf": "1h",
+   "panel": "csv:SPY:1h:split",
+   "status": "watch",
+   "slotKey": null,
+   "checksPassed": 5,
+   "checks": [
+    {
+     "n": 1,
+     "name": "enough trades",
+     "pass": true,
+     "why": "met",
+     "value": 1
+    },
+    {
+     "n": 2,
+     "name": "monkey test",
+     "pass": true,
+     "why": "met",
+     "value": 2
+    },
+    {
+     "n": 3,
+     "name": "locked test window",
+     "pass": true,
+     "why": "met",
+     "value": 3
+    },
+    {
+     "n": 4,
+     "name": "one bar late",
+     "pass": true,
+     "why": "met",
+     "value": 4
+    },
+    {
+     "n": 5,
+     "name": "double costs",
+     "pass": true,
+     "why": "met",
+     "value": 5
+    },
+    {
+     "n": 6,
+     "name": "costs under half moves",
+     "pass": false,
+     "why": "not met",
+     "value": 6
+    },
+    {
+     "n": 7,
+     "name": "beats hold on risk",
+     "pass": false,
+     "why": "not met",
+     "value": 7
+    }
+   ],
+   "why": "5 of 7 checks passed",
+   "source": "claim:demo1",
+   "validated": false,
+   "error": null,
+   "nTrials": 3,
+   "metrics": {
+    "ret": {
+     "value": 0.31,
+     "unit": "pct",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    },
+    "sharpe": {
+     "value": 0.6,
+     "unit": "ratio",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    },
+    "maxDrawdown": {
+     "value": -0.18,
+     "unit": "pct",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    },
+    "dsr": {
+     "value": 0.4,
+     "unit": "prob",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    }
+   },
+   "receipt": 7
+  }
+ ],
+ "next": null
+}
+
+$ apex board --status watch --fixtures --json
+{
+ "items": [
+  {
+   "trialKey": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "strategy": "demo_beta",
+   "symbol": "SPY",
+   "tf": "1h",
+   "panel": "csv:SPY:1h:split",
+   "status": "watch",
+   "slotKey": null,
+   "checksPassed": 5,
+   "checks": [
+    {
+     "n": 1,
+     "name": "enough trades",
+     "pass": true,
+     "why": "met",
+     "value": 1
+    },
+    {
+     "n": 2,
+     "name": "monkey test",
+     "pass": true,
+     "why": "met",
+     "value": 2
+    },
+    {
+     "n": 3,
+     "name": "locked test window",
+     "pass": true,
+     "why": "met",
+     "value": 3
+    },
+    {
+     "n": 4,
+     "name": "one bar late",
+     "pass": true,
+     "why": "met",
+     "value": 4
+    },
+    {
+     "n": 5,
+     "name": "double costs",
+     "pass": true,
+     "why": "met",
+     "value": 5
+    },
+    {
+     "n": 6,
+     "name": "costs under half moves",
+     "pass": false,
+     "why": "not met",
+     "value": 6
+    },
+    {
+     "n": 7,
+     "name": "beats hold on risk",
+     "pass": false,
+     "why": "not met",
+     "value": 7
+    }
+   ],
+   "why": "5 of 7 checks passed",
+   "source": "claim:demo1",
+   "validated": false,
+   "error": null,
+   "nTrials": 3,
+   "metrics": {
+    "ret": {
+     "value": 0.31,
+     "unit": "pct",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    },
+    "sharpe": {
+     "value": 0.6,
+     "unit": "ratio",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    },
+    "maxDrawdown": {
+     "value": -0.18,
+     "unit": "pct",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    },
+    "dsr": {
+     "value": 0.4,
+     "unit": "prob",
+     "n": 55,
+     "basis": "in_sample",
+     "net": true,
+     "receipt": 7
+    }
+   },
+   "receipt": 7
+  }
+ ],
+ "next": null
+}
+
+$ apex pair demo_alpha csv:SPY:1h:split --fixtures --json
+{
+ "trialKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+ "strategy": "demo_alpha",
+ "symbol": "SPY",
+ "tf": "1h",
+ "panel": "csv:SPY:1h:split",
+ "status": "paper",
+ "slotKey": "demo_alpha@csv:SPY:1h:split",
+ "checksPassed": 7,
+ "checks": [
+  {
+   "n": 1,
+   "name": "enough trades",
+   "pass": true,
+   "why": "met",
+   "value": 1
+  },
+  {
+   "n": 2,
+   "name": "monkey test",
+   "pass": true,
+   "why": "met",
+   "value": 2
+  },
+  {
+   "n": 3,
+   "name": "locked test window",
+   "pass": true,
+   "why": "met",
+   "value": 3
+  },
+  {
+   "n": 4,
+   "name": "one bar late",
+   "pass": true,
+   "why": "met",
+   "value": 4
+  },
+  {
+   "n": 5,
+   "name": "double costs",
+   "pass": true,
+   "why": "met",
+   "value": 5
+  },
+  {
+   "n": 6,
+   "name": "costs under half moves",
+   "pass": true,
+   "why": "met",
+   "value": 6
+  },
+  {
+   "n": 7,
+   "name": "beats hold on risk",
+   "pass": true,
+   "why": "met",
+   "value": 7
+  }
+ ],
+ "why": "7 of 7 checks passed",
+ "source": "factory",
+ "validated": true,
+ "error": null,
+ "nTrials": 3,
+ "metrics": {
+  "ret": {
+   "value": 0.2,
+   "unit": "pct",
+   "n": 60,
+   "basis": "in_sample",
+   "net": true,
+   "receipt": 5
+  },
+  "sharpe": {
+   "value": 0.9,
+   "unit": "ratio",
+   "n": 60,
+   "basis": "in_sample",
+   "net": true,
+   "receipt": 5
+  },
+  "maxDrawdown": {
+   "value": -0.1,
+   "unit": "pct",
+   "n": 60,
+   "basis": "in_sample",
+   "net": true,
+   "receipt": 5
+  },
+  "dsr": {
+   "value": 0.4,
+   "unit": "prob",
+   "n": 60,
+   "basis": "in_sample",
+   "net": true,
+   "receipt": 5
+  }
+ },
+ "receipt": 5,
+ "hypothesis": "Fixture data, not a real result: demo_alpha has an edge",
+ "passBar": "all seven checks",
+ "preregSeq": 4,
+ "validator": [
+  {
+   "seq": 10,
+   "purpose": "promotion",
+   "level": "L1",
+   "agrees": true,
+   "exact": true,
+   "source": "same",
+   "diffs": []
+  }
+ ],
+ "receiptEntry": {
+  "seq": 5,
+  "kind": "trial_result",
+  "ts": "2026-01-05T14:30:04.000Z",
+  "actor": "fixture",
+  "payloadHash": "6661050f9a1004f069e5068426087d9b67870ef93f818395925359c6273224f5",
+  "prevHash": "cb1b83b55e3c7a26338892ed966d93855099be0ae6c396cb96eb08f703cf9690",
+  "hash": "6fcbfb17be8a4d759f6c1d8c722b7c2919080f688e153f4615b50292fc8629e9"
+ },
+ "tStat": 2.1,
+ "inputs": {
+  "strategyFingerprint": "fp-demo_alpha",
+  "datasets": [
+   {
+    "id": "csv:SPY:1h:split",
+    "version": "v-demo"
+   }
+  ],
+  "gateVersion": "gate-demo",
+  "costModelVersion": "cm-demo",
+  "engineFingerprint": "eng-demo",
+  "seed": 7
+ },
+ "benchmark": {
+  "bars": 4000,
+  "ret": {
+   "value": 0.1,
+   "unit": "pct",
+   "n": 4000,
+   "basis": "in_sample",
+   "net": false,
+   "receipt": 5
+  },
+  "sharpe": {
+   "value": 0.7,
+   "unit": "ratio",
+   "n": 4000,
+   "basis": "in_sample",
+   "net": false,
+   "receipt": 5
+  },
+  "maxDrawdown": {
+   "value": -0.2,
+   "unit": "pct",
+   "n": 4000,
+   "basis": "in_sample",
+   "net": false,
+   "receipt": 5
+  }
+ },
+ "data": {
+  "first": "2025-09-23T10:30:00.000Z",
+  "last": "2026-01-05T14:30:00.000Z",
+  "rows": 4000
+ }
+}
+
+$ apex slots --fixtures --json
+{
+ "items": [
+  {
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "trialKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "strategy": "demo_alpha",
+   "symbol": "SPY",
+   "tf": "1h",
+   "status": "paper",
+   "role": "primary",
+   "shadowOf": null,
+   "weight": 0.25,
+   "riskFraction": 0.01,
+   "lockedAt": "2026-01-05T14:30:00.000Z",
+   "lockSeq": 11,
+   "forwardTrades": 1,
+   "drift": {
+    "cusum": 0.3,
+    "pauses": 0
+   },
+   "graduation": {
+    "state": null,
+    "month": null
+   }
+  }
+ ],
+ "next": null
+}
+
+$ apex slot demo_alpha@csv:SPY:1h:split --fixtures --json
+{
+ "slotKey": "demo_alpha@csv:SPY:1h:split",
+ "trialKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+ "strategy": "demo_alpha",
+ "symbol": "SPY",
+ "tf": "1h",
+ "status": "paper",
+ "role": "primary",
+ "shadowOf": null,
+ "weight": 0.25,
+ "riskFraction": 0.01,
+ "lockedAt": "2026-01-05T14:30:00.000Z",
+ "lockSeq": 11,
+ "forwardTrades": 1,
+ "drift": {
+  "cusum": 0.3,
+  "pauses": 0
+ },
+ "graduation": {
+  "state": null,
+  "month": null
+ },
+ "fingerprint": "fp-demo_alpha",
+ "lock": {
+  "seq": 11,
+  "kind": "slot_locked",
+  "ts": "2026-01-05T14:30:10.000Z",
+  "actor": "fixture",
+  "payloadHash": "9683d7960e56d0d8322983fc9946c27728603909ce814a961e6429f61d5f6d7e",
+  "prevHash": "ce1b33a32484649b63f634e3940b756172aae5ca837976067d08020d53264659",
+  "hash": "21754c6946a0558d7ead28df8dc7e5f5ffea3a23ddcce8340fbb9ed9df520923"
+ },
+ "locks": [
+  {
+   "id": "evidence",
+   "open": false,
+   "why": "the slot has not graduated from paper"
+  },
+  {
+   "id": "validated",
+   "open": false,
+   "why": "needs a fresh agreeing validator run and a clean review"
+  },
+  {
+   "id": "approved",
+   "open": false,
+   "why": "needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired"
+  },
+  {
+   "id": "machine",
+   "open": false,
+   "why": "opens only on Jeremy’s own machine, with his key. There is no button for this"
+  }
+ ],
+ "clock": {
+  "months": 0,
+  "trades": 1,
+  "dsr": null,
+  "slotsEverLocked": 1,
+  "state": null,
+  "fails": [],
+  "note": null,
+  "earliestMonth": null,
+  "needMonths": 6,
+  "needTrades": 50,
+  "needDsr": 0.95,
+  "checkedMonth": null
+ },
+ "forward": {
+  "trades": 1,
+  "wins": 1,
+  "pnl": {
+   "value": 98,
+   "unit": "usd",
+   "n": 1,
+   "basis": "forward",
+   "net": true
+  },
+  "avgR": {
+   "value": 1.96,
+   "unit": "ratio",
+   "n": 1,
+   "basis": "forward",
+   "net": true
+  }
+ },
+ "position": {
+  "slotKey": "demo_alpha@csv:SPY:1h:split",
+  "symbol": "SPY",
+  "side": "long",
+  "qty": 10,
+  "entry": 110,
+  "stop": 105,
+  "riskUsd": 50,
+  "riskPct": 0.004951965930474398,
+  "since": "2026-01-05T14:30:00.004Z"
+ },
+ "inSample": {
+  "trialKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "strategy": "demo_alpha",
+  "symbol": "SPY",
+  "tf": "1h",
+  "panel": "csv:SPY:1h:split",
+  "status": "paper",
+  "slotKey": "demo_alpha@csv:SPY:1h:split",
+  "checksPassed": 7,
+  "checks": [
+   {
+    "n": 1,
+    "name": "enough trades",
+    "pass": true,
+    "why": "met",
+    "value": 1
+   },
+   {
+    "n": 2,
+    "name": "monkey test",
+    "pass": true,
+    "why": "met",
+    "value": 2
+   },
+   {
+    "n": 3,
+    "name": "locked test window",
+    "pass": true,
+    "why": "met",
+    "value": 3
+   },
+   {
+    "n": 4,
+    "name": "one bar late",
+    "pass": true,
+    "why": "met",
+    "value": 4
+   },
+   {
+    "n": 5,
+    "name": "double costs",
+    "pass": true,
+    "why": "met",
+    "value": 5
+   },
+   {
+    "n": 6,
+    "name": "costs under half moves",
+    "pass": true,
+    "why": "met",
+    "value": 6
+   },
+   {
+    "n": 7,
+    "name": "beats hold on risk",
+    "pass": true,
+    "why": "met",
+    "value": 7
+   }
+  ],
+  "why": "7 of 7 checks passed",
+  "source": "factory",
+  "validated": true,
+  "error": null,
+  "nTrials": 3,
+  "metrics": {
+   "ret": {
+    "value": 0.2,
+    "unit": "pct",
+    "n": 60,
+    "basis": "in_sample",
+    "net": true,
+    "receipt": 5
+   },
+   "sharpe": {
+    "value": 0.9,
+    "unit": "ratio",
+    "n": 60,
+    "basis": "in_sample",
+    "net": true,
+    "receipt": 5
+   },
+   "maxDrawdown": {
+    "value": -0.1,
+    "unit": "pct",
+    "n": 60,
+    "basis": "in_sample",
+    "net": true,
+    "receipt": 5
+   },
+   "dsr": {
+    "value": 0.4,
+    "unit": "prob",
+    "n": 60,
+    "basis": "in_sample",
+    "net": true,
+    "receipt": 5
+   }
+  },
+  "receipt": 5
+ },
+ "shadows": []
+}
+
+$ apex slot demo_alpha@csv:SPY:1h:split --trades --fixtures --json
+{
+ "items": [
+  {
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "symbol": "SPY",
+   "side": "long",
+   "entryAt": "2026-01-05T14:30:00.001Z",
+   "exitAt": "2026-01-05T14:30:00.002Z",
+   "entry": 100,
+   "exit": 110,
+   "qty": 10,
+   "pnl": 98,
+   "r": 1.96,
+   "reason": "target"
+  }
+ ],
+ "next": null
+}
+
+$ apex slot demo_alpha@csv:SPY:1h:split --intents --fixtures --json
+{
+ "items": [
+  {
+   "seq": 18,
+   "ts": "2026-01-05T14:30:17.000Z",
+   "ok": false,
+   "id": "i3",
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "symbol": "SPY",
+   "side": "long",
+   "barAt": "2026-01-05T14:30:00.005Z",
+   "qty": null,
+   "riskUsd": null,
+   "rules": [
+    {
+     "id": "R3",
+     "detail": "one position a symbol"
+    }
+   ],
+   "note": null
+  },
+  {
+   "seq": 16,
+   "ts": "2026-01-05T14:30:15.000Z",
+   "ok": true,
+   "id": "i2",
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "symbol": "SPY",
+   "side": "long",
+   "barAt": "2026-01-05T14:30:00.003Z",
+   "qty": 10,
+   "riskUsd": 50,
+   "rules": [],
+   "note": null
+  },
+  {
+   "seq": 13,
+   "ts": "2026-01-05T14:30:12.000Z",
+   "ok": true,
+   "id": "i1",
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "symbol": "SPY",
+   "side": "long",
+   "barAt": "2026-01-05T14:30:00.000Z",
+   "qty": 10,
+   "riskUsd": 50,
+   "rules": [],
+   "note": null
+  }
+ ],
+ "next": null
+}
+
+$ apex slot demo_alpha@csv:SPY:1h:split --events --fixtures --json
+{
+ "items": [],
+ "next": null
+}
+
+$ apex slot demo_alpha@csv:SPY:1h:split --drift --fixtures --json
+{
+ "items": [
+  {
+   "seq": 19,
+   "ts": "2026-01-05T14:30:18.000Z",
+   "n": 1,
+   "s": 0.3,
+   "alarms": [],
+   "threshold": 4
+  }
+ ],
+ "next": null
+}
+
+$ apex book --fixtures --json
+{
+ "capital": 10000,
+ "equity": {
+  "value": 10097,
+  "unit": "usd",
+  "n": 1,
+  "basis": "book",
+  "net": true
+ },
+ "change": {
+  "value": 0.009700000000000042,
+  "unit": "pct",
+  "n": 1,
+  "basis": "book",
+  "net": true
+ },
+ "drawdown": {
+  "value": -0.00009902951079421296,
+  "unit": "pct",
+  "n": 1,
+  "basis": "book",
+  "net": true
+ },
+ "day": {
+  "value": 98,
+  "unit": "usd",
+  "n": 1,
+  "basis": "book",
+  "net": true
+ },
+ "week": {
+  "value": 98,
+  "unit": "usd",
+  "n": 1,
+  "basis": "book",
+  "net": true
+ },
+ "peak": 10098,
+ "cash": 10097,
+ "openPositions": 1,
+ "closedTrades": 1,
+ "limits": {
+  "dailyLossPct": 0.02,
+  "weeklyLossPct": 0.05,
+  "maxDrawdownPct": 0.15
+ },
+ "lossUsed": {
+  "day": 0,
+  "week": 0,
+  "fromPeak": 0.00009902951079421296
+ },
+ "drawdownPaused": false,
+ "since": "2026-01-05T14:30:19.000Z",
+ "lastMark": "2026-01-05T14:30:00.006Z",
+ "costs": {
+  "version": "cm-demo",
+  "measured": 0,
+  "assumed": 1
+ }
+}
+
+$ apex book --positions --fixtures --json
+{
+ "items": [
+  {
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "symbol": "SPY",
+   "side": "long",
+   "qty": 10,
+   "entry": 110,
+   "stop": 105,
+   "riskUsd": 50,
+   "riskPct": 0.004951965930474398,
+   "since": "2026-01-05T14:30:00.004Z"
+  }
+ ],
+ "next": null
+}
+
+$ apex book --fills --fixtures --json
+{
+ "items": [
+  {
+   "seq": 17,
+   "ts": "2026-01-05T14:30:16.000Z",
+   "intent": "i2",
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "kind": "entry",
+   "at": "2026-01-05T14:30:00.004Z",
+   "price": 110,
+   "qty": 10
+  },
+  {
+   "seq": 15,
+   "ts": "2026-01-05T14:30:14.000Z",
+   "intent": "i1",
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "kind": "target",
+   "at": "2026-01-05T14:30:00.002Z",
+   "price": 110,
+   "qty": 10
+  },
+  {
+   "seq": 14,
+   "ts": "2026-01-05T14:30:13.000Z",
+   "intent": "i1",
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "kind": "entry",
+   "at": "2026-01-05T14:30:00.001Z",
+   "price": 100,
+   "qty": 10
+  }
+ ],
+ "next": null
+}
+
+$ apex book --trades --fixtures --json
+{
+ "items": [
+  {
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "symbol": "SPY",
+   "side": "long",
+   "entryAt": "2026-01-05T14:30:00.001Z",
+   "exitAt": "2026-01-05T14:30:00.002Z",
+   "entry": 100,
+   "exit": 110,
+   "qty": 10,
+   "pnl": 98,
+   "r": 1.96,
+   "reason": "target"
+  }
+ ],
+ "next": null
+}
+
+$ apex book --blocked --fixtures --json
+{
+ "items": [
+  {
+   "seq": 18,
+   "ts": "2026-01-05T14:30:17.000Z",
+   "ok": false,
+   "id": "i3",
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "symbol": "SPY",
+   "side": "long",
+   "barAt": "2026-01-05T14:30:00.005Z",
+   "qty": null,
+   "riskUsd": null,
+   "rules": [
+    {
+     "id": "R3",
+     "detail": "one position a symbol"
+    }
+   ],
+   "note": null
+  }
+ ],
+ "next": null
+}
+
+$ apex risk --fixtures --json
+{
+ "limits": [
+  {
+   "key": "riskPct",
+   "inForce": 0.01,
+   "requested": 0.01,
+   "default": 0.01,
+   "ceiling": 0.02,
+   "pending": null
+  },
+  {
+   "key": "maxOpen",
+   "inForce": 5,
+   "requested": 5,
+   "default": 5,
+   "ceiling": 20,
+   "pending": null
+  },
+  {
+   "key": "maxPerSymbol",
+   "inForce": 1,
+   "requested": 1,
+   "default": 1,
+   "ceiling": 3,
+   "pending": null
+  },
+  {
+   "key": "dailyLossPct",
+   "inForce": 0.02,
+   "requested": 0.02,
+   "default": 0.02,
+   "ceiling": 0.05,
+   "pending": null
+  },
+  {
+   "key": "weeklyLossPct",
+   "inForce": 0.05,
+   "requested": 0.05,
+   "default": 0.05,
+   "ceiling": 0.1,
+   "pending": null
+  },
+  {
+   "key": "maxDrawdownPct",
+   "inForce": 0.15,
+   "requested": 0.15,
+   "default": 0.15,
+   "ceiling": 0.25,
+   "pending": null
+  },
+  {
+   "key": "maxWeightPct",
+   "inForce": 0.25,
+   "requested": 0.25,
+   "default": 0.25,
+   "ceiling": 0.4,
+   "pending": null
+  },
+  {
+   "key": "maxClassPct",
+   "inForce": 0.6,
+   "requested": 0.6,
+   "default": 0.6,
+   "ceiling": 1,
+   "pending": null
+  },
+  {
+   "key": "maxCorrRiskPct",
+   "inForce": 0.02,
+   "requested": 0.02,
+   "default": 0.02,
+   "ceiling": 0.04,
+   "pending": null
+  },
+  {
+   "key": "cooldownBars",
+   "inForce": 1,
+   "requested": 1,
+   "default": 1,
+   "ceiling": null,
+   "pending": null
+  }
+ ],
+ "halts": [],
+ "drawdownPaused": false,
+ "openRiskPct": 0.004951965930474398,
+ "exposure": [
+  {
+   "assetClass": "equity",
+   "riskUsd": 50,
+   "riskPct": 0.004951965930474398,
+   "positions": 1
+  }
+ ],
+ "drift": [
+  {
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "status": "paper",
+   "cusum": 0.3,
+   "threshold": 4,
+   "pauses": 0
+  }
+ ]
+}
+
+$ apex queue --fixtures --json
+{
+ "used": 3,
+ "budget": 25,
+ "waiting": 0,
+ "items": [
+  {
+   "source": "claim:demo1",
+   "label": "Claim check demo1",
+   "pairs": 1,
+   "done": 1,
+   "passed": 0,
+   "nearMiss": 1,
+   "first": "2026-01-05T14:30:05.000Z"
+  },
+  {
+   "source": "factory",
+   "label": "Strategy factory",
+   "pairs": 2,
+   "done": 2,
+   "passed": 1,
+   "nearMiss": 0,
+   "first": "2026-01-05T14:30:03.000Z"
+  }
+ ]
+}
+
+$ apex costs --fixtures --json
+{
+ "version": "cm-demo",
+ "receipt": 3,
+ "rows": [
+  {
+   "assetClass": "equity",
+   "bucket": "liquid",
+   "feeBps": 0.5,
+   "halfSpreadBps": 1,
+   "n": 0,
+   "slipBps": 1,
+   "source": "prior",
+   "venue": "paper"
+  }
+ ]
+}
+
+$ apex data health --fixtures --json
+{
+ "items": [
+  {
+   "dataset": "csv:SPY:1h:split",
+   "status": "ok",
+   "tradable": true,
+   "rows": 4000,
+   "source": "csv",
+   "second": null,
+   "version": "v-demo",
+   "warnings": [],
+   "first": "2025-09-23T10:30:00.000Z",
+   "last": "2026-01-05T14:30:00.000Z",
+   "receipt": 2
+  }
+ ],
+ "next": null
+}
+
+$ apex report --list --fixtures --json
+{
+ "items": [
+  {
+   "id": "20260105T143020-full",
+   "receipt": 22,
+   "ts": "2026-01-05T14:30:21.000Z",
+   "mode": "full",
+   "evaluated": 3,
+   "newTrials": 3,
+   "intents": 2,
+   "blocked": 1,
+   "fills": 3,
+   "errors": 0,
+   "waitingBudget": 0,
+   "problems": []
+  }
+ ],
+ "next": null
+}
+
+$ apex report --fixtures --json
+{
+ "id": "20260105T143020-full",
+ "receipt": 22,
+ "ts": "2026-01-05T14:30:21.000Z",
+ "mode": "full",
+ "evaluated": 3,
+ "newTrials": 3,
+ "intents": 2,
+ "blocked": 1,
+ "fills": 3,
+ "errors": 0,
+ "waitingBudget": 0,
+ "problems": [],
+ "markdown": null
+}
+
+$ apex ledger head --fixtures --json
+{
+ "seq": 22,
+ "hash": "45e61b2c6edd7c290452c662169658d46a931be5ab3089fafc813bea2a3f9d6b",
+ "anchor": null
+}
+
+$ apex ledger tail -n 5 --fixtures --json
+{
+ "items": [
+  {
+   "seq": 18,
+   "kind": "intent_blocked",
+   "ts": "2026-01-05T14:30:17.000Z",
+   "actor": "fixture",
+   "payloadHash": "ebeb4201449015a53b7398316c58220309f3d68c97a1ad2de23a6d4ffb369dca",
+   "prevHash": "391a0c002e7f7be426629489e8b3b861db5df8d1d5d01a6662fc284caecd204b",
+   "hash": "299cec4c804e0fcfa6616455591939e1a69ced2ab5ad4c1125388c95d1ee68b1",
+   "summary": "demo_alpha@csv:SPY:1h:split long",
+   "slotKey": "demo_alpha@csv:SPY:1h:split"
+  },
+  {
+   "seq": 19,
+   "kind": "drift_reading",
+   "ts": "2026-01-05T14:30:18.000Z",
+   "actor": "fixture",
+   "payloadHash": "49e58e16f184be3182ac0ba17d59ebb004cb17d60788be7692a40ffb815649ae",
+   "prevHash": "299cec4c804e0fcfa6616455591939e1a69ced2ab5ad4c1125388c95d1ee68b1",
+   "hash": "b63822f2b83247844371508764dbc9e52373d6e5e845a281a0667f9f63e9f5af",
+   "summary": "demo_alpha@csv:SPY:1h:split: 0.30",
+   "slotKey": "demo_alpha@csv:SPY:1h:split"
+  },
+  {
+   "seq": 20,
+   "kind": "book_snapshot",
+   "ts": "2026-01-05T14:30:19.000Z",
+   "actor": "fixture",
+   "payloadHash": "6dde4c9742a7b4eef2ede548767e3ba2a209500f305daec1e0dfb36a549c8e3f",
+   "prevHash": "b63822f2b83247844371508764dbc9e52373d6e5e845a281a0667f9f63e9f5af",
+   "hash": "80768c34a5211df35916d998157e9a256039eec4e5e74bdd3911983d5b830463",
+   "summary": "equity 10098.00",
+   "slotKey": null
+  },
+  {
+   "seq": 21,
+   "kind": "claim_check",
+   "ts": "2026-01-05T14:30:20.000Z",
+   "actor": "fixture",
+   "payloadHash": "95ca89bf24f618cef8f8e5dbaec1ae898729201a1543eca2b16d4a29c72b474d",
+   "prevHash": "80768c34a5211df35916d998157e9a256039eec4e5e74bdd3911983d5b830463",
+   "hash": "983ddc4554dace8bf098593fed2303a6e03054926aa3a23d9a0636333b400ca1",
+   "summary": "demo1: no edge",
+   "slotKey": null
+  },
+  {
+   "seq": 22,
+   "kind": "run",
+   "ts": "2026-01-05T14:30:21.000Z",
+   "actor": "fixture",
+   "payloadHash": "de4fef1a336180764162b146cfc635ea1b4936b911b00c610808ae06df98f354",
+   "prevHash": "983ddc4554dace8bf098593fed2303a6e03054926aa3a23d9a0636333b400ca1",
+   "hash": "45e61b2c6edd7c290452c662169658d46a931be5ab3089fafc813bea2a3f9d6b",
+   "summary": "20260105T143020-full: 3 evaluated, 2 intents",
+   "slotKey": null
+  }
+ ],
+ "next": null
+}
+
+$ apex ledger show 5 --fixtures --json
+{
+ "seq": 5,
+ "kind": "trial_result",
+ "ts": "2026-01-05T14:30:04.000Z",
+ "actor": "fixture",
+ "payloadHash": "6661050f9a1004f069e5068426087d9b67870ef93f818395925359c6273224f5",
+ "prevHash": "cb1b83b55e3c7a26338892ed966d93855099be0ae6c396cb96eb08f703cf9690",
+ "hash": "6fcbfb17be8a4d759f6c1d8c722b7c2919080f688e153f4615b50292fc8629e9",
+ "summary": "demo_alpha SPY 1h: passed_pending_validation",
+ "payload": {
+  "checks": [
+   {
+    "n": 1,
+    "name": "enough trades",
+    "pass": true,
+    "value": 1,
+    "why": "met"
+   },
+   {
+    "n": 2,
+    "name": "monkey test",
+    "pass": true,
+    "value": 2,
+    "why": "met"
+   },
+   {
+    "n": 3,
+    "name": "locked test window",
+    "pass": true,
+    "value": 3,
+    "why": "met"
+   },
+   {
+    "n": 4,
+    "name": "one bar late",
+    "pass": true,
+    "value": 4,
+    "why": "met"
+   },
+   {
+    "n": 5,
+    "name": "double costs",
+    "pass": true,
+    "value": 5,
+    "why": "met"
+   },
+   {
+    "n": 6,
+    "name": "costs under half moves",
+    "pass": true,
+    "value": 6,
+    "why": "met"
+   },
+   {
+    "n": 7,
+    "name": "beats hold on risk",
+    "pass": true,
+    "value": 7,
+    "why": "met"
+   }
+  ],
+  "data": {
+   "first": 1758623400000,
+   "last": 1767623400000,
+   "rows": 4000
+  },
+  "gateVersion": "gate-demo",
+  "inputHash": "in-a",
+  "inputs": {
+   "costModelVersion": "cm-demo",
+   "dataset": [
+    {
+     "id": "csv:SPY:1h:split",
+     "version": "v-demo"
+    }
+   ],
+   "engineFingerprint": "eng-demo",
+   "gateVersion": "gate-demo",
+   "seed": 7,
+   "strategy": {
+    "fingerprint": "fp-demo_alpha"
+   }
+  },
+  "metrics": {
+   "dd": -0.1,
+   "hold": 0.1,
+   "holdDd": -0.2,
+   "holdSharpe": 0.7,
+   "ret": 0.2,
+   "sharpe": 0.9,
+   "trades": 60
+  },
+  "panel": "csv:SPY:1h:split",
+  "readouts": {
+   "dsrN": 0.4,
+   "nTrials": 3,
+   "tStat": 2.1
+  },
+  "resultHash": "out-a",
+  "status": "passed_pending_validation",
+  "strategy": "demo_alpha",
+  "symbol": "SPY",
+  "tf": "1h",
+  "trialKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "why": "7 of 7 checks passed"
+ },
+ "prev": 4,
+ "next": 6
+}
+
+$ apex ledger verify --fixtures --json
+{
+ "ok": true,
+ "from": 1,
+ "to": 22,
+ "checked": 22,
+ "badSeq": null,
+ "why": null
+}
+
+$ apex live status --fixtures --json
+{
+ "items": [
+  {
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "allowed": false,
+   "locks": [
+    {
+     "id": "evidence",
+     "open": false,
+     "why": "the slot has not graduated from paper"
+    },
+    {
+     "id": "validated",
+     "open": false,
+     "why": "needs a fresh agreeing validator run and a clean review"
+    },
+    {
+     "id": "approved",
+     "open": false,
+     "why": "needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired"
+    },
+    {
+     "id": "machine",
+     "open": false,
+     "why": "opens only on Jeremy’s own machine, with his key. There is no button for this"
+    }
+   ]
+  }
+ ],
+ "next": null
+}
+
+$ apex live status demo_alpha@csv:SPY:1h:split --fixtures --json
+{
+ "items": [
+  {
+   "slotKey": "demo_alpha@csv:SPY:1h:split",
+   "allowed": false,
+   "locks": [
+    {
+     "id": "evidence",
+     "open": false,
+     "why": "the slot has not graduated from paper"
+    },
+    {
+     "id": "validated",
+     "open": false,
+     "why": "needs a fresh agreeing validator run and a clean review"
+    },
+    {
+     "id": "approved",
+     "open": false,
+     "why": "needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired"
+    },
+    {
+     "id": "machine",
+     "open": false,
+     "why": "opens only on Jeremy’s own machine, with his key. There is no button for this"
+    }
+   ]
+  }
+ ],
+ "next": null
+}

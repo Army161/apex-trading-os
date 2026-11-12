@@ -1,0 +1,58 @@
+[
+ {
+  "target": "plugin",
+  "files": 21,
+  "score": 0,
+  "label": "clean",
+  "findings": []
+ },
+ {
+  "target": "plugin/skills/apex-archive",
+  "files": 1,
+  "score": 0,
+  "label": "clean",
+  "findings": []
+ },
+ {
+  "target": "plugin/skills/apex-claim-check",
+  "files": 1,
+  "score": 0,
+  "label": "clean",
+  "findings": []
+ },
+ {
+  "target": "plugin/skills/apex-daily-review",
+  "files": 1,
+  "score": 0,
+  "label": "clean",
+  "findings": []
+ },
+ {
+  "target": "plugin/skills/apex-data-health",
+  "files": 1,
+  "score": 0,
+  "label": "clean",
+  "findings": []
+ },
+ {
+  "target": "plugin/skills/apex-ledger",
+  "files": 1,
+  "score": 0,
+  "label": "clean",
+  "findings": []
+ },
+ {
+  "target": "plugin/skills/apex-risk-check",
+  "files": 1,
+  "score": 0,
+  "label": "clean",
+  "findings": []
+ },
+ {
+  "target": "plugin/skills/apex-validate",
+  "files": 1,
+  "score": 0,
+  "label": "clean",
+  "findings": []
+ }
+]

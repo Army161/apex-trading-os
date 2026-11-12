@@ -1,0 +1,98 @@
+# The daily paper run (docs/design/13 and 04 section 19). Paper only: this job holds no key that can trade, and the pipeline has
+# no code path that sends an order to a broker.
+#
+# State (the ledger, refreshed bars and reports) lives on the `apex-state` branch, so git history is a second witness of the
+# ledger. When DATABASE_URL is set as a secret, Postgres is the ledger instead and the branch keeps the reports and bars.
+#
+# Order each night: refresh bars, then the validator (it re-checks what an earlier run found), then the run. A pair is never
+# promoted by the run that found it, so a new pass waits for the next night's validator.
+name: nightly
+on:
+  schedule:
+    - cron: '30 22 * * 1-5'   # 22:30 UTC, Monday to Friday, after the US close
+  workflow_dispatch:
+    inputs:
+      full:
+        description: Evaluate every pair again (default is a budgeted tick)
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: apex-nightly
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      APEX_STATE_DIR: ${{ github.workspace }}/.apex-state/state
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: fetch the state branch, or start it
+        run: |
+          if git fetch origin apex-state --depth 1 2>/dev/null; then
+            git worktree add --detach .apex-state FETCH_HEAD
+          else
+            git worktree add --detach .apex-state
+            cd .apex-state && git checkout -q --orphan apex-state && git rm -rfq . && cd ..
+            echo "Apex state: the paper ledger, refreshed bars and daily reports. Written by the nightly workflow. Do not edit by hand." > .apex-state/README.md
+          fi
+          mkdir -p "$APEX_STATE_DIR"
+          # No run can be going yet (one nightly at a time), so a run.lock found here was left by a killed run. Clear it.
+          rm -f "$APEX_STATE_DIR/run.lock"
+      - name: the ledger chain is intact before anything is added
+        run: npm run -s apex -- ledger verify
+      - name: refresh bars
+        id: pull
+        # --strict: exit 4 on a missing key or any provider problem. The night goes on so state is saved; the last step goes red.
+        continue-on-error: true
+        run: npm run -s apex -- data pull --strict
+      - name: validator
+        id: validator
+        # An andon from the validator (exit 3) no longer skips the run: the run reads the halt and opens nothing. The last step goes red.
+        run: |
+          code=0; npm run -s apex -- validate || code=$?
+          if [ "$code" = 3 ]; then echo "andon=yes" >> "$GITHUB_OUTPUT"; exit 0; fi
+          exit $code
+      - name: run
+        run: |
+          # The first run ever is the plan-approved seed batch (P1.13): every pair once. After that, a budgeted tick.
+          if [ "${{ inputs.full }}" = "true" ]; then FULL=--full; else FULL=; fi
+          npm run -s apex -- run $FULL --seed-if-empty plan:P1.13 --send telegram > "$RUNNER_TEMP/report.md"
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: the ledger chain is intact after the run
+        run: npm run -s apex -- ledger verify
+      - name: anchor the ledger head
+        # Saves today's head (sequence number and hash) under state/heads. The next step commits it, so git history dates it.
+        run: npm run -s apex -- ledger anchor
+      - name: save state
+        if: always()
+        run: |
+          # A run killed mid-way leaves its lock behind. Never commit it: it would hold the lock on the next night.
+          rm -f "$APEX_STATE_DIR/run.lock"
+          cd .apex-state
+          git config user.name "apex-nightly" && git config user.email "apex-nightly@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "nothing to save"; exit 0; }
+          git commit -q -m "nightly state $(date -u +%Y-%m-%d)"
+          git push origin HEAD:apex-state
+      - name: Check the paper clock is moving
+        # Red here makes GitHub email Jeremy: the pull was not complete, the newest bar is too old, or the validator pulled the andon.
+        if: ${{ !cancelled() }}
+        env:
+          PULL: ${{ steps.pull.outcome }}
+          ANDON: ${{ steps.validator.outputs.andon }}
+        run: |
+          bad=0
+          if [ "$PULL" != "success" ]; then echo "::error::The bar refresh did not complete ($PULL). Without new bars the forward clock does not move. docs/runbooks/run-failed.md"; bad=1; fi
+          if [ "$ANDON" = "yes" ]; then echo "::error::The validator pulled the andon cord. No new paper entries open until Jeremy resumes on the dashboard. docs/runbooks/validator-disagrees.md"; bad=1; fi
+          npm run -s apex -- data fresh --max-age-hours 36 || bad=1
+          exit $bad

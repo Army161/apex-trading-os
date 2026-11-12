@@ -1,0 +1,679 @@
+$ apex status --fixtures
+PAPER · 3 tries counted · data ok · no halts
+Ledger     file, 22 entries
+Last run   20260105T143020-full (full) at 2026-01-05 14:30Z
+
+SLOTS
+slot                         status  role     weight  locked             fwd trades  drift  last check
+demo_alpha@csv:SPY:1h:split  paper   primary  25%     2026-01-05 14:30Z  1           0.30   none yet
+
+BOOK (paper book, after costs, n=1)
+equity $10,097.00   change +1.0%   day 0.0% of 2%   week 0.0% of 5%   drawdown 0.0% of 15%   open 1
+
+Paper mode. Nothing here is proven or guaranteed.
+
+$ apex board --fixtures
+PAPER · 3 tries counted · data ok · no halts
+Results on past data. None of this is a forward record.
+
+strategy    market  tf  status    checks  n   return  sharpe  max dd  luck-adj  basis      net  first failed check
+demo_alpha  SPY     1h  paper     7/7     60  +20.0%  0.90    -10.0%  40.0%     past data  yes
+demo_beta   SPY     1h  watch     5/7     55  +31.0%  0.60    -18.0%  40.0%     past data  yes  costs under half moves
+demo_gamma  SPY     1h  rejected  1/7     74  -2.0%   -0.10   -9.0%   40.0%     past data  yes  monkey test
+
+3 shown of 3. Sorted by status, then checks passed, then Sharpe. Never by return.
+
+$ apex board --sort sharpe --top 2 --fixtures
+PAPER · 3 tries counted · data ok · no halts
+Results on past data. None of this is a forward record.
+
+strategy    market  tf  status  checks  n   return  sharpe  max dd  luck-adj  basis      net  first failed check
+demo_alpha  SPY     1h  paper   7/7     60  +20.0%  0.90    -10.0%  40.0%     past data  yes
+demo_beta   SPY     1h  watch   5/7     55  +31.0%  0.60    -18.0%  40.0%     past data  yes  costs under half moves
+
+2 shown of 3. Sorted by Sharpe. Never by return.
+
+$ apex board --status watch --fixtures
+PAPER · 3 tries counted · data ok · no halts
+Results on past data. None of this is a forward record.
+
+strategy   market  tf  status  checks  n   return  sharpe  max dd  luck-adj  basis      net  first failed check
+demo_beta  SPY     1h  watch   5/7     55  +31.0%  0.60    -18.0%  40.0%     past data  yes  costs under half moves
+
+1 shown of 1. Sorted by status, then checks passed, then Sharpe. Never by return.
+
+$ apex pair demo_alpha csv:SPY:1h:split --fixtures
+PAPER · 3 tries counted · data ok · no halts
+demo_alpha on SPY 1h · paper · past data, after costs, n=60
+7 of 7 checks passed
+
+              strategy   buy and hold
+return        +20.0%     +10.0%
+sharpe        0.90       0.70
+max drawdown  -10.0%     -20.0%
+n             60 trades  4000 bars
+costs         taken off  none
+
+ 1 enough trades                      pass  met
+ 2 monkey test                        pass  met
+ 3 locked test window                 pass  met
+ 4 one bar late                       pass  met
+ 5 double costs                       pass  met
+ 6 costs under half moves             pass  met
+ 7 beats hold on risk                 pass  met
+
+Luck: after 3 tries, the chance this Sharpe is more than luck is 40.0%. The forward gate asks for 95%.
+Written down first: Fixture data, not a real result: demo_alpha has an edge (pass bar: all seven checks; source factory)
+Validator: #10 promotion L1 agrees exactly
+Inputs: strategy fp-demo_alph, data csv:SPY:1h:split@v-demo, gate gate-demo, costs cm-demo (assumed), engine eng-demo
+receipt #5  pre-registered #4  hash 6fcbfb17be8a4d75  trial aaaaaaaaaaaaaaaa
+A result on past data: the start of the evidence, not the end of it.
+
+$ apex slots --fixtures
+PAPER · 3 tries counted · data ok · no halts
+slot                         status  role     weight  locked             fwd trades  drift  last check
+demo_alpha@csv:SPY:1h:split  paper   primary  25%     2026-01-05 14:30Z  1           0.30   none yet
+
+$ apex slot demo_alpha@csv:SPY:1h:split --fixtures
+PAPER · 3 tries counted · data ok · no halts
+demo_alpha on SPY 1h · paper · primary · PAPER
+Locked 2026-01-05 14:30Z (entry #11), weight 25%, risk per trade 1.00%, strategy fp-demo_alph. A locked strategy does not change.
+
+Graduation clock: 0.0 of 6 months, 1 of 50 trades, luck-adjusted - of 95% (counting 1 slots ever locked)
+No monthly check has run yet.
+
+Forward record: $98.00 over 1 trades (1 won), average 1.96 R (forward, after costs, n=1)
+Past data: +20.0% return, Sharpe 0.90, 7 of 7 checks (past data, after costs, n=60). Past and forward results are never added together.
+Open now: long 10 from 110.00, stop 105.00, $50.00 at risk, since 2026-01-05 14:30Z
+Drift: reading 0.30, paused for drift 0 of 3 times.
+
+demo_alpha@csv:SPY:1h:split: live is closed
+  closed evidence: the slot has not graduated from paper
+  closed validated: needs a fresh agreeing validator run and a clean review
+  closed approved: needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired
+  closed machine: opens only on Jeremy’s own machine, with his key. There is no button for this
+
+$ apex slot demo_alpha@csv:SPY:1h:split --trades --fixtures
+PAPER · 3 tries counted · data ok · no halts
+slot                         side  entered            exited             entry   exit    qty  result  R     exit reason  basis    net
+demo_alpha@csv:SPY:1h:split  long  2026-01-05 14:30Z  2026-01-05 14:30Z  100.00  110.00  10   $98.00  1.96  target       forward  yes
+
+$ apex slot demo_alpha@csv:SPY:1h:split --intents --fixtures
+PAPER · 3 tries counted · data ok · no halts
+seq  when               slot                         side  guard    qty  at risk  rule
+18   2026-01-05 14:30Z  demo_alpha@csv:SPY:1h:split  long  BLOCKED                R3: one position a symbol
+16   2026-01-05 14:30Z  demo_alpha@csv:SPY:1h:split  long  allowed  10   $50.00
+13   2026-01-05 14:30Z  demo_alpha@csv:SPY:1h:split  long  allowed  10   $50.00
+
+$ apex slot demo_alpha@csv:SPY:1h:split --events --fixtures
+PAPER · 3 tries counted · data ok · no halts
+No status change yet.
+
+$ apex slot demo_alpha@csv:SPY:1h:split --drift --fixtures
+PAPER · 3 tries counted · data ok · no halts
+seq  when               trades  reading  alarm line  alarms
+19   2026-01-05 14:30Z  1       0.30     4.00        none
+
+$ apex book --fixtures
+PAPER · 3 tries counted · data ok · no halts
+BOOK (paper book, after costs, n=1)
+equity $10,097.00   change +1.0%   day 0.0% of 2%   week 0.0% of 5%   drawdown 0.0% of 15%   open 1
+cash $10,097.00   peak $10,098.00   started at $10,000.00 on 2026-01-05   closed trades 1
+Costs: every cost is assumed, not measured.
+A limit that is reached stops new entries. It never closes a position by itself. No real money is in this book.
+
+$ apex book --positions --fixtures
+PAPER · 3 tries counted · data ok · no halts
+slot                         symbol  side  qty  entry   stop    at risk  share  since
+demo_alpha@csv:SPY:1h:split  SPY     long  10   110.00  105.00  $50.00   0.50%  2026-01-05 14:30Z
+
+$ apex book --fills --fixtures
+PAPER · 3 tries counted · data ok · no halts
+seq  when               slot                         kind    price   qty
+17   2026-01-05 14:30Z  demo_alpha@csv:SPY:1h:split  entry   110.00  10
+15   2026-01-05 14:30Z  demo_alpha@csv:SPY:1h:split  target  110.00  10
+14   2026-01-05 14:30Z  demo_alpha@csv:SPY:1h:split  entry   100.00  10
+
+$ apex book --trades --fixtures
+PAPER · 3 tries counted · data ok · no halts
+slot                         side  entered            exited             entry   exit    qty  result  R     exit reason  basis    net
+demo_alpha@csv:SPY:1h:split  long  2026-01-05 14:30Z  2026-01-05 14:30Z  100.00  110.00  10   $98.00  1.96  target       forward  yes
+
+$ apex book --blocked --fixtures
+PAPER · 3 tries counted · data ok · no halts
+seq  when               slot                         side  guard    qty  at risk  rule
+18   2026-01-05 14:30Z  demo_alpha@csv:SPY:1h:split  long  BLOCKED                R3: one position a symbol
+
+$ apex risk --fixtures
+PAPER · 3 tries counted · data ok · no halts
+limit           in force  asked for  default  ceiling  waiting
+riskPct         1.0%      1.0%       1.0%     2.0%
+maxOpen         5         5          5        20
+maxPerSymbol    1         1          1        3
+dailyLossPct    2.0%      2.0%       2.0%     5.0%
+weeklyLossPct   5.0%      5.0%       5.0%     10%
+maxDrawdownPct  15%       15%        15%      25%
+maxWeightPct    25%       25%        25%      40%
+maxClassPct     60%       60%        60%      100%
+maxCorrRiskPct  2.0%      2.0%       2.0%     4.0%
+cooldownBars    1         1          1        none
+
+A tighter value applies at once. A looser one applies only after 24 hours unchanged. Nothing can exceed its ceiling.
+Halts: none. Drawdown pause off.
+Open risk: 0.50% of paper equity (equity 0.50% in 1).
+
+slot                         status  drift reading  alarm line  pauses
+demo_alpha@csv:SPY:1h:split  paper   0.30           4.00        0 of 3
+
+$ apex queue --fixtures
+PAPER · 3 tries counted · data ok · no halts
+Tries this week: 3 of 25.
+
+source       what               pairs  done  passed  near miss  first
+claim:demo1  Claim check demo1  1      1     0       1          2026-01-05
+factory      Strategy factory   2      2     1       0          2026-01-05
+
+$ apex costs --fixtures
+Cost model cm-demo (entry #3). A row is assumed until paper fills are measured against it.
+
+assetClass  bucket  feeBps  halfSpreadBps  n  slipBps  source  venue
+equity      liquid  0.5     1              0  1        prior   paper
+
+$ apex data health --fixtures
+dataset           status  tradable  bars  first       last               source  notes
+csv:SPY:1h:split  ok      yes       4000  2025-09-23  2026-01-05 14:30Z  csv
+
+$ apex report --list --fixtures
+run                   when               mode  evaluated  new tries  orders  blocked  fills  errors
+20260105T143020-full  2026-01-05 14:30Z  full  3          3          2       1        3      0
+
+$ apex report --fixtures
+run                   when               mode  evaluated  new tries  orders  blocked  fills  errors
+20260105T143020-full  2026-01-05 14:30Z  full  3          3          2       1        3      0
+
+The text of this report is not kept here. The counts above are from the ledger.
+
+$ apex ledger head --fixtures
+seq 22
+hash 45e61b2c6edd7c290452c662169658d46a931be5ab3089fafc813bea2a3f9d6b
+last anchor none yet
+
+$ apex ledger tail -n 5 --fixtures
+    18  2026-01-05 14:30Z  intent_blocked       fixture        demo_alpha@csv:SPY:1h:split long
+    19  2026-01-05 14:30Z  drift_reading        fixture        demo_alpha@csv:SPY:1h:split: 0.30
+    20  2026-01-05 14:30Z  book_snapshot        fixture        equity 10098.00
+    21  2026-01-05 14:30Z  claim_check          fixture        demo1: no edge
+    22  2026-01-05 14:30Z  run                  fixture        20260105T143020-full: 3 evaluated, 2 intents
+
+$ apex ledger show 5 --fixtures
+#5 trial_result by fixture at 2026-01-05 14:30Z
+demo_alpha SPY 1h: passed_pending_validation
+hash         6fcbfb17be8a4d759f6c1d8c722b7c2919080f688e153f4615b50292fc8629e9
+previous     cb1b83b55e3c7a26338892ed966d93855099be0ae6c396cb96eb08f703cf9690
+payload hash 6661050f9a1004f069e5068426087d9b67870ef93f818395925359c6273224f5
+
+{
+ "checks": [
+  {
+   "n": 1,
+   "name": "enough trades",
+   "pass": true,
+   "value": 1,
+   "why": "met"
+  },
+  {
+   "n": 2,
+   "name": "monkey test",
+   "pass": true,
+   "value": 2,
+   "why": "met"
+  },
+  {
+   "n": 3,
+   "name": "locked test window",
+   "pass": true,
+   "value": 3,
+   "why": "met"
+  },
+  {
+   "n": 4,
+   "name": "one bar late",
+   "pass": true,
+   "value": 4,
+   "why": "met"
+  },
+  {
+   "n": 5,
+   "name": "double costs",
+   "pass": true,
+   "value": 5,
+   "why": "met"
+  },
+  {
+   "n": 6,
+   "name": "costs under half moves",
+   "pass": true,
+   "value": 6,
+   "why": "met"
+  },
+  {
+   "n": 7,
+   "name": "beats hold on risk",
+   "pass": true,
+   "value": 7,
+   "why": "met"
+  }
+ ],
+ "data": {
+  "first": 1758623400000,
+  "last": 1767623400000,
+  "rows": 4000
+ },
+ "gateVersion": "gate-demo",
+ "inputHash": "in-a",
+ "inputs": {
+  "costModelVersion": "cm-demo",
+  "dataset": [
+   {
+    "id": "csv:SPY:1h:split",
+    "version": "v-demo"
+   }
+  ],
+  "engineFingerprint": "eng-demo",
+  "gateVersion": "gate-demo",
+  "seed": 7,
+  "strategy": {
+   "fingerprint": "fp-demo_alpha"
+  }
+ },
+ "metrics": {
+  "dd": -0.1,
+  "hold": 0.1,
+  "holdDd": -0.2,
+  "holdSharpe": 0.7,
+  "ret": 0.2,
+  "sharpe": 0.9,
+  "trades": 60
+ },
+ "panel": "csv:SPY:1h:split",
+ "readouts": {
+  "dsrN": 0.4,
+  "nTrials": 3,
+  "tStat": 2.1
+ },
+ "resultHash": "out-a",
+ "status": "passed_pending_validation",
+ "strategy": "demo_alpha",
+ "symbol": "SPY",
+ "tf": "1h",
+ "trialKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+ "why": "7 of 7 checks passed"
+}
+
+$ apex ledger verify --fixtures
+chain   ok   1 .. 22   (22 entries)
+head    seq 22
+head    hash 45e61b2c6edd7c290452c662169658d46a931be5ab3089fafc813bea2a3f9d6b
+head    last anchor none yet
+
+$ apex live status --fixtures
+Live trading is off. Going live needs all four locks, and the last three are Jeremy's alone.
+
+demo_alpha@csv:SPY:1h:split: live is closed
+  closed evidence: the slot has not graduated from paper
+  closed validated: needs a fresh agreeing validator run and a clean review
+  closed approved: needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired
+  closed machine: opens only on Jeremy’s own machine, with his key. There is no button for this
+
+Stages once live is allowed: micro_live (1% size) -> live_10 (10% size) -> live_50 (50% size) -> live_100 (100% size).
+
+$ apex live status demo_alpha@csv:SPY:1h:split --fixtures
+Live trading is off. Going live needs all four locks, and the last three are Jeremy's alone.
+
+demo_alpha@csv:SPY:1h:split: live is closed
+  closed evidence: the slot has not graduated from paper
+  closed validated: needs a fresh agreeing validator run and a clean review
+  closed approved: needs Jeremy’s signed-in approval, made after the validator run and the review, and not expired
+  closed machine: opens only on Jeremy’s own machine, with his key. There is no button for this
+
+Stages once live is allowed: micro_live (1% size) -> live_10 (10% size) -> live_50 (50% size) -> live_100 (100% size).
+
+$ apex tui --once --cols 110 --rows 26 --fixtures
+┌ APEX ─ PAPER ─ 3 tries counted ─ data ok ─ no halts ──────────────────────────────────────────── 15:30 UTC ┐
+│ [1] TODAY   2  Board   3  Slots   4  Book   5  Risk   6  Queue   7  Data   8  Ledger                       │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Ledger     file, 22 entries                                                                                │
+│ Last run   20260105T143020-full (full) at 2026-01-05 14:30Z                                                │
+│                                                                                                            │
+│ SLOTS                                                                                                      │
+│ slot                         status  role     weight  locked             fwd trades  drift  last check     │
+│ demo_alpha@csv:SPY:1h:split  paper   primary  25%     2026-01-05 14:30Z  1           0.30   none yet       │
+│                                                                                                            │
+│ BOOK (paper book, after costs, n=1)                                                                        │
+│ equity $10,097.00   change +1.0%   day 0.0% of 2%   week 0.0% of 5%   drawdown 0.0% of 15%   open 1        │
+│                                                                                                            │
+│ Paper mode. Nothing here is proven or guaranteed.                                                          │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+│                                                                                                            │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ up/down move   enter open   / filter   r refresh   H halt   ? help   q quit                                │
+└──────────────────────────────────────────────────────────────────── fixtures: the committed fixture ledger ┘
+
+$ apex tui --once --cols 72 --rows 20 --fixtures
+┌ APEX ─ PAPER ─ 3 tries counted ─ data ok ─ no halts ────── 15:30 UTC ┐
+│ [1]  2   3   4   5   6   7   8                                       │
+│ Pane: Today                                                          │
+├──────────────────────────────────────────────────────────────────────┤
+│ Ledger     file, 22 entries                                          │
+│ Last run   20260105T143020-full (full) at 2026-01-05 14:30Z          │
+│                                                                      │
+│ SLOTS                                                                │
+│ slot                         status  role     weight  locked       … │
+│ demo_alpha@csv:SPY:1h:split  paper   primary  25%     2026-01-05 14… │
+│                                                                      │
+│ BOOK (paper book, after costs, n=1)                                  │
+│ equity $10,097.00   change +1.0%   day 0.0% of 2%   week 0.0% of 5%… │
+│                                                                      │
+│ Paper mode. Nothing here is proven or guaranteed.                    │
+│                                                                      │
+│                                                                      │
+├──────────────────────────────────────────────────────────────────────┤
+│ up/down move   enter open   / filter   r refresh   H halt   ? help … │
+└────────────────────────────── fixtures: the committed fixture ledger ┘
+
+$ apex completion bash --fixtures
+# apex completion for bash. Load it with: eval "$(apex completion bash)"
+_apex() {
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  if [ "$COMP_CWORD" -eq 1 ]; then COMPREPLY=( $(compgen -W "status run validate board pair slots slot book risk queue costs report data ledger strategies claim halt signoff live doctor tui mcp completion help" -- "$cur") ); return; fi
+  case "${COMP_WORDS[1]}" in
+    status) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
+    run) COMPREPLY=( $(compgen -W "--full --budget --dry-run --seed --seed-if-empty --send --json --remote --local --fixtures" -- "$cur") ) ;;
+    validate) COMPREPLY=( $(compgen -W "--level --dry-run --json --remote --local --fixtures" -- "$cur") ) ;;
+    board) COMPREPLY=( $(compgen -W "--status --market --tf --q --top --sort --json --remote --local --fixtures" -- "$cur") ) ;;
+    pair) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
+    slots) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
+    slot) COMPREPLY=( $(compgen -W "--trades --intents --events --drift --json --remote --local --fixtures" -- "$cur") ) ;;
+    book) COMPREPLY=( $(compgen -W "--positions --fills --trades --blocked --json --remote --local --fixtures" -- "$cur") ) ;;
+    risk) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
+    queue) COMPREPLY=( $(compgen -W "list --json --remote --local --fixtures" -- "$cur") ) ;;
+    costs) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
+    report) COMPREPLY=( $(compgen -W "--list --id --date --send --json --remote --local --fixtures" -- "$cur") ) ;;
+    data) COMPREPLY=( $(compgen -W "health pull fresh --strict --max-age-hours --json --remote --local --fixtures" -- "$cur") ) ;;
+    ledger) COMPREPLY=( $(compgen -W "head tail show verify replay anchor --n --kind --slot --from --json --remote --local --fixtures" -- "$cur") ) ;;
+    strategies) COMPREPLY=( $(compgen -W "list show fingerprint --write --check --json --remote --local --fixtures" -- "$cur") ) ;;
+    claim) COMPREPLY=( $(compgen -W "--extraction --kind --dry-run --request --wait --json --remote --local --fixtures" -- "$cur") ) ;;
+    halt) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
+    signoff) COMPREPLY=( $(compgen -W "--reason --json --remote --local --fixtures" -- "$cur") ) ;;
+    live) COMPREPLY=( $(compgen -W "status --json --remote --local --fixtures" -- "$cur") ) ;;
+    doctor) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
+    tui) COMPREPLY=( $(compgen -W "--once --json --remote --local --fixtures" -- "$cur") ) ;;
+    mcp) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
+    completion) COMPREPLY=( $(compgen -W "bash zsh fish --json --remote --local --fixtures" -- "$cur") ) ;;
+    help) COMPREPLY=( $(compgen -W "--json --remote --local --fixtures" -- "$cur") ) ;;
+  esac
+}
+complete -o default -F _apex apex
+
+$ apex completion zsh --fixtures
+#compdef apex
+# apex completion for zsh. Load it with: eval "$(apex completion zsh)"
+_apex() {
+  local -a cmds
+  cmds=('status:Mode, halts, last run, slots, book' 'run:Run the pipeline once' 'validate:Independent re-run of anything waiting for the validator' 'board:Every evaluated pair' 'pair:One evaluation in detail' 'slots:Every slot ever locked' 'slot:One slot - clock, forward record, locks' 'book:The paper book' 'risk:Limits, halts, exposure, drift' 'queue:The weekly budget of tries' 'costs:The cost model in force' 'report:A run report' 'data:Data health, pull new bars, or check the newest bar is recent' 'ledger:Read and verify the ledger' 'strategies:The strategy library and its fingerprints' 'claim:Test the rules a source states' 'halt:Pull the andon cord' 'signoff:Jeremy only - allow one edit of a red path' 'live:The four locks, read-only' 'doctor:Config, ledger chain, data, fingerprints' 'tui:Full-screen view' 'mcp:Serve the MCP tools over stdio, for Claude Code and Claude Desktop' 'completion:Print a shell completion script' 'help:This text')
+  if (( CURRENT == 2 )); then _describe 'command' cmds; return; fi
+  case "$words[2]" in
+    status) compadd -- --json --remote --local --fixtures ;;
+    run) compadd -- --full --budget --dry-run --seed --seed-if-empty --send --json --remote --local --fixtures ;;
+    validate) compadd -- --level --dry-run --json --remote --local --fixtures ;;
+    board) compadd -- --status --market --tf --q --top --sort --json --remote --local --fixtures ;;
+    pair) compadd -- --json --remote --local --fixtures ;;
+    slots) compadd -- --json --remote --local --fixtures ;;
+    slot) compadd -- --trades --intents --events --drift --json --remote --local --fixtures ;;
+    book) compadd -- --positions --fills --trades --blocked --json --remote --local --fixtures ;;
+    risk) compadd -- --json --remote --local --fixtures ;;
+    queue) compadd -- list --json --remote --local --fixtures ;;
+    costs) compadd -- --json --remote --local --fixtures ;;
+    report) compadd -- --list --id --date --send --json --remote --local --fixtures ;;
+    data) compadd -- health pull fresh --strict --max-age-hours --json --remote --local --fixtures ;;
+    ledger) compadd -- head tail show verify replay anchor --n --kind --slot --from --json --remote --local --fixtures ;;
+    strategies) compadd -- list show fingerprint --write --check --json --remote --local --fixtures ;;
+    claim) compadd -- --extraction --kind --dry-run --request --wait --json --remote --local --fixtures ;;
+    halt) compadd -- --json --remote --local --fixtures ;;
+    signoff) compadd -- --reason --json --remote --local --fixtures ;;
+    live) compadd -- status --json --remote --local --fixtures ;;
+    doctor) compadd -- --json --remote --local --fixtures ;;
+    tui) compadd -- --once --json --remote --local --fixtures ;;
+    mcp) compadd -- --json --remote --local --fixtures ;;
+    completion) compadd -- bash zsh fish --json --remote --local --fixtures ;;
+    help) compadd -- --json --remote --local --fixtures ;;
+  esac
+}
+compdef _apex apex
+
+$ apex completion fish --fixtures
+# apex completion for fish. Load it with: apex completion fish | source
+complete -c apex -f
+complete -c apex -n '__fish_use_subcommand' -a 'status' -d 'Mode, halts, last run, slots, book'
+complete -c apex -n '__fish_use_subcommand' -a 'run' -d 'Run the pipeline once'
+complete -c apex -n '__fish_use_subcommand' -a 'validate' -d 'Independent re-run of anything waiting for the validator'
+complete -c apex -n '__fish_use_subcommand' -a 'board' -d 'Every evaluated pair'
+complete -c apex -n '__fish_use_subcommand' -a 'pair' -d 'One evaluation in detail'
+complete -c apex -n '__fish_use_subcommand' -a 'slots' -d 'Every slot ever locked'
+complete -c apex -n '__fish_use_subcommand' -a 'slot' -d 'One slot: clock, forward record, locks'
+complete -c apex -n '__fish_use_subcommand' -a 'book' -d 'The paper book'
+complete -c apex -n '__fish_use_subcommand' -a 'risk' -d 'Limits, halts, exposure, drift'
+complete -c apex -n '__fish_use_subcommand' -a 'queue' -d 'The weekly budget of tries'
+complete -c apex -n '__fish_use_subcommand' -a 'costs' -d 'The cost model in force'
+complete -c apex -n '__fish_use_subcommand' -a 'report' -d 'A run report'
+complete -c apex -n '__fish_use_subcommand' -a 'data' -d 'Data health, pull new bars, or check the newest bar is recent'
+complete -c apex -n '__fish_use_subcommand' -a 'ledger' -d 'Read and verify the ledger'
+complete -c apex -n '__fish_use_subcommand' -a 'strategies' -d 'The strategy library and its fingerprints'
+complete -c apex -n '__fish_use_subcommand' -a 'claim' -d 'Test the rules a source states'
+complete -c apex -n '__fish_use_subcommand' -a 'halt' -d 'Pull the andon cord'
+complete -c apex -n '__fish_use_subcommand' -a 'signoff' -d 'Jeremy only: allow one edit of a red path'
+complete -c apex -n '__fish_use_subcommand' -a 'live' -d 'The four locks, read-only'
+complete -c apex -n '__fish_use_subcommand' -a 'doctor' -d 'Config, ledger chain, data, fingerprints'
+complete -c apex -n '__fish_use_subcommand' -a 'tui' -d 'Full-screen view'
+complete -c apex -n '__fish_use_subcommand' -a 'mcp' -d 'Serve the MCP tools over stdio, for Claude Code and Claude Desktop'
+complete -c apex -n '__fish_use_subcommand' -a 'completion' -d 'Print a shell completion script'
+complete -c apex -n '__fish_use_subcommand' -a 'help' -d 'This text'
+complete -c apex -n '__fish_seen_subcommand_from status' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from status' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from status' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from status' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'full'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'budget'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'dry-run'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'seed'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'seed-if-empty'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'send'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from run' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from validate' -l 'level'
+complete -c apex -n '__fish_seen_subcommand_from validate' -l 'dry-run'
+complete -c apex -n '__fish_seen_subcommand_from validate' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from validate' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from validate' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from validate' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'status'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'market'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'tf'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'q'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'top'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'sort'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from board' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from pair' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from pair' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from pair' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from pair' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from slots' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from slots' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from slots' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from slots' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from slot' -l 'trades'
+complete -c apex -n '__fish_seen_subcommand_from slot' -l 'intents'
+complete -c apex -n '__fish_seen_subcommand_from slot' -l 'events'
+complete -c apex -n '__fish_seen_subcommand_from slot' -l 'drift'
+complete -c apex -n '__fish_seen_subcommand_from slot' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from slot' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from slot' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from slot' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from book' -l 'positions'
+complete -c apex -n '__fish_seen_subcommand_from book' -l 'fills'
+complete -c apex -n '__fish_seen_subcommand_from book' -l 'trades'
+complete -c apex -n '__fish_seen_subcommand_from book' -l 'blocked'
+complete -c apex -n '__fish_seen_subcommand_from book' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from book' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from book' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from book' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from risk' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from risk' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from risk' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from risk' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from queue' -a 'list'
+complete -c apex -n '__fish_seen_subcommand_from queue' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from queue' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from queue' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from queue' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from costs' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from costs' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from costs' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from costs' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from report' -l 'list'
+complete -c apex -n '__fish_seen_subcommand_from report' -l 'id'
+complete -c apex -n '__fish_seen_subcommand_from report' -l 'date'
+complete -c apex -n '__fish_seen_subcommand_from report' -l 'send'
+complete -c apex -n '__fish_seen_subcommand_from report' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from report' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from report' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from report' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from data' -a 'health'
+complete -c apex -n '__fish_seen_subcommand_from data' -a 'pull'
+complete -c apex -n '__fish_seen_subcommand_from data' -a 'fresh'
+complete -c apex -n '__fish_seen_subcommand_from data' -l 'strict'
+complete -c apex -n '__fish_seen_subcommand_from data' -l 'max-age-hours'
+complete -c apex -n '__fish_seen_subcommand_from data' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from data' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from data' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from data' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'head'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'tail'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'show'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'verify'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'replay'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -a 'anchor'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'n'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'kind'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'slot'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'from'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from ledger' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from strategies' -a 'list'
+complete -c apex -n '__fish_seen_subcommand_from strategies' -a 'show'
+complete -c apex -n '__fish_seen_subcommand_from strategies' -a 'fingerprint'
+complete -c apex -n '__fish_seen_subcommand_from strategies' -l 'write'
+complete -c apex -n '__fish_seen_subcommand_from strategies' -l 'check'
+complete -c apex -n '__fish_seen_subcommand_from strategies' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from strategies' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from strategies' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from strategies' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from claim' -l 'extraction'
+complete -c apex -n '__fish_seen_subcommand_from claim' -l 'kind'
+complete -c apex -n '__fish_seen_subcommand_from claim' -l 'dry-run'
+complete -c apex -n '__fish_seen_subcommand_from claim' -l 'request'
+complete -c apex -n '__fish_seen_subcommand_from claim' -l 'wait'
+complete -c apex -n '__fish_seen_subcommand_from claim' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from claim' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from claim' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from claim' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from halt' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from halt' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from halt' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from halt' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from signoff' -l 'reason'
+complete -c apex -n '__fish_seen_subcommand_from signoff' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from signoff' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from signoff' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from signoff' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from live' -a 'status'
+complete -c apex -n '__fish_seen_subcommand_from live' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from live' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from live' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from live' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from doctor' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from doctor' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from doctor' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from doctor' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from tui' -l 'once'
+complete -c apex -n '__fish_seen_subcommand_from tui' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from tui' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from tui' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from tui' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from mcp' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from mcp' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from mcp' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from mcp' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from completion' -a 'bash'
+complete -c apex -n '__fish_seen_subcommand_from completion' -a 'zsh'
+complete -c apex -n '__fish_seen_subcommand_from completion' -a 'fish'
+complete -c apex -n '__fish_seen_subcommand_from completion' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from completion' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from completion' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from completion' -l 'fixtures'
+complete -c apex -n '__fish_seen_subcommand_from help' -l 'json'
+complete -c apex -n '__fish_seen_subcommand_from help' -l 'remote'
+complete -c apex -n '__fish_seen_subcommand_from help' -l 'local'
+complete -c apex -n '__fish_seen_subcommand_from help' -l 'fixtures'
+
+$ apex help --fixtures
+apex: paper-first trading research. Nothing here places a live order.
+
+  apex status                          Mode, halts, last run, slots, book
+  apex run [--full | --budget N] [--dry-run] [--seed plan:<id>] [--send telegram]
+                                       Run the pipeline once. --dry-run writes nothing
+  apex validate [--level L1|L2]        Independent re-run of anything waiting for the validator
+  apex board [--status S] [--market M] [--tf T] [--q text] [--top N] [--sort checks|sharpe]
+  apex pair <strategy> <dataset>       One evaluation in detail (or: apex pair <trial key>)
+  apex slots                           Every slot ever locked
+  apex slot <key> [--trades | --intents | --events | --drift]
+  apex book [--positions | --fills | --trades | --blocked]
+  apex risk | queue | costs
+  apex report [--list] [--id <run>] [--date YYYY-MM-DD] [--send telegram]
+  apex data health | pull [--strict]   pull needs MASSIVE_API_KEY (a data key; it cannot trade). --strict exits 4 on any problem
+  apex data fresh [--max-age-hours N]  Exit 4 when a slot's newest bar is older than N trading hours (default 36)
+  apex ledger head | tail [-n N] [--kind K] [--slot S] | show <seq> | verify [--from N] | replay | anchor
+  apex strategies list | show <id> | fingerprint [--write | --check]
+  apex claim <file | -> --extraction <json> [--kind transcript|pine|page|rules] [--dry-run]
+                                       Test the rules a source states. Each reading is one try
+  apex claim <file> --request          Print the extraction request (prompt and schema). No model is called here
+  apex halt "<reason>"                 Pull the andon cord. Always allowed
+  apex signoff <path> --reason "..."   Jeremy only: allow one edit of a red path for 48 hours. Needs APEX_SIGNOFF_KEY and a keyboard
+  apex live status [slot]              The four locks, read-only
+  apex doctor                          Config, ledger chain, data, fingerprints
+  apex tui                             Full-screen view. Read-only except for Halt
+  apex mcp                             Serve the MCP tools over stdio (for Claude Code and Claude Desktop). Read, claim check and halt only
+  apex completion bash|zsh|fish        Print a completion script
+
+Where the answer comes from:
+  (default)    the ledger in this checkout
+  --remote     the dashboard's API. Needs APEX_API_URL and APEX_API_KEY in the environment. Read, claim and halt only
+  --fixtures   a small made-up ledger that ships with the tool. Read-only
+  --json       print the answer as JSON, in the same shape the API sends
+
+Exit codes: 0 ok, 1 error, 2 usage, 3 halted or blocked, 4 verification failed.
+There is no `apex resume`: resuming is Jeremy's, on the dashboard.

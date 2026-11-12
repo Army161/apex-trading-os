@@ -1,0 +1,11 @@
+{
+  "description": "Apex guard: red paths, live flags and keys cannot be edited by an agent without Jeremy's sign-off. One of three layers; CODEOWNERS and the protected-paths check decide.",
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash", "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/guard.mjs\"", "timeout": 10 }] }
+    ],
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session_start.mjs\"", "timeout": 5 }] }
+    ]
+  }
+}

@@ -28,7 +28,7 @@ import { correlationMatrix, lockForIncubation, incubationReport, walkForward } f
 import { olsFit, sgdFit, behaviour, expectedValue, walkBook, size as qsize, logReturns } from './quant';
 import { simulateMM, leadLag, convert } from './mm';
 import { timeSplit, holdSameBalances } from './validate';
-const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/parity.json'), 'utf8'));
+const fx = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../packages/engine/src/fixtures/parity.json'), 'utf8'));
 const bars: Bar[] = fx.bars.map((r: number[]) => ({ t: r[0], o: r[1], h: r[2], l: r[3], c: r[4], v: r[5] }));
 let fail = 0;
 for (const [id, e] of Object.entries<any>(fx.expected)) {

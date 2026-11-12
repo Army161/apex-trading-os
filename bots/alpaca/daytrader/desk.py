@@ -31,6 +31,7 @@ import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, ".."))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "..", "engine"))
 
@@ -39,6 +40,10 @@ from apex_engine.patterns import candles  # noqa: E402
 from apex_engine.risk import RiskGuard, RiskConfig  # noqa: E402
 from apex_engine.strategies.base import Strategy  # noqa: E402
 from apex_engine.reporter import Reporter  # noqa: E402
+import daybook  # noqa: E402
+
+BOT_ID = "day-trader"
+DAY_BOOK = os.path.join(HERE, "desk_day.json")
 
 UA = {"User-Agent": "Mozilla/5.0 (apex-desk)"}
 CFG_PATH = os.path.join(HERE, "desk_config.json")
@@ -209,23 +214,36 @@ def budget(entry, stop):
     return {"shares": sh, "risk_usd": round(sh * abs(entry - stop), 2), "notional": round(sh * entry, 2)}
 
 
-def risk_check(entry, stop, target):
-    log = os.path.join(HERE, "desk_log.json")
-    hist = json.load(open(log)) if os.path.exists(log) else []
-    today = datetime.now().strftime("%Y-%m-%d")
-    todays = [h for h in hist if h["date"] == today]
+def risk_check(entry, stop, target, book_path=None, now=None):
+    """Plan checks plus the daily caps from the day book (trades sent today, today's P&L). An unreadable book refuses."""
+    path = book_path or DAY_BOOK
+    now = now or datetime.now(daybook.NY)
+    try:
+        book = daybook.load(path, daybook.today(now))
+    except daybook.Unreadable as e:
+        return {"allowed": False, "reason": str(e)}
+    cap = daybook.cap_hit(book, CFG["account_size"], CFG["max_daily_loss_pct"], CFG["max_trades_per_day"])
+    if cap:
+        return {"allowed": False, "reason": cap}
     g = RiskGuard(RiskConfig(min_rr=CFG["min_rr"], daily_loss_limit_pct=CFG["max_daily_loss_pct"] / 100, max_open_positions=CFG["max_trades_per_day"]),
                   equity=CFG["account_size"])
-    g.state.open_positions = len(todays)
-    g.state.day = today
+    g.state.open_positions = book["trades"]
+    g.state.day = time.strftime("%Y-%m-%d", time.gmtime())  # the guard's own day roll would reset the start equity
     g.state.day_start_equity = CFG["account_size"]
-    g.state.equity = CFG["account_size"] + sum(h.get("pnl", 0) for h in todays)
+    g.state.equity = CFG["account_size"] + min(book["realised_pnl"], book["day_pnl"])
     ok, why = g.check(entry, stop, target)
-    now = datetime.now(tz=pd.Timestamp.now(tz="America/New_York").tz)
     mins_open = (now.hour * 60 + now.minute) - (9 * 60 + 30)
     if ok and 0 <= mins_open < CFG["no_trade_first_minutes"]:
         ok, why = False, f"no trades in the first {CFG['no_trade_first_minutes']} minutes"
     return {"allowed": ok, "reason": why}
+
+
+def sync_pnl(api, book_path=None, now=None):
+    """Today's P&L from the broker into the day book. Realised = account day change minus today's change on open positions."""
+    acct = api.account()
+    day_change = float(acct["equity"]) - float(acct["last_equity"])
+    open_today = sum(float(p.get("unrealized_intraday_pl") or 0) for p in api.positions())
+    return daybook.record_pnl(book_path or DAY_BOOK, daybook.today(now), day_change - open_today, day_change)
 
 
 # ---------------- Desk 4: execute ----------------
@@ -236,29 +254,49 @@ def alerts(symbol, levels: dict):
             if (name == "stop" and px <= lv) or (name != "stop" and px >= lv):
                 msg = f"ALERT {symbol} {name} {lv} hit at {px}"
                 print(msg, flush=True)
-                Reporter("day-trader", "alpaca", "Day Trader Desk").event("alert", msg)
+                Reporter(BOT_ID, "alpaca", "Day Trader Desk").event("alert", msg)
                 levels.pop(name)
         if not levels:
             return
         time.sleep(20)
 
 
-def execute(symbol, side, entry, stop, target, yes=False):
+def execute(symbol, side, entry, stop, target, yes=False, api=None, book_path=None, now=None):
+    """Order steps: broker P&L into the day book -> plan and cap checks -> ticket -> your typed yes -> dashboard halt check ->
+    count the trade in the day book (refused once a cap is hit) -> bracket order (the broker checks the halt state again)."""
+    import guard
     from broker import Alpaca
-    rc = risk_check(entry, stop, target)
+    path = book_path or DAY_BOOK
+    api = api or Alpaca(BOT_ID)
+    try:
+        sync_pnl(api, path, now)
+    except daybook.Unreadable as e:
+        return {"blocked": str(e)}
+    except Exception as e:  # noqa: BLE001
+        return {"blocked": f"cannot read today's P&L from the broker ({type(e).__name__}); refusing"}
+    rc = risk_check(entry, stop, target, path, now)
     if not rc["allowed"]:
         return {"blocked": rc["reason"]}
     b = budget(entry, stop)
     ticket = {"symbol": symbol, "side": side, "qty": b["shares"], "entry_ref": entry, "stop": stop, "target": target, **b}
-    api = Alpaca()
     print(json.dumps({"ORDER TICKET": ticket, "account": "PAPER" if api.paper else "LIVE"}, indent=1))
     phrase = f"YES {side.upper()} {b['shares']} {symbol}"
     if not yes:
         if input(f"Type exactly '{phrase}' to send: ").strip() != phrase:
             return {"cancelled": True}
-    o = api.bracket(symbol, b["shares"], side, take_profit=target, stop_loss=stop, client_order_id=f"desk-{symbol}-{int(time.time())}")
-    Reporter("day-trader", "alpaca", "Day Trader Desk", "paper" if api.paper else "live").trade({**ticket, "order_id": o.get("id"), "status": "submitted"})
-    return {"submitted": o.get("id"), "status": o.get("status")}
+    try:
+        guard.check(BOT_ID, api.paper, getattr(api, "_fetch", None))
+    except guard.Halted as e:
+        return {"blocked": str(e)}
+    ok, why = daybook.reserve(path, daybook.today(now), CFG["account_size"], CFG["max_daily_loss_pct"], CFG["max_trades_per_day"])
+    if not ok:
+        return {"blocked": why}
+    try:
+        o = api.bracket(symbol, b["shares"], side, take_profit=target, stop_loss=stop, client_order_id=f"desk-{symbol}-{int(time.time())}")
+    except guard.Halted as e:
+        return {"blocked": str(e)}
+    Reporter(BOT_ID, "alpaca", "Day Trader Desk", "paper" if api.paper else "live").trade({**ticket, "order_id": o.get("id"), "status": "submitted"})
+    return {"submitted": o.get("id"), "status": o.get("status"), "day": why}
 
 
 def main():

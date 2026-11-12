@@ -1,0 +1,11 @@
+[
+  { "name": "clean long", "intent": {}, "book": {}, "ctx": {}, "ok": true, "qty": 25, "failed": [] },
+  { "name": "clean short", "intent": { "side": -1, "stop": 104 }, "book": {}, "ctx": {}, "ok": true, "qty": 25, "failed": [] },
+  { "name": "stop on the wrong side", "intent": { "stop": 101 }, "book": {}, "ctx": {}, "ok": false, "qty": 0, "failed": ["stop-required", "min-size"] },
+  { "name": "kill switch", "intent": {}, "book": {}, "ctx": { "halts": { "readable": true, "kill": true, "andon": false } }, "ok": false, "qty": 0, "failed": ["halted"] },
+  { "name": "daily loss limit", "intent": {}, "book": { "dayPnl": -200 }, "ctx": {}, "ok": false, "qty": 0, "failed": ["book-paused"] },
+  { "name": "drawdown limit", "intent": {}, "book": { "equity": 8500 }, "ctx": {}, "ok": false, "qty": 0, "failed": ["book-paused"] },
+  { "name": "wide stop sizes down", "intent": { "stop": 80 }, "book": {}, "ctx": {}, "ok": true, "qty": 5, "failed": [] },
+  { "name": "blocked data", "intent": {}, "book": {}, "ctx": { "dataStatus": "blocked" }, "ok": false, "qty": 0, "failed": ["data-blocked"] },
+  { "name": "tight stop would need leverage", "intent": { "stop": 99.5 }, "book": {}, "ctx": {}, "ok": false, "qty": 0, "failed": ["notional"] }
+]

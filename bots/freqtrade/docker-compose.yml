@@ -1,4 +1,6 @@
 # Apex Freqtrade. Starts in DRY-RUN (paper) mode. Exchange keys come only from env, never from config.json.
+# Every command goes through launch.py, the second live switch: it refuses to trade live unless you turn that switch on
+# yourself, and refuses to start with an empty or placeholder API password. Do not call freqtrade directly here.
 services:
   freqtrade:
     image: freqtradeorg/freqtrade:stable
@@ -7,6 +9,7 @@ services:
     volumes:
       - ./user_data:/freqtrade/user_data
       - ../../engine:/apex-engine:ro
+      - ./launch.py:/apex/launch.py:ro
     ports:
       - "127.0.0.1:8080:8080"
     environment:
@@ -19,4 +22,7 @@ services:
       - FREQTRADE__TELEGRAM__ENABLED=${TELEGRAM_ENABLED:-false}
       - FREQTRADE__TELEGRAM__TOKEN=${TELEGRAM_TOKEN:-}
       - FREQTRADE__TELEGRAM__CHAT_ID=${TELEGRAM_CHAT_ID:-}
-    entrypoint: ["/bin/sh", "-c", "pip install --quiet -e /apex-engine && freqtrade trade --config /freqtrade/user_data/config.json --strategy ${FT_STRATEGY:-ApexTurtle}"]
+      # Passed through by name only, from the shell you start compose in; never given a value in this file.
+      - APEX_ALLOW_LIVE
+    entrypoint: ["/bin/sh", "-c", "pip install --quiet -e /apex-engine && exec python3 /apex/launch.py \"$$@\"", "launch"]
+    command: ["trade", "--config", "/freqtrade/user_data/config.json", "--strategy", "${FT_STRATEGY:-ApexTurtle}"]

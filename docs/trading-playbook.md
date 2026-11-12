@@ -1,6 +1,6 @@
 # Apex trading playbook
 
-This is every testable rule in the archive, boiled down. The method comes from archive/chat/75, and `.claude/agents/playbook-distiller.md` keeps it up to date. The tested status comes only from `docs/validation-results.md` (real data, run 2026-11-10), never from what a speaker claimed. **No rule here has a proven edge yet.** The closest is the chat/78 previous-range pullback, which passes all six checks on SPY and IWM intraday but still needs forward paper trading (see `docs/validation-results.md`). Profit screenshots in the videos are unproven.
+This is every testable rule in the archive, boiled down. The method comes from archive/chat/75, and `plugin/agents/playbook-distiller.md` keeps it up to date. The tested status comes only from `docs/validation-results.md` (real data, run 2026-11-10), never from what a speaker claimed. **No rule here has a proven edge yet.** The closest is the chat/78 previous-range pullback, which passes all six checks on SPY and IWM intraday but still needs forward paper trading (see `docs/validation-results.md`). Profit screenshots in the videos are unproven.
 
 The status tags mean:
 - **no edge**: tested, failed the checks.

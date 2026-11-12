@@ -1,0 +1,21 @@
+{
+ "title": "Turtle Breakout 55/20",
+ "sourceKind": "transcript",
+ "claims": [
+  { "text": "The strategy made 729% in profit in the TradingView backtest", "metric": "return", "value": 729, "unit": "%", "period": null, "evidence": { "quote": "729% in profit", "offset": 0 } },
+  { "text": "Win rate was 45%", "metric": "win_rate", "value": 45, "unit": "%", "period": null, "evidence": { "quote": "our win rate was only 45%", "offset": 0 } },
+  { "text": "Max drawdown was 3.29%", "metric": "drawdown", "value": 3.29, "unit": "%", "period": null, "evidence": { "quote": "our max draw down was 3.29%", "offset": 0 } }
+ ],
+ "ruleSets": [
+  { "name": "Turtle Breakout 55/20", "market": ["Bitcoin"], "timeframe": ["daily"], "direction": "long",
+    "entry": [{ "text": "Buy when the daily close is above the highest high of the previous 55 days", "evidence": { "quote": "we buy when the daily close is above the highest high of the previous 55 days", "offset": 0 } }],
+    "exit": [{ "text": "Sell when the daily close is below the lowest low of the previous 20 days", "evidence": { "quote": "sell when the daily close is below the lowest low of the previous 20 days", "offset": 0 } }],
+    "stop": { "text": "Stop two times ATR(20) below the signal day close", "evidence": { "quote": "two times the ATR below", "offset": 0 } },
+    "target": null, "filters": [], "sizing": "Risk 1% of the account per trade", "assumptions": [], "ambiguity": "low" }
+ ],
+ "interpretations": [
+  { "ruleSet": 0, "label": "As stated: 55-day entry, 20-day exit, 2 ATR stop", "target": "template",
+    "template": { "id": "breakout_channel", "params": [{ "name": "entryN", "value": 55 }, { "name": "exitN", "value": 20 }, { "name": "atrStop", "value": 2 }] }, "spec": null, "unsupported": [] }
+ ],
+ "flags": []
+}

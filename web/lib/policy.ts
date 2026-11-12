@@ -6,8 +6,9 @@
 import { push, list, getJSON, setJSON } from './store';
 
 export type Trigger = 'person' | 'routine' | 'agent';
-export type Verb = 'read' | 'analyze' | 'write_file' | 'notify' | 'send' | 'pay' | 'sign' | 'delete' | 'order' | 'withdraw' | 'transfer' | 'shell' | 'browse';
-export type Action = { agent: string; verb: Verb; target?: string; trigger: Trigger; detail?: Record<string, unknown> };
+export type Verb = 'read' | 'analyze' | 'write_file' | 'notify' | 'send' | 'pay' | 'sign' | 'delete' | 'order' | 'withdraw' | 'transfer' | 'shell' | 'browse' | 'halt';
+/** `step` marks a later action of a job that was already counted: it is checked and logged like any other, and does not use up a second job. */
+export type Action = { agent: string; verb: Verb; target?: string; trigger: Trigger; detail?: Record<string, unknown>; step?: boolean };
 export type Rule = { id: string; effect: 'allow' | 'deny'; when: (a: Action) => boolean; why?: string };
 export type Verdict = { allow: boolean; needsApproval: boolean; rule: string; why: string };
 
@@ -51,14 +52,15 @@ export const purposeStale = (a: Agent) => (a.purposeFor ?? '') !== [...a.tools].
 /** Rules generated from the roster: an agent may use only its own tools, and only within its daily job budget. */
 export function rosterRules(roster: Agent[], usedToday: Record<string, number>): Rule[] {
   return [
-    { id: 'over-daily-budget', effect: 'deny', when: a => (usedToday[a.agent] ?? 0) >= (roster.find(r => r.id === a.agent)?.jobsPerDay ?? 0), why: 'daily job budget used up' },
+    { id: 'over-daily-budget', effect: 'deny', when: a => !a.step && (usedToday[a.agent] ?? 0) >= (roster.find(r => r.id === a.agent)?.jobsPerDay ?? 0), why: 'daily job budget used up' },
     { id: 'own-tools', effect: 'allow', when: a => Boolean(roster.find(r => r.id === a.agent)?.tools.includes(a.verb)), why: 'tool is on the agent card' },
   ];
 }
-/** Does this allowed action still wait for a yes? Money verbs never get here (always denied). */
+/** Does this allowed action still wait for a yes? Money verbs never get here (always denied). A halt never waits: it only makes things safer,
+ *  and there is no verb that releases one. */
 export function asks(agent: Agent | undefined, verb: Verb) {
   if (NEEDS_APPROVAL.includes(verb)) return true;
-  if (verb === 'read' || verb === 'analyze') return false;
+  if (verb === 'read' || verb === 'analyze' || verb === 'halt') return false;
   const lvl = agent?.approval ?? 'ask';
   return lvl === 'ask' || (lvl === 'auto_edits' && verb !== 'write_file');
 }
@@ -87,7 +89,7 @@ export async function gate(a: Action, extra: Rule[] = []) {
   const v = d.allow ? { ...d, needsApproval: d.needsApproval || asks(r.find(x => x.id === a.agent), a.verb) } : d;
   const row: AuditRow = { ts: Date.now(), agent: a.agent, verb: a.verb, target: a.target ? redact(a.target) : undefined, trigger: a.trigger, ...v, detail: clean(a.detail) };
   await push('agents:audit', row, 2000);                                        // the record exists before the action happens
-  if (v.allow && !v.needsApproval) { used[a.agent] = (used[a.agent] ?? 0) + 1; await setJSON(`agents:used:${day()}`, used); }
+  if (v.allow && !v.needsApproval && !a.step) { used[a.agent] = (used[a.agent] ?? 0) + 1; await setJSON(`agents:used:${day()}`, used); }
   return v;
 }
 export const audit = (n = 200) => list<AuditRow>('agents:audit', n);
