@@ -18,7 +18,7 @@ export default function LiveApproval({ slotKey, stage, sizePct, maxDays, checkli
   return (
     <form className="ax-confirm" onSubmit={go}>
       <p><strong>Approve {stage.replace('_', '-')} for this slot.</strong> This records your approval in the ledger and does nothing else. Nothing trades until lock 4 is opened on your own machine, with your own keys. There is no button for that, here or anywhere.</p>
-      <p className="ax-n">The program that would open lock 4 and place orders is not built yet, so today this approval cannot lead to a live order.</p>
+      <p className="ax-n">The executor that opens lock 4 runs only on your machine, rehearses by default, and has no live broker adapter yet, so today this approval cannot lead to a live order.</p>
       {checklist.map(([k, text]) => <label key={k} className="ax-tick"><input type="checkbox" checked={ticked.includes(k)} onChange={e => setTicked(t => e.target.checked ? [...t, k] : t.filter(x => x !== k))} /> {text}</label>)}
       <label htmlFor={`${id}-c`}>Size cap, as a percent of the paper-sized risk (at most {sizePct}).</label>
       <input id={`${id}-c`} inputMode="decimal" value={cap} onChange={e => setCap(e.target.value)} autoComplete="off" />

@@ -46,12 +46,22 @@ jobs:
             echo "Apex state: the paper ledger, refreshed bars and daily reports. Written by the nightly workflow. Do not edit by hand." > .apex-state/README.md
           fi
           mkdir -p "$APEX_STATE_DIR"
+          # No run can be going yet (one nightly at a time), so a run.lock found here was left by a killed run. Clear it.
+          rm -f "$APEX_STATE_DIR/run.lock"
       - name: the ledger chain is intact before anything is added
         run: npm run -s apex -- ledger verify
       - name: refresh bars
-        run: npm run -s apex -- data pull
+        id: pull
+        # --strict: exit 4 on a missing key or any provider problem. The night goes on so state is saved; the last step goes red.
+        continue-on-error: true
+        run: npm run -s apex -- data pull --strict
       - name: validator
-        run: npm run -s apex -- validate
+        id: validator
+        # An andon from the validator (exit 3) no longer skips the run: the run reads the halt and opens nothing. The last step goes red.
+        run: |
+          code=0; npm run -s apex -- validate || code=$?
+          if [ "$code" = 3 ]; then echo "andon=yes" >> "$GITHUB_OUTPUT"; exit 0; fi
+          exit $code
       - name: run
         run: |
           # The first run ever is the plan-approved seed batch (P1.13): every pair once. After that, a budgeted tick.
@@ -66,9 +76,23 @@ jobs:
       - name: save state
         if: always()
         run: |
+          # A run killed mid-way leaves its lock behind. Never commit it: it would hold the lock on the next night.
+          rm -f "$APEX_STATE_DIR/run.lock"
           cd .apex-state
           git config user.name "apex-nightly" && git config user.email "apex-nightly@users.noreply.github.com"
           git add -A
           git diff --cached --quiet && { echo "nothing to save"; exit 0; }
           git commit -q -m "nightly state $(date -u +%Y-%m-%d)"
           git push origin HEAD:apex-state
+      - name: Check the paper clock is moving
+        # Red here makes GitHub email Jeremy: the pull was not complete, the newest bar is too old, or the validator pulled the andon.
+        if: ${{ !cancelled() }}
+        env:
+          PULL: ${{ steps.pull.outcome }}
+          ANDON: ${{ steps.validator.outputs.andon }}
+        run: |
+          bad=0
+          if [ "$PULL" != "success" ]; then echo "::error::The bar refresh did not complete ($PULL). Without new bars the forward clock does not move. docs/runbooks/run-failed.md"; bad=1; fi
+          if [ "$ANDON" = "yes" ]; then echo "::error::The validator pulled the andon cord. No new paper entries open until Jeremy resumes on the dashboard. docs/runbooks/validator-disagrees.md"; bad=1; fi
+          npm run -s apex -- data fresh --max-age-hours 36 || bad=1
+          exit $bad

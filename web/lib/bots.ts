@@ -1,4 +1,5 @@
 import { getJSON, setJSON, push, list } from './store';
+import { botCommand, type Cord } from './andon';
 export type BotInfo = { id: string; kind: string; name: string; mode: string; source: string; run: string; lastSeen?: number; status?: any };
 // Every bot Apex ships. They show as "not connected" until they send their first heartbeat to /api/ingest.
 export const CATALOG: BotInfo[] = [
@@ -26,7 +27,42 @@ export async function upsertBot(b: Partial<BotInfo> & { id: string }) {
   await setJSON('bots', seen);
   return key;
 }
-export async function setCommand(id: string, command: string) { await setJSON(`cmd:${id}`, { command, at: Date.now() }); await push('events', { ts: Date.now(), bot: id, level: 'control', message: `command ${command} queued` }); }
-export async function takeCommand(id: string) { const c = await getJSON<any>(`cmd:${id}`, null); if (c) await setJSON(`cmd:${id}`, null); return c?.command ?? null; }
+// A dashboard command for one bot. It stays queued, and is handed out on every poll by that bot, until the bot acknowledges
+// it by its ref or a newer command replaces it. Nothing else reads it away: a heartbeat or trade report never touches it.
+export type BotCmd = 'pause' | 'resume' | 'kill';
+export type BotControl = { command: BotCmd; ref: string; at: number };
+export type CommandReply = { command: string | null; ref: string | null; halted: boolean; why: string | null };
+/** The catalog row a bot id belongs to: the same mapping upsertBot uses, so a command reaches the bot the dashboard row shows. */
+export const botKey = (id: string) => CATALOG.find(c => id === c.id || id.startsWith(c.id))?.id ?? id;
+const CMDS: readonly string[] = ['pause', 'resume', 'kill'];
+/** What a polling bot is told. Pure. A halt (kill switch or andon) wins and leaves the queued command in place for after release.
+ *  `halted` is true while the last dashboard command for this bot is pause or kill, acknowledged or not. */
+export function commandReply(killswitch: boolean, cord: Cord, ctl: BotControl | null, ackedRef: string | null): CommandReply {
+  const pending = ctl && ctl.ref !== ackedRef ? ctl : null, halt = killswitch || cord.on;
+  return { command: botCommand(killswitch, cord, pending?.command ?? null), ref: halt ? null : pending?.ref ?? null,
+    halted: halt || ctl?.command === 'pause' || ctl?.command === 'kill',
+    why: killswitch ? 'kill switch is on' : cord.on ? `andon cord: ${cord.reason ?? 'pulled'}` : ctl && ctl.command !== 'resume' ? `${ctl.command} from the dashboard` : null };
+}
+/** The last command for a bot. An older stored shape (no ref) still reads as pending; anything unreadable reads as pause. */
+export async function botControl(id: string): Promise<BotControl | null> {
+  const c = await getJSON<any>(`cmd:${botKey(id)}`, null);
+  if (!c) return null;
+  return { command: CMDS.includes(c.command) ? c.command : 'pause', ref: typeof c.ref === 'string' && c.ref ? c.ref : `c${Number(c.at) || 0}`, at: Number(c.at) || 0 };
+}
+export const ackedRef = (id: string) => getJSON<string | null>(`cmdack:${botKey(id)}`, null);
+export async function setCommand(id: string, command: string) {
+  const k = botKey(id), ref = globalThis.crypto.randomUUID();
+  await setJSON(`cmd:${k}`, { command, ref, at: Date.now() });
+  await push('events', { ts: Date.now(), bot: k, level: 'control', message: `command ${command} queued` });
+  return ref;
+}
+/** The bot says it has the command with this ref. A ref that is not the current one changes nothing. The ack is kept apart from
+ *  the command, so an ack racing a newer command can never overwrite or clear that newer command. */
+export async function ackCommand(id: string, ref: string): Promise<'acked' | 'stale'> {
+  const k = botKey(id), c = await botControl(k);
+  if (!c || !ref || c.ref !== ref) return 'stale';
+  if ((await ackedRef(k)) !== ref) { await setJSON(`cmdack:${k}`, ref); await push('events', { ts: Date.now(), bot: k, level: 'control', message: `command ${c.command} received by the bot` }); }
+  return 'acked';
+}
 export const events = (n = 100) => list<any>('events', n);
 export const trades = (n = 200) => list<any>('trades', n);

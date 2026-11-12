@@ -13,3 +13,5 @@ bots/research-council/reports/
 *.log
 .apex/
 *.tsbuildinfo
+bots/alpaca/daytrader/desk_day.json*
+bots/alpaca/daytrader/.desk_day.*

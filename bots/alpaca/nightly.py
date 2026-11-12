@@ -20,8 +20,10 @@ from apex_engine import indicators as ind  # noqa: E402
 from apex_engine.strategies import get  # noqa: E402
 from apex_engine.reporter import Reporter  # noqa: E402
 from broker import Alpaca, to_df, telegram  # noqa: E402
+from guard import Halted  # noqa: E402
 
 NY = ZoneInfo("America/New_York")
+BOT_ID = "alpaca-core-sleeves"
 STATE = os.path.join(HERE, "state.json")
 PAUSE = os.path.join(HERE, "pause")
 LOCK = os.path.join(HERE, ".lock")
@@ -105,8 +107,14 @@ def evening(api: Alpaca, cfg: dict, st: dict, send: bool, rep: Reporter):
         side = "buy" if diff > 0 else "sell"
         cid = f"apex-{today}-{t}-{side}"
         orders.append({"symbol": t, "qty": abs(diff), "side": side, "client_order_id": cid})
-    sent = []
+    sent, refused = [], ""
     if send:
+        try:  # ask before cancelling any stop, so a halt never leaves positions without their stops
+            api.gate()
+        except Halted as e:
+            refused = str(e)
+            rep.event("risk", f"orders refused: {refused}")
+    if send and not refused:
         open_ids = {o.get("client_order_id") for o in api.orders("all")}
         for o in api.orders("open"):  # Alpaca blocks a sell while a stop holds the shares: cancel sleeve stops first
             if o["type"] == "stop" and any(x["symbol"] == o["symbol"] and x["side"] == "sell" for x in orders):
@@ -114,14 +122,19 @@ def evening(api: Alpaca, cfg: dict, st: dict, send: bool, rep: Reporter):
         for o in orders:
             if o["client_order_id"] in open_ids:
                 continue
-            api.submit(o["symbol"], o["qty"], o["side"], "market", "opg", o["client_order_id"])
+            try:  # the broker asks the dashboard halt state before every order
+                api.submit(o["symbol"], o["qty"], o["side"], "market", "opg", o["client_order_id"])
+            except Halted as e:
+                refused = str(e)
+                rep.event("risk", f"orders refused: {refused}")
+                break
             sent.append(o)
     st["prev_equity"] = equity
     st["last_evening"] = today
     summary = (f"Apex evening {today} ({'PAPER' if api.paper else 'LIVE'}{'' if send else ', DRY RUN'})\n"
                f"{cfg['core']['engine']} {'above' if engine_up else 'below'} {cfg['core']['line']}d line -> core holds {core_hold}\n"
                f"volatile={volatile} slot={slot:.0%} borrow={'on' if allow_borrow else 'OFF (dd beyond backtest worst)'}"
-               f"{' | NEW TRADES BLOCKED' if block_new else ''}\n" + "\n".join(notes) +
+               f"{' | NEW TRADES BLOCKED' if block_new else ''}{f' | ORDERS REFUSED ({refused})' if refused else ''}\n" + "\n".join(notes) +
                "\nOrders: " + (", ".join(f"{o['side']} {o['qty']} {o['symbol']}" for o in (sent if send else orders)) or "none"))
     telegram(summary)
     rep.heartbeat({"equity": equity, "core_hold": core_hold, "engine_up": bool(engine_up), "volatile": bool(volatile),
@@ -139,7 +152,11 @@ def morning(api: Alpaca, cfg: dict, st: dict, send: bool):
         if t in stops and t not in have:
             px = float(p["avg_entry_price"]) * (1 - stops[t])
             if send:
-                api.submit(t, int(float(p["qty"])), "sell", "stop", "gtc", f"apex-stop-{today}-{t}", stop_price=px)
+                try:
+                    api.submit(t, int(float(p["qty"])), "sell", "stop", "gtc", f"apex-stop-{today}-{t}", stop_price=px)
+                except Halted as e:
+                    placed.append(f"{t} stop NOT placed ({e})")
+                    continue
             placed.append(f"{t} stop {px:.2f}")
     st["last_morning"] = today
     telegram(f"Apex morning {today}: " + (", ".join(placed) or "all positions already protected"))
@@ -155,8 +172,8 @@ def main():
     open(LOCK, "w").write(str(os.getpid()))
     try:
         cfg = json.load(open(os.path.join(HERE, "system.json")))
-        api, st = Alpaca(), load_state()
-        rep = Reporter("alpaca-core-sleeves", "alpaca", "ETF Core + Sleeves", "paper" if api.paper else "live")
+        api, st = Alpaca(BOT_ID), load_state()
+        rep = Reporter(BOT_ID, "alpaca", "ETF Core + Sleeves", "paper" if api.paper else "live")
         now = dt.datetime.now(NY)
         today = now.date().isoformat()
         try:

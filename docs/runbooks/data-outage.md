@@ -8,7 +8,7 @@ Nothing. A blocked dataset already stops its own slots from opening positions, a
 
 ## Steps
 1. Read the reason: `npm run apex -- data health`. The warnings say which check failed (gaps, a bad bar, a split that was not adjusted, too old).
-2. If it is only old, refresh: `npm run apex -- data pull`. This needs `MASSIVE_API_KEY`, which is a data key and cannot trade. The nightly workflow does this every night.
+2. If it is only old, refresh: `npm run apex -- data pull`. This needs `MASSIVE_API_KEY`, which is a data key and cannot trade. The nightly workflow does this every night, and ends red at its last step when the pull was not complete or a bar is too old (`run-failed.md`).
 3. If a check failed, compare with the second source named on the Data health screen, where one is configured.
 4. Never fill a gap by hand and never edit a bar file. A corrected pull makes a new data version, and the ledger records it.
 5. If a source is gone for good, the dataset stays blocked and its slots stay idle. Marking a dataset retired is not built yet.

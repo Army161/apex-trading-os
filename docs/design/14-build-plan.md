@@ -127,7 +127,7 @@ The shortest path to "the system runs by itself every day in paper and says plai
 | Apply branch protection and CODEOWNERS enforcement on the repo | P0.3 | Settings, two minutes |
 | Create the Vercel project `apex-trading-os` linked to the repo (the earlier attempt to create one from here was refused) | deploys | Then set env vars there himself |
 | Create the Supabase project (or approve creating it through the connector) and set `DATABASE_URL` and storage keys | P0.7 in production | The build can run on the memory driver and CI Postgres until then |
-| Set GitHub secrets (section 2 of `13`) | scheduled workflows | Data and paper keys only |
+| Set GitHub secrets (section 2 of `13`) | scheduled workflows | Data and paper keys only. `MASSIVE_API_KEY` is required for the nightly: without it no new bars arrive and the forward clock never moves |
 | Generate `APEX_SIGNOFF_KEY` on his own machine | sign-offs, lock 4 | Never in chat, never in the cloud |
 | Read and accept data terms (Tiingo or other), or choose another source | P2.3 | |
 | Decide on gamma exposure data | P2.7 | Open question |

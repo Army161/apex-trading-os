@@ -1,7 +1,7 @@
 # The validator disagrees
 
 ## How you notice
-A report or the Research queue lists "Validator disagreed on ...". A pair stays at "passed, pending validation". A paper slot moves to `paused_data` with the reason "re-validation no longer reproduces the locked result".
+A report or the Research queue lists "Validator disagreed on ...". A pair stays at "passed, pending validation". A paper slot moves to `paused_data` with the reason "re-validation no longer reproduces the locked result". When the validator pulls the andon cord, the nightly workflow still runs (opening nothing) and ends red at its last step with "The validator pulled the andon cord".
 
 ## Safe first step
 Nothing needs stopping. A pair that is not validated is never promoted, and a slot whose re-run no longer matches pauses itself.

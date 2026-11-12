@@ -1,5 +1,6 @@
 {
   "compilerOptions": { "target": "ES2022", "lib": ["ES2023"], "module": "esnext", "moduleResolution": "bundler", "strict": true, "noEmit": true,
     "skipLibCheck": true, "esModuleInterop": true, "resolveJsonModule": true, "isolatedModules": true, "types": ["node"], "allowImportingTsExtensions": true, "jsx": "react-jsx" },
-  "include": ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx", "packages/*/test/**/*.ts", "apps/cli/src/**/*.ts", "apps/cli/test/**/*.ts", "apps/proof/test/**/*.ts"]
+  "include": ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx", "packages/*/test/**/*.ts", "apps/cli/src/**/*.ts", "apps/cli/test/**/*.ts", "apps/proof/test/**/*.ts",
+    "apps/executor/src/**/*.ts", "apps/executor/test/**/*.ts"]
 }

@@ -1,5 +1,6 @@
-"""Minimal Alpaca REST client (stdlib only). PAPER endpoint is forced unless APEX_ALLOW_LIVE=yes AND
-ALPACA_LIVE=true are both set by you on your own machine."""
+"""Minimal Alpaca REST client (stdlib only). PAPER endpoint is forced unless you set both switches yourself, on your own
+machine: ALPACA_LIVE to true and APEX_ALLOW_LIVE to exactly yes. Every order (submit, bracket) first asks guard.check for the
+dashboard halt state of this bot; live mode refuses when that state cannot be read."""
 from __future__ import annotations
 
 import json
@@ -7,13 +8,16 @@ import os
 import urllib.parse
 import urllib.request
 
+import guard
+
 PAPER = "https://paper-api.alpaca.markets"
 LIVE = "https://api.alpaca.markets"
 DATA = "https://data.alpaca.markets"
 
 
 class Alpaca:
-    def __init__(self):
+    def __init__(self, bot_id: str = "", fetch=None):
+        self.bot_id, self._fetch = bot_id, fetch  # fetch: only tests hand one in
         self.key = os.environ.get("ALPACA_API_KEY", "")
         self.secret = os.environ.get("ALPACA_SECRET_KEY", "")
         live = os.environ.get("ALPACA_LIVE") == "true" and os.environ.get("APEX_ALLOW_LIVE") == "yes"
@@ -44,7 +48,14 @@ class Alpaca:
     def clock(self):
         return self._req("GET", f"{self.base}/v2/clock")
 
+    def gate(self):
+        """Raises guard.Halted when no order may go out now. Every order calls it; callers may also ask before other steps."""
+        if not self.bot_id:
+            raise guard.Halted("no bot id: cannot check the dashboard halt state, order refused")
+        guard.check(self.bot_id, self.paper, self._fetch)
+
     def submit(self, symbol, qty, side, type_="market", tif="day", client_order_id=None, stop_price=None, limit_price=None):
+        self.gate()
         body = {"symbol": symbol, "qty": str(qty), "side": side, "type": type_, "time_in_force": tif}
         if client_order_id:
             body["client_order_id"] = client_order_id
@@ -55,6 +66,7 @@ class Alpaca:
         return self._req("POST", f"{self.base}/v2/orders", body)
 
     def bracket(self, symbol, qty, side, take_profit, stop_loss, client_order_id=None):
+        self.gate()
         body = {"symbol": symbol, "qty": str(qty), "side": side, "type": "market", "time_in_force": "day", "order_class": "bracket",
                 "take_profit": {"limit_price": str(round(take_profit, 2))}, "stop_loss": {"stop_price": str(round(stop_loss, 2))}}
         if client_order_id:

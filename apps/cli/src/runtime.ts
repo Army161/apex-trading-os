@@ -18,7 +18,7 @@ import { createHash, createHmac } from 'node:crypto';
 import { createInterface } from 'node:readline';
 export type Env = Record<string, string | undefined>;
 /** `confirm` asks a person at the keyboard to type `expect`. It is absent when there is no real terminal, and commands that need a person refuse. */
-export type Ctx = { root: string; env: Env; stateDir: string; now: () => number; confirm?: (question: string, expect: string) => Promise<boolean>; fetch?: typeof fetch };
+export type Ctx = { root: string; env: Env; stateDir: string; now: () => number; confirm?: (question: string, expect: string) => Promise<boolean>; fetch?: typeof fetch; sleep?: (ms: number) => Promise<void> };
 export const makeCtx = (root: string, env: Env = process.env, now: () => number = Date.now): Ctx => ({ root, env, stateDir: env.APEX_STATE_DIR || join(root, '.apex'), now });
 
 export type Opened = { store: LedgerStore; kind: 'postgres' | 'file'; where: string; lock: () => Promise<(() => Promise<void>) | null>; saveReport: (id: string, at: number, md: string, summary: unknown) => Promise<string>; close: () => Promise<void> };
@@ -61,7 +61,9 @@ export async function pullData(ctx: Ctx, fetchFn: typeof fetch = fetch, sleep: (
       if (done.size > 1) await sleep(Math.ceil(60000 / adapter.rateLimit.perMinute) + 500);
       const r = await pullDataset({ ...spec, tf: spec.from?.tf ?? spec.tf, from: undefined }, adapter, { cacheDir, now: ctx.now(), sourcesMd });
       pulled.push(`${spec.symbol} ${spec.from?.tf ?? spec.tf}: ${r.added} new bars${r.restated.length ? `, ${r.restated.length} restated by the provider` : ''}`); }
-    catch (e) { problems.push(`${spec.symbol}: ${(e as Error).message.replace(key, '[key]')}`); }
+    catch (e) { const m = (e as Error).message.split(key).join('[key]');
+      // 401 and 403 are the provider refusing the key or the plan, not a passing fault: say so, so it is not waited out.
+      problems.push(`${spec.symbol} ${spec.from?.tf ?? spec.tf}: ${m}${/HTTP 40[13]\b/.test(m) ? ' (the provider refused the key, or the plan does not cover this symbol or timeframe)' : ''}`); }
   }
   return { pulled, problems };
 }

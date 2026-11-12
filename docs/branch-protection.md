@@ -24,11 +24,11 @@ Also, Settings, Actions, General: set workflow permissions to read by default. T
 
 ## Secrets for the nightly paper run
 
-Settings, Secrets and variables, Actions. All optional. None can trade.
+Settings, Secrets and variables, Actions. None can trade. `MASSIVE_API_KEY` is required; the others are optional.
 
 | Secret | What it does | Without it |
 |---|---|---|
-| `MASSIVE_API_KEY` | Fresh bars each night | The committed files are used, they go stale, and stale data cannot open paper orders |
+| `MASSIVE_API_KEY` | Fresh bars each night. Required | No new bars arrive, so no paper slot gets a new bar and the forward clock never moves. The nightly workflow ends red at its last step every night until it is set |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Short report each night | The report is saved on the `apex-state` branch and in the run summary |
 | `DATABASE_URL` | Postgres ledger | The file ledger on the `apex-state` branch is used |
 

@@ -7,6 +7,8 @@ npm run apex -- board --top 20         # results on past data
 npm run apex -- pair <strategy> <dataset>
 npm run apex -- ledger verify          # exit 4 if the chain is broken
 npm run apex -- doctor                 # config, ledger chain, fingerprints, data
+npm run apex -- data pull --strict     # refresh bars; exit 4 on a missing key or any provider problem
+npm run apex -- data fresh             # exit 4 when a slot's newest bar is older than 36 trading hours
 npm run apex -- run                    # one paper run: step paper slots, evaluate a few pairs, write the report
 npm run apex -- validate               # independent re-run of anything waiting
 npm run apex -- halt "why"             # pull the andon cord
@@ -33,6 +35,7 @@ Shell completion: `eval "$(apex completion bash)"`, `eval "$(apex completion zsh
 - `src/source.ts`: the three places an answer comes from. The text for each shape is `packages/sdk/src/text.ts`, shared with the MCP server. `src/tui.ts`: the full-screen view. `src/completion.ts`: the completion scripts.
 - `src/mcp.ts`: `apex mcp`, the stdio side of `packages/mcp`. Start it with `tsx` directly, not `npm run`, because standard output must carry only the protocol.
 - `src/runtime.ts`: the store, the data files, the run, Telegram and the sign-off. The nightly job uses it.
+- `src/fresh.ts`: the freshness check behind `data fresh`, pure. Age is counted in trading hours: weekends and full-day NYSE holidays do not count for stocks and ETFs, weekends not for currencies, every hour for crypto.
 - `test/snapshots/`: the text and JSON of every read command on the fixtures. After a wording change that is meant, run the tests once with `UPDATE_SNAPSHOTS=1` and commit the diff.
 
 ## Invariants
@@ -46,5 +49,6 @@ Shell completion: `eval "$(apex completion bash)"`, `eval "$(apex completion zsh
 - The full-screen view only reads. Its one write is the halt, which needs a typed reason and then the word `HALT`. No single key changes anything.
 - `--seed` and `--seed-if-empty` accept only an approved plan item (`plan:<id>`). They exempt a batch from the weekly trial budget and record why in each pre-registration.
 - One run at a time: a run takes the lock first and releases it at the end.
+- The nightly job's alarms fail closed. `data pull --strict` exits 4 when the key is missing, a provider refused or failed, or nothing was pulled. `data fresh` exits 4 when a dataset behind a slot that is not retired (before any slot, every registry dataset) has no bars, an unknown calendar, or a newest bar older than the limit. `data fresh` only reads.
 - A key is never printed. Telegram and data errors never include the URL or the key.
 - The command line never calls a model.

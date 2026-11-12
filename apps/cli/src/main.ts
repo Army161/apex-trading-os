@@ -17,6 +17,9 @@ import { SourceError, all, localSource, remoteSource, type Source } from './sour
 import * as R from '@apex/sdk/text';
 import { completion } from './completion';
 import { runTui } from './tui';
+import { checkFresh, freshScope } from './fresh';
+import { TF_MS } from '@apex/data/types';
+import { loadRegistry } from '@apex/data/registry';
 
 /** Every command there is. The shell completion is made from this, and a test holds it against the switch below, so a command
  *  cannot be added without being listed here with what it writes. `local` means it works only on this checkout's own ledger. */
@@ -34,7 +37,7 @@ export const COMMANDS: Record<string, Command> = {
   queue: { about: 'The weekly budget of tries', subs: ['list'] },
   costs: { about: 'The cost model in force' },
   report: { about: 'A run report', flags: ['list', 'id', 'date', 'send'] },
-  data: { about: 'Data health, or pull new bars', subs: ['health', 'pull'], writes: 'refreshed bars in the state folder (pull only)' },
+  data: { about: 'Data health, pull new bars, or check the newest bar is recent', subs: ['health', 'pull', 'fresh'], flags: ['strict', 'max-age-hours'], writes: 'refreshed bars in the state folder (pull only)' },
   ledger: { about: 'Read and verify the ledger', subs: ['head', 'tail', 'show', 'verify', 'replay', 'anchor'], flags: ['n', 'kind', 'slot', 'from'] },
   strategies: { about: 'The strategy library and its fingerprints', subs: ['list', 'show', 'fingerprint'], flags: ['write', 'check'], writes: 'the fingerprint file (--write only)', local: true },
   claim: { about: 'Test the rules a source states', flags: ['extraction', 'kind', 'dry-run', 'request', 'wait'], writes: 'ledger entries' },
@@ -62,7 +65,8 @@ const HELP = `apex: paper-first trading research. Nothing here places a live ord
   apex book [--positions | --fills | --trades | --blocked]
   apex risk | queue | costs
   apex report [--list] [--id <run>] [--date YYYY-MM-DD] [--send telegram]
-  apex data health | pull              pull needs MASSIVE_API_KEY (a data key; it cannot trade)
+  apex data health | pull [--strict]   pull needs MASSIVE_API_KEY (a data key; it cannot trade). --strict exits 4 on any problem
+  apex data fresh [--max-age-hours N]  Exit 4 when a slot's newest bar is older than N trading hours (default 36)
   apex ledger head | tail [-n N] [--kind K] [--slot S] | show <seq> | verify [--from N] | replay | anchor
   apex strategies list | show <id> | fingerprint [--write | --check]
   apex claim <file | -> --extraction <json> [--kind transcript|pine|page|rules] [--dry-run]
@@ -86,7 +90,7 @@ Exit codes: 0 ok, 1 error, 2 usage, 3 halted or blocked, 4 verification failed.
 There is no \`apex resume\`: resuming is Jeremy's, on the dashboard.`;
 
 type Args = { _: string[]; flags: Record<string, string | boolean> };
-const SWITCHES = new Set(['full', 'dry-run', 'write', 'check', 'json', 'request', 'remote', 'local', 'fixtures', 'trades', 'intents', 'events', 'drift', 'positions', 'fills', 'blocked', 'wait', 'list', 'once', 'help']);
+const SWITCHES = new Set(['strict', 'full', 'dry-run', 'write', 'check', 'json', 'request', 'remote', 'local', 'fixtures', 'trades', 'intents', 'events', 'drift', 'positions', 'fills', 'blocked', 'wait', 'list', 'once', 'help']);
 export function parse(argv: string[]): Args {
   const a: Args = { _: [], flags: {} };
   for (let i = 0; i < argv.length; i++) { const x = argv[i];
@@ -193,8 +197,21 @@ async function dispatch(a: Args, ctx: Ctx, print: (s: string) => void): Promise<
       print(R.table([['venue', 'class', 'bucket', 'fee', 'half spread', 'slip', 'source', 'n'], ...PRIOR_COSTS.rows.map(r => [r.venue, r.assetClass, r.bucket, r.feeBps, r.halfSpreadBps, r.slipBps, r.source, r.n])])); return 0; }
 
     case 'data': {
-      if (sub === 'pull') { localOnly(); const r = await pullData(ctx); for (const x of r.pulled) print(`Pulled ${x}.`); for (const x of r.problems) print(`Problem: ${x}.`); if (!r.pulled.length && !r.problems.length) print('Nothing to pull.'); return 0; }
-      if (sub && sub !== 'health') throw new Usage('Usage: apex data health | pull');
+      if (sub === 'pull') { localOnly(); const r = await pullData(ctx, ctx.fetch, ctx.sleep); for (const x of r.pulled) print(`Pulled ${x}.`); for (const x of r.problems) print(`Problem: ${x}.`); if (!r.pulled.length && !r.problems.length) print('Nothing to pull.');
+        // --strict is for the nightly job: any problem, or nothing pulled at all, means no new bars and a forward clock that stands still.
+        if (a.flags.strict && (r.problems.length || !r.pulled.length)) { print(`Strict: the pull is not complete (${r.problems.length} ${r.problems.length === 1 ? 'problem' : 'problems'}, ${r.pulled.length} pulled). Exit 4: docs/runbooks/run-failed.md`); return 4; }
+        return 0; }
+      if (sub === 'fresh') { localOnly(); const max = num('max-age-hours', 36, 1, 24 * 30), now = ctx.now();
+        const slots = await withStore(entries => [...buildView(entries, cfg.paperCapital).slots.values()]), specs = loadRegistry(ctx.root).datasets, d = loadData(ctx);
+        const scope = freshScope(slots, specs.map(x => x.id)), r = checkFresh(scope.datasets.map(id => { const spec = specs.find(x => x.id === id), got = d.datasets.find(x => x.spec.id === id), bar = got?.bars[got.bars.length - 1];
+          return { dataset: id, calendar: spec?.calendar ?? null, lastClose: spec && bar ? bar.t + TF_MS[spec.tf] : null }; }), now, max);
+        if (json) { print(JSON.stringify({ ok: r.ok, basis: scope.basis, maxAgeHours: max, items: r.rows }, null, 1)); return r.ok ? 0 : 4; }
+        print(R.table([['dataset', 'newest bar closed', 'trading hours old', 'fresh'], ...r.rows.map(x => [x.dataset, R.when(x.lastClose === null ? null : new Date(x.lastClose).toISOString()), x.ageHours === null ? '-' : x.ageHours.toFixed(1), x.ok ? 'yes' : 'NO'])]));
+        const bad = r.rows.filter(x => !x.ok), what = scope.basis === 'slots' ? 'every dataset behind a slot' : 'every registry dataset (no slot is locked yet)';
+        for (const x of bad) print(`Stale: ${x.dataset}: ${x.why}.`);
+        print(r.ok ? `The paper clock is moving: ${what} has a bar from the last ${max} trading hours.` : `The paper clock is not moving for ${bad.length} of ${r.rows.length} datasets. Exit 4: docs/runbooks/run-failed.md`);
+        return r.ok ? 0 : 4; }
+      if (sub && sub !== 'health') throw new Usage('Usage: apex data health | pull [--strict] | fresh [--max-age-hours N]');
       // Away from a checkout the answer is what the last run recorded. In a checkout it is a fresh check of the files themselves.
       if (a.flags.fixtures || wantRemote) { const s = src(), rows = await all<DataHealth>(s, 'dataHealth'); await out(s, pageOf(rows), () => R.dataText(rows), false); return rows.some(r => r.status === 'blocked') ? 1 : 0; }
       const d = loadData(ctx), rows = d.datasets.map((x, i) => ({ dataset: x.spec.id, bars: x.bars.length, last: x.bars.length ? new Date(x.bars[x.bars.length - 1].t).toISOString() : null, status: d.health[i].status, tradable: d.health[i].tradable, notes: d.health[i].checks.filter(c => c.status !== 'ok').map(c => `${c.id}: ${c.detail}`) }));
